@@ -32,7 +32,7 @@ export default async function LearnLayout({ children }: { children: React.ReactN
               />
               <span className="leading-tight">
                 <span className="block font-display text-base font-extrabold uppercase tracking-tight text-forest-950">
-                  ITDS <span className="text-forest-500">·</span> E-Learning
+                  ITDS <span className="text-gold-500">·</span> E-Learning
                 </span>
                 <span className="hidden text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-soft sm:block">
                   Department of IT &amp; Decision Sciences · UENR
@@ -104,9 +104,9 @@ export default async function LearnLayout({ children }: { children: React.ReactN
           <nav className="scrollbar-hide -mx-1 mt-3 flex items-center gap-x-5 overflow-x-auto border-t border-forest-50 px-1 pt-3 text-sm">
             <Link
               href="/learn"
-              className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap font-bold text-forest-950 transition-colors hover:text-forest-600"
+              className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap font-bold text-forest-950 transition-colors hover:text-gold-600"
             >
-              <BookOpen className="h-4 w-4 text-forest-500" />
+              <BookOpen className="h-4 w-4 text-gold-500" />
               Home
             </Link>
             {subjects.map((s) => (
@@ -133,7 +133,7 @@ export default async function LearnLayout({ children }: { children: React.ReactN
           </p>
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 font-bold text-forest-600 transition-colors hover:text-forest-700"
+            className="inline-flex items-center gap-1.5 font-bold text-gold-600 transition-colors hover:text-gold-700"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Back to main website

@@ -7,7 +7,7 @@ import { requireRole } from "@/lib/auth";
 import { cn, formatDate } from "@/lib/utils";
 
 const inputClass =
-  "w-full rounded-lg border border-forest-200 bg-white px-3.5 py-2.5 text-sm text-forest-950 placeholder:text-ink-soft/60 outline-none transition-all focus:border-forest-500 focus:ring-2 focus:ring-forest-500/20";
+  "w-full rounded-lg border border-forest-200 bg-white px-3.5 py-2.5 text-sm text-forest-950 placeholder:text-ink-soft/60 outline-none transition-all focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20";
 
 export default async function ReviewQueuePage({
   searchParams,
@@ -21,7 +21,7 @@ export default async function ReviewQueuePage({
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
       <div>
-        <span className="inline-flex items-center gap-2 rounded-lg bg-forest-50 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-forest-600">
+        <span className="inline-flex items-center gap-2 rounded-lg bg-gold-50 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-gold-600">
           <ClipboardCheck className="h-4 w-4" />
           Review
         </span>
@@ -58,10 +58,10 @@ export default async function ReviewQueuePage({
             <li key={lesson.id}>
               <Link
                 href={`/learn/review/${lesson.id}`}
-                className="flex flex-wrap items-center gap-4 rounded-xl border border-forest-100 bg-white p-4 transition-all hover:-translate-y-0.5 hover:border-forest-300 hover:shadow-md"
+                className="flex flex-wrap items-center gap-4 rounded-xl border border-forest-100 bg-white p-4 transition-all hover:-translate-y-0.5 hover:border-gold-300 hover:shadow-md"
               >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-forest-50">
-                  <ClipboardCheck className="h-5 w-5 text-forest-600" />
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gold-50">
+                  <ClipboardCheck className="h-5 w-5 text-gold-600" />
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-bold text-forest-900">
@@ -74,7 +74,7 @@ export default async function ReviewQueuePage({
                 <span className="hidden shrink-0 text-xs text-ink-soft lg:block">
                   Submitted {formatDate(lesson.updatedAt)}
                 </span>
-                <span className="rounded-lg bg-forest-50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-forest-600">
+                <span className="rounded-lg bg-gold-50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-gold-600">
                   {LESSON_STATUS_LABEL[lesson.status]}
                 </span>
               </Link>
@@ -87,7 +87,7 @@ export default async function ReviewQueuePage({
       <div className="mt-14 grid gap-6 lg:grid-cols-2">
         <div className="rounded-2xl border border-forest-100 bg-white p-6">
           <h2 className="flex items-center gap-2 font-display text-lg font-extrabold text-forest-950">
-            <FolderPlus className="h-5 w-5 text-forest-500" />
+            <FolderPlus className="h-5 w-5 text-gold-500" />
             New subject
           </h2>
           <form action={createSubject} className="mt-4 space-y-3">
@@ -115,7 +115,7 @@ export default async function ReviewQueuePage({
 
         <div className="rounded-2xl border border-forest-100 bg-white p-6">
           <h2 className="flex items-center gap-2 font-display text-lg font-extrabold text-forest-950">
-            <ListPlus className="h-5 w-5 text-forest-500" />
+            <ListPlus className="h-5 w-5 text-gold-500" />
             New topic
           </h2>
           <form action={createTopic} className="mt-4 space-y-3">

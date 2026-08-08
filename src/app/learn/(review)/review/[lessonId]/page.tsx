@@ -41,7 +41,7 @@ export default async function ReviewLessonPage({
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <span className="inline-flex items-center gap-2 rounded-lg bg-forest-50 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-forest-600">
+          <span className="inline-flex items-center gap-2 rounded-lg bg-gold-50 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-gold-600">
             <ClipboardCheck className="h-4 w-4" />
             In review
           </span>

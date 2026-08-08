@@ -24,7 +24,6 @@ export default async function SubjectPage({
         title={subject.name}
         subtitle={subject.description ?? undefined}
         crumbs={[{ label: "Home", href: "/" }, { label: "Learn", href: "/learn" }, { label: subject.name }]}
-        accent="forest"
       />
 
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
@@ -38,7 +37,7 @@ export default async function SubjectPage({
                 <h2 className="font-display text-lg font-extrabold uppercase tracking-tight text-white">
                   {topic.title}
                 </h2>
-                <span className="rounded-lg bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-forest-300">
+                <span className="rounded-lg bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-gold-400">
                   {topic.lessons.length} {topic.lessons.length === 1 ? "lesson" : "lessons"}
                 </span>
               </div>
@@ -47,15 +46,15 @@ export default async function SubjectPage({
                   <li key={lesson.id}>
                     <Link
                       href={`/learn/${subject.slug}/${topic.slug}/${lesson.slug}`}
-                      className="group flex items-center gap-4 px-6 py-4 transition-colors hover:bg-forest-50/60"
+                      className="group flex items-center gap-4 px-6 py-4 transition-colors hover:bg-gold-50/60"
                     >
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-forest-50 text-sm font-extrabold text-forest-700 transition-colors group-hover:bg-forest-600 group-hover:text-white">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-forest-50 text-sm font-extrabold text-forest-700 transition-colors group-hover:bg-gold-500 group-hover:text-white">
                         {i + 1}
                       </span>
-                      <span className="flex-1 font-semibold text-forest-900 group-hover:text-forest-700">
+                      <span className="flex-1 font-semibold text-forest-900 group-hover:text-gold-700">
                         {lesson.title}
                       </span>
-                      <PlayCircle className="h-5 w-5 text-forest-300 transition-colors group-hover:text-forest-600" />
+                      <PlayCircle className="h-5 w-5 text-forest-300 transition-colors group-hover:text-gold-500" />
                     </Link>
                   </li>
                 ))}
@@ -79,7 +78,7 @@ export default async function SubjectPage({
 
         <Link
           href="/learn"
-          className="mt-10 inline-flex items-center gap-1.5 text-sm font-bold text-forest-600 hover:text-forest-700"
+          className="mt-10 inline-flex items-center gap-1.5 text-sm font-bold text-gold-600 hover:text-gold-700"
         >
           <ChevronRight className="h-4 w-4 rotate-180" />
           All subjects

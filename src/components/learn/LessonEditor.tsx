@@ -74,7 +74,7 @@ const blockLabels: Record<ContentBlock["type"], string> = {
 };
 
 const inputClass =
-  "w-full rounded-lg border border-forest-200 bg-white px-3.5 py-2.5 text-sm text-forest-950 placeholder:text-ink-soft/60 outline-none transition-all focus:border-forest-500 focus:ring-2 focus:ring-forest-500/20";
+  "w-full rounded-lg border border-forest-200 bg-white px-3.5 py-2.5 text-sm text-forest-950 placeholder:text-ink-soft/60 outline-none transition-all focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20";
 
 function SectionCard({
   step,
@@ -92,7 +92,7 @@ function SectionCard({
   return (
     <section className="rounded-2xl border border-forest-100 bg-white p-6 sm:p-8">
       <div className="flex items-start gap-3">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-forest-600 font-display text-sm font-extrabold text-white">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gold-500 font-display text-sm font-extrabold text-white">
           {step}
         </span>
         <div>
@@ -186,7 +186,7 @@ export default function LessonEditor({ lesson }: { lesson: EditorLesson }) {
             lesson.status === "PUBLISHED"
               ? "bg-emerald-50 text-emerald-700"
               : lesson.status === "IN_REVIEW"
-                ? "bg-forest-50 text-forest-600"
+                ? "bg-gold-50 text-gold-600"
                 : lesson.status === "CHANGES_REQUESTED"
                   ? "bg-red-50 text-red-600"
                   : "bg-stone-100 text-stone-600"
@@ -203,7 +203,7 @@ export default function LessonEditor({ lesson }: { lesson: EditorLesson }) {
       )}
 
       {lesson.status === "PUBLISHED" && (
-        <p className="mb-6 rounded-xl border border-forest-200 bg-forest-50 px-5 py-3.5 text-sm font-medium text-forest-700">
+        <p className="mb-6 rounded-xl border border-gold-200 bg-gold-50 px-5 py-3.5 text-sm font-medium text-gold-700">
           This lesson is <strong>live</strong>. Saving will create a draft revision —
           students keep seeing the current published version until your revision is
           approved.
@@ -211,14 +211,14 @@ export default function LessonEditor({ lesson }: { lesson: EditorLesson }) {
       )}
 
       {locked && (
-        <p className="mb-6 rounded-xl border border-forest-200 bg-forest-50 px-5 py-3.5 text-sm font-medium text-forest-700">
+        <p className="mb-6 rounded-xl border border-gold-200 bg-gold-50 px-5 py-3.5 text-sm font-medium text-gold-700">
           This lesson is awaiting review and cannot be edited right now.
         </p>
       )}
 
       <fieldset disabled={locked} className="space-y-6 disabled:opacity-70">
         {/* 1. Title */}
-        <SectionCard step={1} icon={<Heading2 className="h-5 w-5 text-forest-500" />} title="Title">
+        <SectionCard step={1} icon={<Heading2 className="h-5 w-5 text-gold-500" />} title="Title">
           <input
             name="title"
             required
@@ -232,7 +232,7 @@ export default function LessonEditor({ lesson }: { lesson: EditorLesson }) {
         {/* 2. Objective */}
         <SectionCard
           step={2}
-          icon={<Target className="h-5 w-5 text-forest-500" />}
+          icon={<Target className="h-5 w-5 text-gold-500" />}
           title="Learning objective"
           hint="One sentence: what the student will be able to do after this lesson."
         >
@@ -249,7 +249,7 @@ export default function LessonEditor({ lesson }: { lesson: EditorLesson }) {
         {/* 3. Content body */}
         <SectionCard
           step={3}
-          icon={<Quote className="h-5 w-5 text-forest-500" />}
+          icon={<Quote className="h-5 w-5 text-gold-500" />}
           title="Content body"
           hint="Explain the concept in structured blocks — headings, paragraphs, code and lists."
         >
@@ -338,7 +338,7 @@ export default function LessonEditor({ lesson }: { lesson: EditorLesson }) {
                         rows={5}
                         placeholder="Code…"
                         spellCheck={false}
-                        className="w-full rounded-lg border border-forest-800 bg-forest-950 p-3.5 font-mono text-[13px] text-emerald-100 placeholder:text-emerald-100/40 outline-none focus:ring-2 focus:ring-forest-500/40"
+                        className="w-full rounded-lg border border-forest-800 bg-forest-950 p-3.5 font-mono text-[13px] text-emerald-100 placeholder:text-emerald-100/40 outline-none focus:ring-2 focus:ring-gold-500/40"
                       />
                     </div>
                   )}
@@ -346,7 +346,7 @@ export default function LessonEditor({ lesson }: { lesson: EditorLesson }) {
                     <div className="space-y-2">
                       {(block as { items: string[] }).items.map((item, j) => (
                         <div key={j} className="flex gap-2">
-                          <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-forest-500" />
+                          <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gold-500" />
                           <input
                             value={item}
                             onChange={(e) =>
@@ -382,7 +382,7 @@ export default function LessonEditor({ lesson }: { lesson: EditorLesson }) {
                             items: [...(block as { items: string[] }).items, ""],
                           })
                         }
-                        className="inline-flex items-center gap-1.5 text-xs font-bold text-forest-600 hover:text-forest-700"
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-gold-600 hover:text-gold-700"
                       >
                         <Plus className="h-3.5 w-3.5" /> Add item
                       </button>
@@ -399,7 +399,7 @@ export default function LessonEditor({ lesson }: { lesson: EditorLesson }) {
                   key={type}
                   type="button"
                   onClick={() => addBlock(type)}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-forest-200 bg-white px-3 py-2 text-xs font-bold text-ink-soft transition-all hover:-translate-y-0.5 hover:border-forest-400 hover:text-forest-700 hover:shadow-sm"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-forest-200 bg-white px-3 py-2 text-xs font-bold text-ink-soft transition-all hover:-translate-y-0.5 hover:border-gold-400 hover:text-gold-700 hover:shadow-sm"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   {blockLabels[type]}
@@ -412,7 +412,7 @@ export default function LessonEditor({ lesson }: { lesson: EditorLesson }) {
         {/* 4. Worked example / playground */}
         <SectionCard
           step={4}
-          icon={<MonitorPlay className="h-5 w-5 text-forest-500" />}
+          icon={<MonitorPlay className="h-5 w-5 text-gold-500" />}
           title="Code playground"
           hint="Optional — programming lessons get an embedded runnable editor (Phase 2)."
         >
@@ -422,7 +422,7 @@ export default function LessonEditor({ lesson }: { lesson: EditorLesson }) {
               name="hasPlayground"
               checked={hasPlayground}
               onChange={(e) => setHasPlayground(e.target.checked)}
-              className="h-4 w-4 rounded border-forest-300 accent-forest-600"
+              className="h-4 w-4 rounded border-forest-300 accent-gold-500"
             />
             <span className="text-sm font-semibold text-forest-900">
               Include a code playground with starter code
@@ -456,7 +456,7 @@ export default function LessonEditor({ lesson }: { lesson: EditorLesson }) {
                   defaultValue={lesson.starterCode ?? ""}
                   placeholder="print('Hello, world!')"
                   spellCheck={false}
-                  className="w-full rounded-lg border border-forest-800 bg-forest-950 p-3.5 font-mono text-[13px] text-emerald-100 placeholder:text-emerald-100/40 outline-none focus:ring-2 focus:ring-forest-500/40"
+                  className="w-full rounded-lg border border-forest-800 bg-forest-950 p-3.5 font-mono text-[13px] text-emerald-100 placeholder:text-emerald-100/40 outline-none focus:ring-2 focus:ring-gold-500/40"
                 />
               </div>
             </div>
@@ -466,7 +466,7 @@ export default function LessonEditor({ lesson }: { lesson: EditorLesson }) {
         {/* 5. Practice exercise */}
         <SectionCard
           step={5}
-          icon={<Dumbbell className="h-5 w-5 text-forest-500" />}
+          icon={<Dumbbell className="h-5 w-5 text-gold-500" />}
           title="Practice exercise"
           hint="Optional — a self-check prompt students work through."
         >
@@ -482,7 +482,7 @@ export default function LessonEditor({ lesson }: { lesson: EditorLesson }) {
         {/* 6. Quiz */}
         <SectionCard
           step={6}
-          icon={<List className="h-5 w-5 text-forest-500" />}
+          icon={<List className="h-5 w-5 text-gold-500" />}
           title="Quiz / check for understanding"
           hint="Optional — 1–3 short questions, self-graded for the student."
         >
@@ -516,7 +516,7 @@ export default function LessonEditor({ lesson }: { lesson: EditorLesson }) {
                         name={`answer-${qi}`}
                         checked={q.answer === oi}
                         onChange={() => updateQuestion(qi, { answer: oi })}
-                        className="h-4 w-4 accent-forest-600"
+                        className="h-4 w-4 accent-gold-500"
                         aria-label={`Mark option ${oi + 1} as correct`}
                       />
                       <input
@@ -554,7 +554,7 @@ export default function LessonEditor({ lesson }: { lesson: EditorLesson }) {
                 <button
                   type="button"
                   onClick={() => updateQuestion(qi, { options: [...q.options, ""] })}
-                  className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-forest-600 hover:text-forest-700"
+                  className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-gold-600 hover:text-gold-700"
                 >
                   <Plus className="h-3.5 w-3.5" /> Add option
                 </button>
@@ -563,7 +563,7 @@ export default function LessonEditor({ lesson }: { lesson: EditorLesson }) {
             <button
               type="button"
               onClick={addQuestion}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-forest-200 bg-white px-3 py-2 text-xs font-bold text-ink-soft transition-all hover:-translate-y-0.5 hover:border-forest-400 hover:text-forest-700"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-forest-200 bg-white px-3 py-2 text-xs font-bold text-ink-soft transition-all hover:-translate-y-0.5 hover:border-gold-400 hover:text-gold-700"
             >
               <Plus className="h-3.5 w-3.5" /> Add question
             </button>
@@ -583,7 +583,7 @@ export default function LessonEditor({ lesson }: { lesson: EditorLesson }) {
           <button
             type="submit"
             data-submit-review="true"
-            className="inline-flex items-center gap-2 rounded-xl bg-forest-600 px-6 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-forest-700 hover:shadow-lg hover:shadow-forest-600/25"
+            className="inline-flex items-center gap-2 rounded-xl bg-gold-500 px-6 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-gold-600 hover:shadow-lg hover:shadow-gold-500/25"
           >
             <Send className="h-4 w-4" />
             {lesson.status === "PUBLISHED"

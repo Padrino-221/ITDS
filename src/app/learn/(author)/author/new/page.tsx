@@ -12,7 +12,7 @@ export default async function NewLessonPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6">
-      <span className="inline-flex items-center gap-2 rounded-lg bg-forest-50 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-forest-600">
+      <span className="inline-flex items-center gap-2 rounded-lg bg-gold-50 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-gold-600">
         <FilePlus2 className="h-4 w-4" />
         Authoring
       </span>
@@ -50,7 +50,7 @@ export default async function NewLessonPage() {
             required
             minLength={3}
             placeholder="e.g. Your First Web Page"
-            className="w-full rounded-xl border border-forest-200 bg-white px-4 py-2.5 text-sm text-forest-950 placeholder:text-ink-soft/60 outline-none transition-all focus:border-forest-500 focus:ring-2 focus:ring-forest-500/20"
+            className="w-full rounded-xl border border-forest-200 bg-white px-4 py-2.5 text-sm text-forest-950 placeholder:text-ink-soft/60 outline-none transition-all focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20"
           />
         </div>
 

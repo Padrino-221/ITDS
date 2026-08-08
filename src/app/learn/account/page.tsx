@@ -21,7 +21,7 @@ export default async function LearnAccountPage() {
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <span className="inline-flex items-center gap-2 rounded-lg bg-forest-50 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-forest-600">
+          <span className="inline-flex items-center gap-2 rounded-lg bg-gold-50 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-gold-600">
             <GraduationCap className="h-4 w-4" />
             My Progress
           </span>
@@ -40,7 +40,7 @@ export default async function LearnAccountPage() {
       {/* Stats */}
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border border-forest-100 bg-white p-5">
-          <Trophy className="h-5 w-5 text-forest-500" />
+          <Trophy className="h-5 w-5 text-gold-500" />
           <p className="mt-3 font-display text-3xl font-extrabold text-forest-950">
             {myProgress.length}
           </p>
@@ -49,7 +49,7 @@ export default async function LearnAccountPage() {
           </p>
         </div>
         <div className="rounded-2xl border border-forest-100 bg-white p-5">
-          <Compass className="h-5 w-5 text-forest-500" />
+          <Compass className="h-5 w-5 text-gold-500" />
           <p className="mt-3 font-display text-3xl font-extrabold text-forest-950">
             {subjects.length}
           </p>
@@ -58,7 +58,7 @@ export default async function LearnAccountPage() {
           </p>
         </div>
         <div className="rounded-2xl border border-forest-100 bg-white p-5">
-          <GraduationCap className="h-5 w-5 text-forest-500" />
+          <GraduationCap className="h-5 w-5 text-gold-500" />
           <p className="mt-3 font-display text-3xl font-extrabold text-forest-950">
             {new Set(myProgress.map((p) => p.lesson.topic.subject.slug)).size}
           </p>
@@ -83,7 +83,7 @@ export default async function LearnAccountPage() {
           </p>
           <Link
             href="/learn"
-            className="mt-5 inline-flex items-center gap-2 rounded-lg bg-forest-950 px-5 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-forest-800"
+            className="mt-5 inline-flex items-center gap-2 rounded-lg bg-gold-500 px-5 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-gold-600"
           >
             Browse subjects <ArrowRight className="h-4 w-4" />
           </Link>
@@ -94,7 +94,7 @@ export default async function LearnAccountPage() {
             <li key={item.id}>
               <Link
                 href={`/learn/${item.lesson.topic.subject.slug}/${item.lesson.topic.slug}/${item.lesson.slug}`}
-                className="flex items-center gap-4 rounded-xl border border-forest-100 bg-white p-4 transition-all hover:-translate-y-0.5 hover:border-forest-300 hover:shadow-md"
+                className="flex items-center gap-4 rounded-xl border border-forest-100 bg-white p-4 transition-all hover:-translate-y-0.5 hover:border-gold-300 hover:shadow-md"
               >
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-50">
                   <CheckCircle2 className="h-5 w-5 text-emerald-600" />

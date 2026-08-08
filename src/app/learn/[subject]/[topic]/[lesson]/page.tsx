@@ -50,11 +50,11 @@ export default async function LessonPage({
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       {/* Breadcrumbs */}
       <nav className="flex flex-wrap items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-ink-soft">
-        <Link href="/learn" className="transition-colors hover:text-forest-600">
+        <Link href="/learn" className="transition-colors hover:text-gold-600">
           Learn
         </Link>
         <span className="text-forest-300">/</span>
-        <Link href={`/learn/${subject.slug}`} className="transition-colors hover:text-forest-600">
+        <Link href={`/learn/${subject.slug}`} className="transition-colors hover:text-gold-600">
           {subject.name}
         </Link>
         <span className="text-forest-300">/</span>
@@ -128,13 +128,13 @@ export default async function LessonPage({
             {prevLesson ? (
               <Link
                 href={`/learn/${subject.slug}/${topicSlug}/${prevLesson.slug}`}
-                className="group rounded-xl border border-forest-100 bg-white p-4 transition-all hover:border-forest-300 hover:shadow-md"
+                className="group rounded-xl border border-forest-100 bg-white p-4 transition-all hover:border-gold-300 hover:shadow-md"
               >
                 <span className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-ink-soft">
                   <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5" />
                   Previous
                 </span>
-                <span className="mt-1 block text-sm font-bold text-forest-900 group-hover:text-forest-700">
+                <span className="mt-1 block text-sm font-bold text-forest-900 group-hover:text-gold-700">
                   {prevLesson.title}
                 </span>
               </Link>
@@ -144,13 +144,13 @@ export default async function LessonPage({
             {nextLesson ? (
               <Link
                 href={`/learn/${subject.slug}/${topicSlug}/${nextLesson.slug}`}
-                className="group rounded-xl border border-forest-100 bg-white p-4 text-right transition-all hover:border-forest-300 hover:shadow-md"
+                className="group rounded-xl border border-forest-100 bg-white p-4 text-right transition-all hover:border-gold-300 hover:shadow-md"
               >
                 <span className="flex items-center justify-end gap-1 text-xs font-bold uppercase tracking-wider text-ink-soft">
                   Next
                   <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                 </span>
-                <span className="mt-1 block text-sm font-bold text-forest-900 group-hover:text-forest-700">
+                <span className="mt-1 block text-sm font-bold text-forest-900 group-hover:text-gold-700">
                   {nextLesson.title}
                 </span>
               </Link>
@@ -165,7 +165,7 @@ export default async function LessonPage({
           {/* Progress */}
           <div className="rounded-2xl border border-forest-100 bg-white p-5">
             <h3 className="flex items-center gap-2 font-display text-sm font-extrabold uppercase tracking-wider text-forest-950">
-              <ListChecks className="h-4 w-4 text-forest-500" />
+              <ListChecks className="h-4 w-4 text-gold-500" />
               Progress
             </h3>
             {session ? (
@@ -194,7 +194,7 @@ export default async function LessonPage({
               <p className="mt-3 text-sm leading-relaxed text-ink-soft">
                 <Link
                   href="/learn/account/signin"
-                  className="font-bold text-forest-600 hover:text-forest-700"
+                  className="font-bold text-gold-600 hover:text-gold-700"
                 >
                   Sign in
                 </Link>{" "}
@@ -206,7 +206,7 @@ export default async function LessonPage({
           {/* Topic lessons */}
           <div className="mt-5 rounded-2xl border border-forest-100 bg-white p-5">
             <h3 className="flex items-center gap-2 font-display text-sm font-extrabold uppercase tracking-wider text-forest-950">
-              <SignpostBig className="h-4 w-4 text-forest-500" />
+              <SignpostBig className="h-4 w-4 text-gold-500" />
               {lessonRow.topic.title}
             </h3>
             <ol className="mt-4 space-y-1">
