@@ -1,4 +1,4 @@
-import { requireAuth } from "@/lib/auth";
+import { requireRole } from "@/lib/auth";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 
 export const metadata = { title: "Admin" };
@@ -8,7 +8,9 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const user = await requireAuth();
+  // Only staff roles may use the admin panel. Students (who can self-register
+  // on /learn) and lecturers must NOT reach content management here.
+  const user = await requireRole(["ADMIN", "EDITOR"], "/staff-panel/login");
 
   return (
     <div className="flex min-h-dvh bg-stone-100">

@@ -43,6 +43,7 @@ const footerLinks = {
   resources: [
     { label: "Student Projects", href: "/projects" },
     { label: "IT Society", href: "/about/it-society" },
+    { label: "E-Learning Hub", href: "/learn" },
   ],
 };
 

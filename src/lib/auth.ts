@@ -12,12 +12,16 @@ const secret = () =>
     process.env.AUTH_SECRET ?? "itds-dev-secret-change-me-in-production"
   );
 
+export type SessionRole = "ADMIN" | "EDITOR" | "LECTURER" | "STUDENT";
+
 export type SessionUser = {
   id: string;
   name: string;
   email: string;
-  role: "ADMIN" | "EDITOR";
+  role: SessionRole;
 };
+
+const VALID_ROLES: SessionRole[] = ["ADMIN", "EDITOR", "LECTURER", "STUDENT"];
 
 export async function hashPassword(password: string): Promise<string> {
   return hash(password, 12);
@@ -65,24 +69,26 @@ export async function getSession(): Promise<SessionUser | null> {
 
   try {
     const { payload } = await jwtVerify(token, secret());
-    if (!payload.sub || typeof payload.name !== "string" || typeof payload.role !== "string") {
+    if (!payload.sub || typeof payload.name !== "string" || typeof payload.email !== "string") {
       return null;
     }
+    const role = payload.role as SessionRole;
+    if (!VALID_ROLES.includes(role)) return null;
     return {
       id: payload.sub,
       name: payload.name,
-      email: payload.email as string,
-      role: payload.role === "ADMIN" ? "ADMIN" : "EDITOR",
+      email: payload.email,
+      role,
     };
   } catch {
     return null;
   }
 }
 
-/** Guard for any authenticated admin/editor user. Redirects to login. */
-export async function requireAuth(): Promise<SessionUser> {
+/** Guard for any signed-in user. Redirects to the given login page. */
+export async function requireAuth(redirectTo = "/staff-panel/login"): Promise<SessionUser> {
   const user = await getSession();
-  if (!user) redirect("/staff-panel/login");
+  if (!user) redirect(redirectTo);
   return user;
 }
 
@@ -90,6 +96,20 @@ export async function requireAuth(): Promise<SessionUser> {
 export async function requireAdmin(): Promise<SessionUser> {
   const user = await requireAuth();
   if (user.role !== "ADMIN") redirect("/staff-panel");
+  return user;
+}
+
+/**
+ * Guard for any of the given roles. Unauthenticated users are sent to
+ * `loginPath`; authenticated users without a matching role are sent home.
+ */
+export async function requireRole(
+  roles: SessionRole[],
+  loginPath = "/learn/account/signin"
+): Promise<SessionUser> {
+  const user = await getSession();
+  if (!user) redirect(loginPath);
+  if (!roles.includes(user.role)) redirect("/learn");
   return user;
 }
 

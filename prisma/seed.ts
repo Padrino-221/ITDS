@@ -34,6 +34,28 @@ async function main() {
       role: Role.EDITOR,
     },
   });
+  const lecturerPassword = await hash("lecturer123", 12);
+  const studentPassword = await hash("student123", 12);
+  await prisma.user.upsert({
+    where: { email: "lecturer@itds.uenr.edu.gh" },
+    update: {},
+    create: {
+      name: "Dr. Yaw Anokye-Acheampong",
+      email: "lecturer@itds.uenr.edu.gh",
+      passwordHash: lecturerPassword,
+      role: Role.LECTURER,
+    },
+  });
+  await prisma.user.upsert({
+    where: { email: "student@itds.uenr.edu.gh" },
+    update: {},
+    create: {
+      name: "Ama Owusu",
+      email: "student@itds.uenr.edu.gh",
+      passwordHash: studentPassword,
+      role: Role.STUDENT,
+    },
+  });
 
   // ------------------------------------------------------------------
   // Settings
@@ -738,9 +760,128 @@ Thesis writing, Internal review, External examination, Thesis defense & viva voc
     }
   }
 
+  // ------------------------------------------------------------------
+  // E-Learning platform (/learn)
+  // ------------------------------------------------------------------
+  const lecturerUser = await prisma.user.findUniqueOrThrow({
+    where: { email: "lecturer@itds.uenr.edu.gh" },
+  });
+
+  const subjects = [
+    {
+      name: "Web Development",
+      slug: "web-development",
+      description:
+        "Build modern websites and web applications with HTML, CSS and JavaScript.",
+    },
+    {
+      name: "Python Programming",
+      slug: "python-programming",
+      description:
+        "Learn Python from first principles to writing real programs with confidence.",
+    },
+    {
+      name: "Networking & Security",
+      slug: "networking-security",
+      description:
+        "Understand how computer networks work — and how to keep them secure.",
+    },
+  ];
+
+  for (const s of subjects) {
+    await prisma.subject.upsert({
+      where: { slug: s.slug },
+      update: { name: s.name, description: s.description },
+      create: s,
+    });
+  }
+
+  const webDev = await prisma.subject.findUniqueOrThrow({ where: { slug: "web-development" } });
+  const python = await prisma.subject.findUniqueOrThrow({ where: { slug: "python-programming" } });
+
+  const topics = [
+    { subjectId: webDev.id, title: "HTML & CSS Basics", slug: "html-css-basics", order: 1 },
+    { subjectId: webDev.id, title: "JavaScript Fundamentals", slug: "javascript-fundamentals", order: 2 },
+    { subjectId: python.id, title: "Getting Started with Python", slug: "getting-started-python", order: 1 },
+  ];
+
+  for (const t of topics) {
+    await prisma.topic.upsert({
+      where: { subjectId_slug: { subjectId: t.subjectId, slug: t.slug } },
+      update: { title: t.title, order: t.order },
+      create: t,
+    });
+  }
+
+  const htmlTopic = await prisma.topic.findFirstOrThrow({ where: { slug: "html-css-basics" } });
+
+  const sampleLesson = {
+    slug: "your-first-web-page",
+    title: "Your First Web Page",
+    objective:
+      "By the end of this lesson you will be able to create a basic HTML page and view it in a browser.",
+    contentBody: [
+      {
+        type: "paragraph",
+        text: "Every website you have visited is built from HTML — the HyperText Markup Language. HTML describes the structure of a page using tags.",
+      },
+      { type: "heading", text: "The anatomy of an HTML document", level: 2 },
+      {
+        type: "code",
+        language: "html",
+        code: `<!DOCTYPE html>\n<html>\n  <head>\n    <title>My First Page</title>\n  </head>\n  <body>\n    <h1>Hello, world!</h1>\n  </body>\n</html>`,
+      },
+      { type: "paragraph", text: "Let's break down each part:" },
+      {
+        type: "list",
+        items: [
+          "<!DOCTYPE html> declares the document type",
+          "<html> wraps the whole page",
+          "<head> holds metadata and the page title",
+          "<body> holds everything visible on the page",
+        ],
+      },
+    ],
+    quiz: [
+      {
+        question: "Which tag wraps the visible content of a page?",
+        options: ["<head>", "<body>", "<title>", "<html>"],
+        answer: 1,
+      },
+      {
+        question: "What does HTML stand for?",
+        options: [
+          "HyperText Markup Language",
+          "HighText Machine Language",
+          "Hyperlink and Text Markup Language",
+          "Home Tool Markup Language",
+        ],
+        answer: 0,
+      },
+    ],
+    exercisePrompt:
+      "Create a page with a heading, one paragraph about yourself, and a list of three things you want to learn this semester.",
+  };
+
+  const existingLesson = await prisma.lesson.findFirst({
+    where: { topicId: htmlTopic.id, slug: sampleLesson.slug },
+  });
+  if (existingLesson) {
+    await prisma.lesson.update({
+      where: { id: existingLesson.id },
+      data: { ...sampleLesson, status: "PUBLISHED", authorId: lecturerUser.id },
+    });
+  } else {
+    await prisma.lesson.create({
+      data: { ...sampleLesson, topicId: htmlTopic.id, order: 1, status: "PUBLISHED", authorId: lecturerUser.id },
+    });
+  }
+
   console.log("Seed complete ✅");
-  console.log("Admin login:  admin@itds.uenr.edu.gh / itds-admin123");
-  console.log("Editor login: editor@itds.uenr.edu.gh / editor123");
+  console.log("Admin login:   admin@itds.uenr.edu.gh / itds-admin123");
+  console.log("Editor login:  editor@itds.uenr.edu.gh / editor123");
+  console.log("Lecturer login: lecturer@itds.uenr.edu.gh / lecturer123");
+  console.log("Student login:  student@itds.uenr.edu.gh / student123");
 }
 
 main()

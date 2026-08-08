@@ -556,12 +556,15 @@ export async function createUser(formData: FormData) {
     throw new Error("A user with this email already exists.");
   }
 
+  const allowedRoles: Role[] = ["ADMIN", "EDITOR", "LECTURER"];
+  const safeRole = allowedRoles.includes(role) ? role : "EDITOR";
+
   await prisma.user.create({
     data: {
       name,
       email: email.toLowerCase(),
       passwordHash: await hashPassword(password),
-      role: role === "ADMIN" ? "ADMIN" : "EDITOR",
+      role: safeRole,
     },
   });
   revalidatePath("/staff-panel/users");
@@ -580,10 +583,12 @@ export async function deleteUser(id: string) {
 
 export async function updateUserRole(id: string, formData: FormData) {
   await requireAdmin();
-  const role = str(formData, "role");
+  const role = str(formData, "role") as Role;
+  const allowedRoles: Role[] = ["ADMIN", "EDITOR", "LECTURER"];
+  const safeRole = allowedRoles.includes(role) ? role : "EDITOR";
   await prisma.user.update({
     where: { id },
-    data: { role: role === "ADMIN" ? "ADMIN" : "EDITOR" },
+    data: { role: safeRole },
   });
   revalidatePath("/staff-panel/users");
 }

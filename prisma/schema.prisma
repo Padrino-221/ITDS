@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -32,15 +32,20 @@ model Program {
 enum Role {
   ADMIN
   EDITOR
+  LECTURER
+  STUDENT
 }
 
 model User {
-  id           String   @id @default(cuid())
-  name         String
-  email        String   @unique
-  passwordHash String
-  role         Role     @default(EDITOR)
-  createdAt    DateTime @default(now())
+  id              String        @id @default(cuid())
+  name            String
+  email           String        @unique
+  passwordHash    String
+  role            Role          @default(STUDENT)
+  createdAt       DateTime      @default(now())
+  authoredLessons Lesson[]      @relation("AuthoredLessons")
+  reviewedLessons Lesson[]      @relation("ReviewedLessons")
+  progress        UserProgress[]
 }
 
 model NewsPost {
@@ -124,4 +129,78 @@ model GalleryImage {
 model Setting {
   key   String @id
   value String
+}
+
+// ---------------------------------------------------------------------------
+// E-Learning platform (/learn)
+// ---------------------------------------------------------------------------
+
+enum LessonStatus {
+  DRAFT
+  IN_REVIEW
+  CHANGES_REQUESTED
+  PUBLISHED
+}
+
+model Subject {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  topics      Topic[]
+  createdAt   DateTime @default(now())
+}
+
+model Topic {
+  id        String   @id @default(cuid())
+  subjectId String
+  subject   Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  title     String
+  slug      String
+  order     Int      @default(0)
+  lessons   Lesson[]
+
+  @@unique([subjectId, slug])
+}
+
+model Lesson {
+  id              String       @id @default(cuid())
+  topicId         String
+  topic           Topic        @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  title           String
+  slug            String
+  objective       String       @default("")
+  contentBody     Json         @default("{}") // rich text / structured content
+  hasPlayground   Boolean      @default(false)
+  playgroundLang  String?
+  starterCode     String?
+  exercisePrompt  String?
+  quiz            Json?        // optional check-for-understanding
+  status          LessonStatus @default(DRAFT)
+  authorId        String
+  author          User         @relation("AuthoredLessons", fields: [authorId], references: [id])
+  reviewerId      String?
+  reviewer        User?        @relation("ReviewedLessons", fields: [reviewerId], references: [id])
+  reviewNote      String?
+  // Snapshot of the last PUBLISHED version, so authors can revise a live
+  // lesson without mutating it (spec §5.5).
+  publishedSnapshot Json?
+  progress        UserProgress[]
+  order           Int          @default(0)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@unique([topicId, slug])
+}
+
+model UserProgress {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId    String
+  lesson      Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+
+  @@unique([userId, lessonId])
 }

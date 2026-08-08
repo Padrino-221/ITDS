@@ -33,6 +33,7 @@ const NAV: NavItem[] = [
     ],
   },
   { label: "Lecturers", href: "/lecturers" },
+  { label: "Learn", href: "/learn" },
 ];
 
 const socialLinks = [

@@ -57,6 +57,7 @@ export default async function AdminUsersPage({
               defaultValue="EDITOR"
               options={[
                 { value: "EDITOR", label: "Editor — can manage content" },
+                { value: "LECTURER", label: "Lecturer — can author e-learning lessons" },
                 { value: "ADMIN", label: "Admin — full access" },
               ]}
             />
@@ -106,6 +107,7 @@ export default async function AdminUsersPage({
                   className="w-28"
                   options={[
                     { value: "EDITOR", label: "Editor" },
+                    { value: "LECTURER", label: "Lecturer" },
                     { value: "ADMIN", label: "Admin" },
                   ]}
                 />
