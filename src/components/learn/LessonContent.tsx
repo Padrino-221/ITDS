@@ -26,7 +26,7 @@ export default function LessonContent({ blocks }: { blocks: ContentBlock[] }) {
             );
           case "paragraph":
             return (
-              <p key={i} className="mt-3 leading-relaxed text-ink first:mt-0">
+              <p key={i} className="mt-3 break-words leading-relaxed text-ink first:mt-0">
                 {block.text}
               </p>
             );
@@ -41,7 +41,7 @@ export default function LessonContent({ blocks }: { blocks: ContentBlock[] }) {
             );
           case "list":
             return (
-              <ul key={i} className="mt-3 list-disc space-y-1.5 pl-5 text-ink">
+              <ul key={i} className="mt-3 list-disc space-y-1.5 break-words pl-5 text-ink">
                 {block.items.map((item, j) => (
                   <li key={j}>{item}</li>
                 ))}

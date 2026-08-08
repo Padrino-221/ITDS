@@ -22,7 +22,7 @@ export function PageHeader({
       />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {crumbs && crumbs.length > 0 && (
-          <nav className="mb-5 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-gold-400">
+          <nav className="mb-5 flex flex-wrap items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-gold-400">
             {crumbs.map((crumb, i) => (
               <span key={crumb.label} className="flex items-center gap-1.5">
                 {i > 0 && <ChevronRight className="h-3 w-3 text-white/40" />}
@@ -37,7 +37,7 @@ export function PageHeader({
             ))}
           </nav>
         )}
-        <h1 className="display-heading max-w-3xl text-4xl font-extrabold uppercase tracking-tight text-white text-balance sm:text-5xl">
+        <h1 className="display-heading max-w-3xl text-3xl font-extrabold uppercase tracking-tight text-white text-balance sm:text-4xl lg:text-5xl">
           {title}
         </h1>
         {subtitle && (

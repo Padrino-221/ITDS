@@ -31,7 +31,7 @@ export default async function LearnLayout({ children }: { children: React.ReactN
                 className="h-10 w-10 rounded-lg object-cover"
               />
               <span className="leading-tight">
-                <span className="block font-display text-base font-extrabold uppercase tracking-tight text-forest-950">
+                <span className="block font-display text-sm font-extrabold uppercase tracking-tight text-forest-950 sm:text-base">
                   ITDS <span className="text-gold-500">·</span> E-Learning
                 </span>
                 <span className="hidden text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-soft sm:block">
