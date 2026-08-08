@@ -5,6 +5,6 @@ export default async function LearnReviewLayout({
 }: {
   children: React.ReactNode;
 }) {
-  await requireRole(["ADMIN"], "/learn/account/signin");
+  await requireRole(["ADMIN"], "/staff-panel/login");
   return <>{children}</>;
 }

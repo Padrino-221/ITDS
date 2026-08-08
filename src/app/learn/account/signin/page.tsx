@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { BookOpen } from "lucide-react";
+import Link from "next/link";
+import { BookOpen, ShieldCheck } from "lucide-react";
 import { SignInForm } from "@/components/learn/AuthForms";
 
 export const metadata: Metadata = { title: "Sign in — ITDS E-Learning Hub" };
@@ -15,11 +16,21 @@ export default function SignInPage() {
           Welcome back
         </h1>
         <p className="mt-1 text-sm text-ink-soft">
-          Sign in to track your progress across the E-Learning Hub.
+          Sign in as a learner to track your progress across the E-Learning Hub.
         </p>
         <div className="mt-6">
           <SignInForm />
         </div>
+        <p className="mt-5 flex items-start gap-2 rounded-xl bg-forest-50 px-4 py-3 text-xs leading-relaxed text-ink-soft">
+          <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-forest-700" />
+          Staff and lecturers — sign in via the{" "}
+          <Link
+            href="/staff-panel/login"
+            className="font-bold text-forest-800 underline underline-offset-2 hover:text-gold-600"
+          >
+            Staff Panel
+          </Link>
+        </p>
       </div>
     </div>
   );

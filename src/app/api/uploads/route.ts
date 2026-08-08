@@ -2,7 +2,12 @@ import { NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { writeFile } from "fs/promises";
 import { getSession } from "@/lib/auth";
+import type { SessionRole } from "@/lib/auth";
 import { ensureUploadsDir, extForMime, MAX_UPLOAD_BYTES } from "@/lib/uploads";
+
+// Only staff accounts may upload files — students self-register on /learn and
+// must never be able to write to the server.
+const STAFF_ROLES: SessionRole[] = ["ADMIN", "EDITOR", "LECTURER"];
 
 // Raster formats only — SVG (and other XML-based "images") can carry scripts
 // and would be a stored-XSS vector if ever served/opened outside an <img>.
@@ -27,6 +32,12 @@ export async function POST(request: Request) {
   const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: "Not signed in." }, { status: 401 });
+  }
+  if (!STAFF_ROLES.includes(session.role)) {
+    return NextResponse.json(
+      { error: "Only staff accounts can upload files." },
+      { status: 403 }
+    );
   }
 
   let form: FormData;

@@ -91,6 +91,13 @@ export async function signin(prev: { error?: string }, formData: FormData) {
 
   const user = await authenticate(email, password);
   if (!user) return { error: "Invalid email or password." };
+  // This sign-in is for learners. Staff and lecturers use the Staff Panel
+  // sign-in (/staff-panel/login) — the same session then unlocks /learn/author.
+  if (user.role !== "STUDENT") {
+    return {
+      error: "This sign-in is for learners. Staff and lecturers sign in from the Staff Panel.",
+    };
+  }
   await createSession(user);
   redirect("/learn/account");
 }

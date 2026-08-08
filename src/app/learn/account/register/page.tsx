@@ -15,7 +15,7 @@ export default function RegisterPage() {
           Create your account
         </h1>
         <p className="mt-1 text-sm text-ink-soft">
-          Free and optional — used only to save your lesson progress.
+          For learners — free and optional, used only to save your lesson progress.
         </p>
         <div className="mt-6">
           <RegisterForm />
