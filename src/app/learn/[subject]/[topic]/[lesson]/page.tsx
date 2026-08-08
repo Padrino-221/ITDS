@@ -123,18 +123,21 @@ export default async function LessonPage({
             </div>
           )}
 
-          {/* Prev / next — compact buttons that fit their content */}
-          <div className="mt-12 flex flex-col gap-4 border-t border-forest-100 pt-8 sm:flex-row">
+          {/* Prev / next — side-by-side halves on mobile, compact on desktop */}
+          <div className="mt-12 grid grid-cols-2 gap-3 border-t border-forest-100 pt-8 sm:flex sm:items-start sm:gap-4">
             {prevLesson && (
               <Link
                 href={`/learn/${subject.slug}/${topicSlug}/${prevLesson.slug}`}
-                className="group rounded-xl border border-forest-100 bg-white p-4 transition-all hover:border-gold-300 hover:shadow-md"
+                className={cn(
+                  "group min-w-0 rounded-xl border border-forest-100 bg-white p-4 transition-all hover:border-gold-300 hover:shadow-md",
+                  !nextLesson && "col-span-2"
+                )}
               >
                 <span className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-ink-soft">
                   <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5" />
                   Previous
                 </span>
-                <span className="mt-1 block text-sm font-bold text-forest-900 group-hover:text-gold-700">
+                <span className="mt-1 block line-clamp-2 text-sm font-bold text-forest-900 group-hover:text-gold-700">
                   {prevLesson.title}
                 </span>
               </Link>
@@ -142,13 +145,16 @@ export default async function LessonPage({
             {nextLesson && (
               <Link
                 href={`/learn/${subject.slug}/${topicSlug}/${nextLesson.slug}`}
-                className="group ml-auto rounded-xl border border-forest-100 bg-white p-4 text-right transition-all hover:border-gold-300 hover:shadow-md"
+                className={cn(
+                  "group min-w-0 rounded-xl border border-forest-100 bg-white p-4 text-right transition-all hover:border-gold-300 hover:shadow-md",
+                  !prevLesson ? "col-span-2" : "sm:ml-auto"
+                )}
               >
                 <span className="flex items-center justify-end gap-1 text-xs font-bold uppercase tracking-wider text-ink-soft">
                   Next
                   <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                 </span>
-                <span className="mt-1 block text-sm font-bold text-forest-900 group-hover:text-gold-700">
+                <span className="mt-1 block line-clamp-2 text-sm font-bold text-forest-900 group-hover:text-gold-700">
                   {nextLesson.title}
                 </span>
               </Link>
