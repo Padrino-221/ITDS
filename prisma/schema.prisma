@@ -194,13 +194,18 @@ model Lesson {
 }
 
 model UserProgress {
-  id          String    @id @default(cuid())
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lessonId    String
-  lesson      Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  completed   Boolean   @default(false)
-  completedAt DateTime?
+  id             String    @id @default(cuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId       String
+  lesson         Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  completed      Boolean   @default(false)
+  completedAt    DateTime?
+  // Quiz best score tracking (one row per user+lesson, best score kept).
+  bestScore      Int?
+  bestScoreTotal Int?
+  attemptCount   Int       @default(0)
+  lastAttemptAt  DateTime?
 
   @@unique([userId, lessonId])
 }

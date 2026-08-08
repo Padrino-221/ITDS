@@ -91,6 +91,39 @@ const PUBLIC_LESSON_WHERE: Prisma.LessonWhereInput = {
   OR: [{ status: "PUBLISHED" }, { publishedSnapshot: { not: Prisma.DbNull } }],
 };
 
+/** Flatten structured content blocks into plain searchable text. */
+export function flattenBlocks(blocks: unknown): string {
+  if (!Array.isArray(blocks)) return "";
+  return (blocks as ContentBlock[])
+    .map((b) => {
+      switch (b.type) {
+        case "heading":
+        case "paragraph":
+          return b.text;
+        case "code":
+          return b.code;
+        case "list":
+          return b.items.join(" ");
+        default:
+          return "";
+      }
+    })
+    .filter(Boolean)
+    .join(" ");
+}
+
+/** Rough reading time in minutes (≈200 wpm). */
+export function readingMinutes(content: Pick<LessonContent, "objective" | "contentBody">): number {
+  const text = [
+    content.objective ?? "",
+    ...(content.contentBody ?? []).map((b) =>
+      b.type === "list" ? b.items.join(" ") : b.type === "code" ? b.code : b.text
+    ),
+  ].join(" ");
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 200));
+}
+
 // ---------------------------------------------------------------------------
 // Public queries
 // ---------------------------------------------------------------------------
@@ -125,6 +158,7 @@ export type LessonSearchResult = {
   title: string;
   slug: string;
   objective: string;
+  contentText: string;
   topicTitle: string;
   topicSlug: string;
   subjectName: string;
@@ -146,6 +180,7 @@ export const getAllPublishedLessons = cache(async (): Promise<LessonSearchResult
         title: true,
         slug: true,
         objective: true,
+        contentBody: true,
         publishedSnapshot: true,
         topic: {
           select: {
@@ -160,14 +195,17 @@ export const getAllPublishedLessons = cache(async (): Promise<LessonSearchResult
       rows.map((l) => {
         const snap =
           l.publishedSnapshot && typeof l.publishedSnapshot === "object"
-            ? (l.publishedSnapshot as { objective?: unknown })
+            ? (l.publishedSnapshot as { objective?: unknown; contentBody?: unknown })
             : null;
+        const liveBody = flattenBlocks(l.contentBody);
+        const snapBody = snap ? flattenBlocks(snap.contentBody) : "";
         return {
           id: l.id,
           title: l.title,
           slug: l.slug,
           objective:
             typeof snap?.objective === "string" ? snap.objective : l.objective,
+          contentText: [liveBody, snapBody].join(" "),
           topicTitle: l.topic.title,
           topicSlug: l.topic.slug,
           subjectName: l.topic.subject.name,
@@ -175,6 +213,17 @@ export const getAllPublishedLessons = cache(async (): Promise<LessonSearchResult
         };
       })
     )
+);
+
+/** Subject/topic/lesson slugs for every publicly visible lesson (SSG). */
+export const getAllLessonPaths = cache(async () =>
+  prisma.lesson.findMany({
+    where: PUBLIC_LESSON_WHERE,
+    select: {
+      slug: true,
+      topic: { select: { slug: true, subject: { select: { slug: true } } } },
+    },
+  })
 );
 
 const lessonSidebarSelect = {
@@ -262,6 +311,77 @@ export const getMyProgress = cache(async (userId: string) =>
   prisma.userProgress.findMany({
     where: { userId, completed: true },
     orderBy: { completedAt: "desc" },
+    include: { lesson: { include: { topic: { include: { subject: true } } } } },
+  })
+);
+
+export type ContinueLesson = {
+  lessonId: string;
+  title: string;
+  slug: string;
+  topicTitle: string;
+  topicSlug: string;
+  subjectName: string;
+  subjectSlug: string;
+  completed: number;
+  total: number;
+};
+
+/**
+ * The next incomplete lesson for each subject the learner has started — the
+ * "continue where you left off" list for the account dashboard.
+ */
+export const getContinueLessons = cache(
+  async (userId: string): Promise<ContinueLesson[]> => {
+    const subjects = await prisma.subject.findMany({
+      orderBy: { name: "asc" },
+      include: {
+        topics: {
+          orderBy: { order: "asc" },
+          include: {
+            lessons: {
+              where: PUBLIC_LESSON_WHERE,
+              orderBy: { order: "asc" },
+              select: { id: true, slug: true, title: true },
+            },
+          },
+        },
+      },
+    });
+    const completed = await getCompletedLessonIds(userId);
+
+    const out: ContinueLesson[] = [];
+    for (const s of subjects) {
+      const lessons = s.topics.flatMap((t) =>
+        t.lessons.map((l) => ({ ...l, topicTitle: t.title, topicSlug: t.slug }))
+      );
+      if (lessons.length === 0) continue;
+      const done = lessons.filter((l) => completed.has(l.id)).length;
+      if (done === 0 || done === lessons.length) continue;
+      const next = lessons.find((l) => !completed.has(l.id));
+      if (!next) continue;
+      out.push({
+        lessonId: next.id,
+        title: next.title,
+        slug: next.slug,
+        topicTitle: next.topicTitle,
+        topicSlug: next.topicSlug,
+        subjectName: s.name,
+        subjectSlug: s.slug,
+        completed: done,
+        total: lessons.length,
+      });
+    }
+    // Most-progressed subjects first, so the learner picks up near the finish line.
+    return out.sort((a, b) => b.completed / b.total - a.completed / a.total);
+  }
+);
+
+/** Lessons with a recorded quiz best score, for the account dashboard. */
+export const getQuizScores = cache(async (userId: string) =>
+  prisma.userProgress.findMany({
+    where: { userId, bestScore: { not: null } },
+    orderBy: { lastAttemptAt: "desc" },
     include: { lesson: { include: { topic: { include: { subject: true } } } } },
   })
 );

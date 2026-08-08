@@ -5,9 +5,7 @@ import { createSubject, createTopic } from "@/app/learn/actions";
 import { Select } from "@/components/admin/Dropdown";
 import { requireRole } from "@/lib/auth";
 import { cn, formatDate } from "@/lib/utils";
-
-const inputClass =
-  "w-full rounded-lg border border-forest-200 bg-white px-3.5 py-2.5 text-sm text-forest-950 placeholder:text-ink-soft/60 outline-none transition-all focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20";
+import { inputClass } from "@/lib/styles";
 
 export default async function ReviewQueuePage({
   searchParams,

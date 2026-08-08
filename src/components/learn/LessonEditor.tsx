@@ -18,6 +18,8 @@ import {
 import type { ContentBlock, QuizQuestion } from "@/lib/learn";
 import { saveLesson } from "@/app/learn/actions";
 import { cn } from "@/lib/utils";
+import { inputClass } from "@/lib/styles";
+import { Select } from "@/components/admin/Dropdown";
 
 type EditorLesson = {
   id: string;
@@ -72,9 +74,6 @@ const blockLabels: Record<ContentBlock["type"], string> = {
   code: "Code block",
   list: "Bullet list",
 };
-
-const inputClass =
-  "w-full rounded-lg border border-forest-200 bg-white px-3.5 py-2.5 text-sm text-forest-950 placeholder:text-ink-soft/60 outline-none transition-all focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20";
 
 function SectionCard({
   step,
@@ -434,17 +433,12 @@ export default function LessonEditor({ lesson }: { lesson: EditorLesson }) {
                 <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-ink-soft">
                   Language
                 </label>
-                <select
+                <Select
                   name="playgroundLang"
                   defaultValue={lesson.playgroundLang ?? "python"}
-                  className={cn(inputClass, "max-w-[220px]")}
-                >
-                  {LANGUAGES.map((lang) => (
-                    <option key={lang} value={lang}>
-                      {lang}
-                    </option>
-                  ))}
-                </select>
+                  options={LANGUAGES.map((lang) => ({ value: lang, label: lang }))}
+                  className="max-w-[220px]"
+                />
               </div>
               <div>
                 <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-ink-soft">

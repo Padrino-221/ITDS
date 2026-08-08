@@ -3,12 +3,14 @@
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { Prisma, Role } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
   authenticate,
   createSession,
   destroySession,
+  getSession,
   hashPassword,
   requireRole,
 } from "@/lib/auth";
@@ -18,6 +20,29 @@ import type { ContentBlock, QuizQuestion } from "@/lib/learn";
 
 const AUTHOR_ROLES: SessionRole[] = ["LECTURER", "EDITOR", "ADMIN"];
 const ADMIN_ROLES: SessionRole[] = ["ADMIN"];
+
+// ---------------------------------------------------------------------------
+// Auth rate limiting (in-memory sliding window — fine for a single instance)
+// ---------------------------------------------------------------------------
+
+const buckets = new Map<string, number[]>();
+
+function rateLimit(key: string, limit: number, windowMs: number): boolean {
+  const now = Date.now();
+  const recent = (buckets.get(key) ?? []).filter((t) => now - t < windowMs);
+  if (recent.length >= limit) {
+    buckets.set(key, recent);
+    return false;
+  }
+  recent.push(now);
+  buckets.set(key, recent);
+  return true;
+}
+
+async function clientIp(): Promise<string> {
+  const fwd = (await headers()).get("x-forwarded-for");
+  return fwd?.split(",")[0]?.trim() || "unknown";
+}
 
 function str(formData: FormData, key: string): string {
   const value = formData.get(key);
@@ -64,10 +89,19 @@ export async function register(prev: { error?: string }, formData: FormData) {
   const email = str(formData, "email");
   const password = str(formData, "password");
 
+  // Validate before rate-limiting so invalid submissions can't lock an email.
   if (name.length < 2) return { error: "Please enter your full name." };
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { error: "Enter a valid email address." };
   if (password.length < 8) {
     return { error: "Password must be at least 8 characters." };
+  }
+
+  // Slow down automated account creation.
+  if (!rateLimit(`register:${email.toLowerCase()}`, 3, 10 * 60 * 1000)) {
+    return { error: "Too many attempts for this email. Try again later." };
+  }
+  if (!rateLimit(`register-ip:${await clientIp()}`, 10, 10 * 60 * 1000)) {
+    return { error: "Too many sign-ups from this connection. Try again later." };
   }
 
   const existing = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
@@ -88,6 +122,14 @@ export async function register(prev: { error?: string }, formData: FormData) {
 export async function signin(prev: { error?: string }, formData: FormData) {
   const email = str(formData, "email");
   const password = str(formData, "password");
+
+  // Slow down credential stuffing against known accounts.
+  if (!rateLimit(`signin:${email.toLowerCase()}`, 8, 10 * 60 * 1000)) {
+    return { error: "Too many attempts. Try again in a few minutes." };
+  }
+  if (!rateLimit(`signin-ip:${await clientIp()}`, 20, 10 * 60 * 1000)) {
+    return { error: "Too many attempts. Try again in a few minutes." };
+  }
 
   const user = await authenticate(email, password);
   if (!user) return { error: "Invalid email or password." };
@@ -133,6 +175,54 @@ export async function toggleLessonComplete(lessonId: string) {
     });
   }
   revalidateLearn();
+}
+
+/**
+ * Record a self-graded quiz attempt. Keeps the best score per user+lesson.
+ * Anonymous learners are silently skipped (the quiz is still self-graded
+ * in the browser either way).
+ */
+export async function saveQuizScore(lessonId: string, score: number, total: number) {
+  const user = await getSession();
+  if (!user) return;
+  if (!Number.isInteger(score) || !Number.isInteger(total) || total < 1 || score < 0 || score > total) {
+    return;
+  }
+  const lesson = await prisma.lesson.findUnique({ where: { id: lessonId }, select: { id: true } });
+  if (!lesson) return;
+
+  const existing = await prisma.userProgress.findUnique({
+    where: { userId_lessonId: { userId: user.id, lessonId } },
+  });
+  if (existing) {
+    await prisma.userProgress.update({
+      where: { id: existing.id },
+      data: {
+        bestScore:
+          existing.bestScore == null || score > existing.bestScore ? score : existing.bestScore,
+        bestScoreTotal:
+          existing.bestScore == null || score > existing.bestScore
+            ? total
+            : existing.bestScoreTotal,
+        attemptCount: { increment: 1 },
+        lastAttemptAt: new Date(),
+      },
+    });
+  } else {
+    await prisma.userProgress.create({
+      data: {
+        userId: user.id,
+        lessonId,
+        completed: false,
+        bestScore: score,
+        bestScoreTotal: total,
+        attemptCount: 1,
+        lastAttemptAt: new Date(),
+      },
+    });
+  }
+  // Only the learner's dashboard changes — no need to bust every static lesson.
+  revalidatePath("/learn/account");
 }
 
 // ---------------------------------------------------------------------------

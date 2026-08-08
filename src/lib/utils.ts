@@ -8,6 +8,9 @@ export function slugify(input: string): string {
     .replace(/^-|-$/g, "");
 }
 
+/** Canonical production origin — single source for sitemaps and structured data. */
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://itdsuenr.com";
+
 export function formatDate(date: Date | string): string {
   const d = typeof date === "string" ? new Date(date) : date;
   return d.toLocaleDateString("en-GB", {

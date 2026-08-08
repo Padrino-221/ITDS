@@ -11,6 +11,7 @@ import {
   XCircle,
 } from "lucide-react";
 import LessonContent from "@/components/learn/LessonContent";
+import CodeBlock from "@/components/learn/CodeBlock";
 import { getLessonForAuthor, resolvePublishedContent } from "@/lib/learn";
 import { approveLesson, requestChanges } from "@/app/learn/actions";
 import { requireRole } from "@/lib/auth";
@@ -78,9 +79,7 @@ export default async function ReviewLessonPage({
               <MonitorPlay className="h-4 w-4 text-forest-500" />
               Playground ({content.playgroundLang ?? "code"})
             </h3>
-            <pre className="mt-3 overflow-x-auto rounded-xl bg-forest-950 p-4 text-[13px] text-emerald-100">
-              <code>{content.starterCode}</code>
-            </pre>
+            <CodeBlock code={content.starterCode} language={content.playgroundLang ?? undefined} />
           </div>
         )}
 

@@ -21,11 +21,37 @@ const ROLE_LABELS: Record<SessionRole, string> = {
 };
 
 const linkClass =
-  "inline-flex items-center gap-1.5 text-sm font-semibold text-ink-soft transition-colors hover:text-forest-900";
+  "inline-flex items-center gap-1.5 text-sm font-semibold text-ink-soft transition-colors hover:text-forest-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/40 rounded";
 
-export default function AccountMenu({ user }: { user: SessionUser }) {
+/**
+ * Header account area. Fetches the session client-side through the learn API
+ * so the /learn layout stays static (no server-side cookie/JWT work on every
+ * request). Shows a compact Sign in link when anonymous, the inline menu on
+ * desktop and a hamburger + dropdown on small screens when signed in.
+ */
+export default function AccountMenu() {
+  const [session, setSession] = useState<SessionUser | null>(null);
+  const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/learn/session", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (!cancelled) setSession((data?.user as SessionUser) ?? null);
+      })
+      .catch(() => {
+        if (!cancelled) setSession(null);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -45,6 +71,22 @@ export default function AccountMenu({ user }: { user: SessionUser }) {
     };
   }, [open]);
 
+  if (loading) {
+    return <span aria-hidden className="h-10 w-20 animate-pulse rounded-lg bg-forest-100" />;
+  }
+
+  if (!session) {
+    return (
+      <Link
+        href="/learn/account/signin"
+        className="rounded-lg bg-forest-950 px-4 py-2 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-forest-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/60"
+      >
+        Sign in
+      </Link>
+    );
+  }
+
+  const user = session;
   const staff = user.role !== "STUDENT";
 
   const accountLinks = staff ? (
@@ -94,7 +136,7 @@ export default function AccountMenu({ user }: { user: SessionUser }) {
         <form action={signout}>
           <button
             type="submit"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-forest-200 px-3 py-1.5 text-sm font-semibold text-ink-soft transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-forest-200 px-3 py-1.5 text-sm font-semibold text-ink-soft transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50"
           >
             <LogOut className="h-3.5 w-3.5" />
             Sign out
@@ -108,17 +150,19 @@ export default function AccountMenu({ user }: { user: SessionUser }) {
         onClick={() => setOpen((o) => !o)}
         aria-label={open ? "Close account menu" : "Open account menu"}
         aria-expanded={open}
-        className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-forest-200 text-ink-soft transition-colors hover:border-gold-400 hover:text-gold-700 sm:hidden"
+        aria-haspopup="menu"
+        className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-forest-200 text-ink-soft transition-colors hover:border-gold-400 hover:text-gold-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/50 sm:hidden"
       >
         {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-60 rounded-2xl border border-forest-100 bg-white p-2 shadow-xl animate-scale-in sm:hidden">
+        <div
+          role="menu"
+          className="absolute right-0 top-full z-50 mt-2 w-60 rounded-2xl border border-forest-100 bg-white p-2 shadow-xl animate-scale-in sm:hidden"
+        >
           <div className="border-b border-forest-50 px-3 pb-2.5 pt-1.5">
-            <p className="truncate text-sm font-bold text-forest-900">
-              {user.name}
-            </p>
+            <p className="truncate text-sm font-bold text-forest-900">{user.name}</p>
             <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-soft">
               {ROLE_LABELS[user.role]}
             </p>
@@ -128,7 +172,7 @@ export default function AccountMenu({ user }: { user: SessionUser }) {
             <form action={signout} className="pt-1.5">
               <button
                 type="submit"
-                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-ink-soft transition-colors hover:bg-red-50 hover:text-red-600"
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-ink-soft transition-colors hover:bg-red-50 hover:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50"
               >
                 <LogOut className="h-4 w-4" />
                 Sign out

@@ -3,9 +3,16 @@
 import { useState } from "react";
 import { CheckCircle2, XCircle } from "lucide-react";
 import type { QuizQuestion } from "@/lib/learn";
+import { saveQuizScore } from "@/app/learn/actions";
 import { cn } from "@/lib/utils";
 
-export default function QuizBlock({ questions }: { questions: QuizQuestion[] }) {
+export default function QuizBlock({
+  questions,
+  lessonId,
+}: {
+  questions: QuizQuestion[];
+  lessonId: string;
+}) {
   const [answers, setAnswers] = useState<(number | null)[]>(() =>
     questions.map(() => null)
   );
@@ -94,6 +101,8 @@ export default function QuizBlock({ questions }: { questions: QuizQuestion[] }) 
               setSubmitted(false);
             } else {
               setSubmitted(true);
+              // Persist the best score for signed-in learners (no-op when anonymous).
+              void saveQuizScore(lessonId, score, questions.length);
             }
           }}
           className="rounded-lg bg-forest-950 px-5 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-forest-800 hover:shadow-lg"

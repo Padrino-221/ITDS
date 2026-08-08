@@ -1,4 +1,5 @@
 import type { ContentBlock } from "@/lib/learn";
+import CodeBlock from "@/components/learn/CodeBlock";
 
 export default function LessonContent({ blocks }: { blocks: ContentBlock[] }) {
   if (!blocks.length) {
@@ -32,12 +33,7 @@ export default function LessonContent({ blocks }: { blocks: ContentBlock[] }) {
             );
           case "code":
             return (
-              <pre
-                key={i}
-                className="mt-4 overflow-x-auto rounded-xl bg-forest-950 p-4 text-[13px] leading-relaxed text-emerald-100"
-              >
-                <code>{block.code}</code>
-              </pre>
+              <CodeBlock key={i} code={block.code} language={block.language} />
             );
           case "list":
             return (

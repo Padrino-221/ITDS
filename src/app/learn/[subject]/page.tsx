@@ -1,12 +1,29 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { BookOpenCheck, ChevronRight, PlayCircle } from "lucide-react";
 import { PageHeader, EmptyState } from "@/components/ui";
 import { getSubjectWithTopics, getSubjects } from "@/lib/learn";
 
+export const revalidate = 3600;
+
 export async function generateStaticParams() {
   const subjects = await getSubjects();
   return subjects.map((s) => ({ subject: s.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ subject: string }>;
+}): Promise<Metadata> {
+  const { subject: slug } = await params;
+  const subject = await getSubjectWithTopics(slug);
+  if (!subject) return {};
+  return {
+    title: `${subject.name} — E-Learning`,
+    description: subject.description ?? `Lessons and topics for ${subject.name} on the ITDS E-Learning Hub.`,
+  };
 }
 
 export default async function SubjectPage({
@@ -18,8 +35,29 @@ export default async function SubjectPage({
   const subject = await getSubjectWithTopics(slug);
   if (!subject) notFound();
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    name: subject.name,
+    description: subject.description ?? undefined,
+    provider: {
+      "@type": "CollegeOrUniversity",
+      name: "Department of Information Technology and Decision Sciences, UENR",
+    },
+    inLanguage: "en",
+    hasCourseInstance: {
+      "@type": "CourseInstance",
+      courseMode: "online",
+      name: `${subject.name} on the ITDS E-Learning Hub`,
+    },
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <PageHeader
         title={subject.name}
         subtitle={subject.description ?? undefined}

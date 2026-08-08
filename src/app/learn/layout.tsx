@@ -2,11 +2,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, BookOpen } from "lucide-react";
 import { getSubjects } from "@/lib/learn";
-import { getSession } from "@/lib/auth";
 import AccountMenu from "@/components/learn/AccountMenu";
 
 export default async function LearnLayout({ children }: { children: React.ReactNode }) {
-  const [subjects, session] = await Promise.all([getSubjects(), getSession()]);
+  const subjects = await getSubjects();
 
   return (
     <div className="flex min-h-dvh flex-col bg-paper">
@@ -33,16 +32,8 @@ export default async function LearnLayout({ children }: { children: React.ReactN
             </Link>
 
             <div className="ml-auto flex items-center">
-              {session ? (
-                <AccountMenu user={session} />
-              ) : (
-                <Link
-                  href="/learn/account/signin"
-                  className="rounded-lg bg-forest-950 px-4 py-2 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-forest-800"
-                >
-                  Sign in
-                </Link>
-              )}
+              {/* Session is fetched client-side so this layout stays static */}
+              <AccountMenu />
             </div>
           </div>
 

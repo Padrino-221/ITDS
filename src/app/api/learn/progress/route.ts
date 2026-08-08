@@ -1,0 +1,18 @@
+import { NextResponse } from "next/server";
+import { getSession } from "@/lib/auth";
+import { getCompletedLessonIds } from "@/lib/learn";
+
+export const dynamic = "force-dynamic";
+
+/** Completed lesson ids for the signed-in learner (empty when anonymous). */
+export async function GET() {
+  const user = await getSession();
+  if (!user) {
+    return NextResponse.json({ completedIds: [] }, { headers: { "Cache-Control": "no-store" } });
+  }
+  const completedIds = await getCompletedLessonIds(user.id);
+  return NextResponse.json(
+    { completedIds: [...completedIds] },
+    { headers: { "Cache-Control": "no-store" } }
+  );
+}

@@ -79,7 +79,8 @@ export default function LearnCatalog({
     if (!terms.length) return [];
     return lessons.filter((l) => {
       const hay =
-        `${l.title} ${l.objective} ${l.topicTitle} ${l.subjectName}`.toLowerCase();
+        `${l.title} ${l.objective} ${l.contentText} ${l.topicTitle} ${l.subjectName}`
+          .toLowerCase();
       return terms.every((t) => hay.includes(t));
     });
   }, [lessons, terms]);

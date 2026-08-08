@@ -35,7 +35,20 @@ export function Dropdown({
 
   return (
     <div ref={ref} className="relative">
-      <div onClick={() => setOpen(!open)} className="cursor-pointer">
+      <div
+        onClick={() => setOpen(!open)}
+        onKeyDown={(e) => {
+          // Keyboard access for button-style triggers: Enter/Space already
+          // click the button, ArrowDown opens the menu. Escape closes it.
+          if (e.key === "ArrowDown") {
+            e.preventDefault();
+            setOpen(true);
+          } else if (e.key === "Escape") {
+            setOpen(false);
+          }
+        }}
+        className="cursor-pointer"
+      >
         {trigger}
       </div>
       {open && (
@@ -53,7 +66,7 @@ export function Dropdown({
                 setOpen(false);
               }}
               className={cn(
-                "flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm font-medium transition-colors",
+                "flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/40 focus-visible:bg-forest-50",
                 item.danger
                   ? "text-red-600 hover:bg-red-50"
                   : "text-ink hover:bg-forest-50"
