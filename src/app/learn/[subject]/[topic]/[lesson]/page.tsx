@@ -123,9 +123,9 @@ export default async function LessonPage({
             </div>
           )}
 
-          {/* Prev / next */}
-          <div className="mt-12 grid gap-4 border-t border-forest-100 pt-8 sm:grid-cols-2">
-            {prevLesson ? (
+          {/* Prev / next — compact buttons that fit their content */}
+          <div className="mt-12 flex flex-col gap-4 border-t border-forest-100 pt-8 sm:flex-row">
+            {prevLesson && (
               <Link
                 href={`/learn/${subject.slug}/${topicSlug}/${prevLesson.slug}`}
                 className="group rounded-xl border border-forest-100 bg-white p-4 transition-all hover:border-gold-300 hover:shadow-md"
@@ -138,13 +138,11 @@ export default async function LessonPage({
                   {prevLesson.title}
                 </span>
               </Link>
-            ) : (
-              <span />
             )}
-            {nextLesson ? (
+            {nextLesson && (
               <Link
                 href={`/learn/${subject.slug}/${topicSlug}/${nextLesson.slug}`}
-                className="group rounded-xl border border-forest-100 bg-white p-4 text-right transition-all hover:border-gold-300 hover:shadow-md"
+                className="group ml-auto rounded-xl border border-forest-100 bg-white p-4 text-right transition-all hover:border-gold-300 hover:shadow-md"
               >
                 <span className="flex items-center justify-end gap-1 text-xs font-bold uppercase tracking-wider text-ink-soft">
                   Next
@@ -154,8 +152,6 @@ export default async function LessonPage({
                   {nextLesson.title}
                 </span>
               </Link>
-            ) : (
-              <span />
             )}
           </div>
         </article>
