@@ -1,17 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, BookOpen, CircleUserRound, LogOut, PenLine, ShieldCheck } from "lucide-react";
+import { ArrowLeft, BookOpen } from "lucide-react";
 import { getSubjects } from "@/lib/learn";
 import { getSession } from "@/lib/auth";
-import type { SessionRole } from "@/lib/auth";
-import { signout } from "./actions";
-
-const ROLE_LABELS: Record<SessionRole, string> = {
-  STUDENT: "Learner",
-  LECTURER: "Lecturer",
-  EDITOR: "Editor",
-  ADMIN: "Administrator",
-};
+import AccountMenu from "@/components/learn/AccountMenu";
 
 export default async function LearnLayout({ children }: { children: React.ReactNode }) {
   const [subjects, session] = await Promise.all([getSubjects(), getSession()]);
@@ -40,55 +32,9 @@ export default async function LearnLayout({ children }: { children: React.ReactN
               </span>
             </Link>
 
-            <div className="ml-auto flex items-center gap-4">
+            <div className="ml-auto flex items-center">
               {session ? (
-                <>
-                  {/* Always show WHO is signed in, so the menu is never a mystery */}
-                  <div className="hidden text-right leading-tight sm:block">
-                    <p className="text-sm font-bold text-forest-900">{session.name}</p>
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-soft">
-                      {ROLE_LABELS[session.role]}
-                    </p>
-                  </div>
-                  <span className="hidden h-6 w-px bg-forest-100 sm:block" />
-                  {session.role === "STUDENT" ? (
-                    <Link
-                      href="/learn/account"
-                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink-soft transition-colors hover:text-forest-900"
-                    >
-                      <CircleUserRound className="h-4 w-4" />
-                      My Progress
-                    </Link>
-                  ) : (
-                    <>
-                      <Link
-                        href="/learn/author"
-                        className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink-soft transition-colors hover:text-forest-900"
-                      >
-                        <PenLine className="h-4 w-4" />
-                        Author
-                      </Link>
-                      {session.role === "ADMIN" && (
-                        <Link
-                          href="/learn/review"
-                          className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink-soft transition-colors hover:text-forest-900"
-                        >
-                          <ShieldCheck className="h-4 w-4" />
-                          Review
-                        </Link>
-                      )}
-                    </>
-                  )}
-                  <form action={signout}>
-                    <button
-                      type="submit"
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-forest-200 px-3 py-1.5 text-sm font-semibold text-ink-soft transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600"
-                    >
-                      <LogOut className="h-3.5 w-3.5" />
-                      Sign out
-                    </button>
-                  </form>
-                </>
+                <AccountMenu user={session} />
               ) : (
                 <Link
                   href="/learn/account/signin"
