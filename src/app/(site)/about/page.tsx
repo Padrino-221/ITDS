@@ -18,6 +18,19 @@ import type { AcronymValue, CoreValue, Highlight } from "@/lib/settings";
 
 const valueIcons = [Award, Route, Users, GraduationCap];
 
+export const metadata = {
+  title: "About Us",
+  description:
+    "Learn about the Department of Information Technology and Decision Sciences at UENR — our story, vision, mission, core values and the Student Project Management System (SPMS).",
+  alternates: { canonical: "/about" },
+  openGraph: {
+    type: "website",
+    url: "/about",
+    title: "About Us — ITDS UENR",
+    description: "The story, vision, mission and values of the ITDS Department at UENR.",
+  },
+};
+
 export default async function AboutPage() {
   const [story, vision, mission, coreValues, acronymValues, highlights] =
     await Promise.all([

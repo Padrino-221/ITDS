@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getPrograms, getProgramBySlug, DEGREE_LABELS } from "@/lib/data";
 import { ArrowLeft, BookOpen, Target, LayoutList, Mail } from "lucide-react";
+import { absoluteUrl } from "@/lib/utils";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -15,9 +16,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const program = await getProgramBySlug(slug);
   if (!program) return { title: "Programme Not Found" };
+  const degree = DEGREE_LABELS[program.degreeLevel];
+  const description = program.overview.split("\n")[0].substring(0, 160);
   return {
-    title: `${DEGREE_LABELS[program.degreeLevel]} — Programmes`,
-    description: program.overview.split("\n")[0].substring(0, 160),
+    title: `${degree} — Programmes`,
+    description,
+    alternates: { canonical: `/programs/${program.slug}` },
+    openGraph: {
+      type: "website",
+      title: `${degree} Programme — ITDS UENR`,
+      description,
+      url: absoluteUrl(`/programs/${program.slug}`),
+    },
   };
 }
 
@@ -52,6 +62,25 @@ export default async function ProgramPage({ params }: Props) {
   const program = await getProgramBySlug(slug);
   if (!program) notFound();
 
+  const degree = DEGREE_LABELS[program.degreeLevel];
+  const programJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "EducationalOccupationalProgram",
+    name: `${degree} Programme`,
+    url: absoluteUrl(`/programs/${program.slug}`),
+    description: program.overview.split("\n")[0].substring(0, 300),
+    educationalProgramMode: "onsite",
+    inLanguage: "en",
+    provider: {
+      "@type": "CollegeOrUniversity",
+      name: "University of Energy and Natural Resources (UENR)",
+      department: {
+        "@type": "Organization",
+        name: "Department of Information Technology and Decision Sciences",
+      },
+    },
+  };
+
   const sections = [
     {
       title: "Programme Overview",
@@ -77,6 +106,11 @@ export default async function ProgramPage({ params }: Props) {
 
   return (
     <main className="bg-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(programJsonLd) }}
+      />
+
       {/* Hero */}
       <section className="relative overflow-hidden bg-forest-950 py-20 text-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(236,59,106,0.12),transparent_60%)]" />
@@ -89,7 +123,7 @@ export default async function ProgramPage({ params }: Props) {
             All Programmes
           </Link>
           <h1 className="display-heading text-4xl font-extrabold tracking-tight sm:text-5xl">
-            {DEGREE_LABELS[program.degreeLevel]} Programme
+            {degree} Programme
           </h1>
         </div>
       </section>

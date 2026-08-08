@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -10,11 +11,36 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui";
 import { getProjectBySlug, getProjects, DEGREE_LABELS } from "@/lib/data";
-import { paragraphs } from "@/lib/utils";
+import { absoluteUrl, paragraphs } from "@/lib/utils";
 
 export async function generateStaticParams() {
   const projects = await getProjects("ALL");
   return projects.map((project) => ({ slug: project.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const project = await getProjectBySlug(slug);
+  if (!project) return {};
+  const description =
+    project.abstract?.split(/\n\s*\n/)[0]?.slice(0, 160) ||
+    `A ${DEGREE_LABELS[project.degreeLevel].toLowerCase()} project by ${project.studentName ?? "an ITDS student"} at UENR.`;
+  return {
+    title: project.title,
+    description,
+    alternates: { canonical: `/projects/${project.slug}` },
+    openGraph: {
+      type: "website",
+      title: project.title,
+      description,
+      url: absoluteUrl(`/projects/${project.slug}`),
+      images: project.image ? [project.image] : undefined,
+    },
+  };
 }
 
 export default async function ProjectDetailPage({
@@ -26,8 +52,51 @@ export default async function ProjectDetailPage({
   const project = await getProjectBySlug(slug);
   if (!project) notFound();
 
+  const projectJsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CreativeWork",
+        name: project.title,
+        headline: project.title,
+        description: project.abstract?.slice(0, 300) ?? undefined,
+        image: project.image ? absoluteUrl(project.image) : undefined,
+        url: absoluteUrl(`/projects/${project.slug}`),
+        creator: project.studentName
+          ? { "@type": "Person", name: project.studentName }
+          : undefined,
+        author: project.supervisor
+          ? { "@type": "Person", name: project.supervisor.name }
+          : undefined,
+        isPartOf: {
+          "@type": "CollegeOrUniversity",
+          name: "University of Energy and Natural Resources (UENR)",
+        },
+        inLanguage: "en",
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: absoluteUrl("/") },
+          { "@type": "ListItem", position: 2, name: "Projects", item: absoluteUrl("/projects") },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: project.title,
+            item: absoluteUrl(`/projects/${project.slug}`),
+          },
+        ],
+      },
+    ],
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(projectJsonLd) }}
+      />
+
       <section className="relative overflow-hidden bg-forest-900 text-white">
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.07]"

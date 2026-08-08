@@ -3,7 +3,18 @@ import { PageHeader, SectionHeading } from "@/components/ui";
 import ContactForm from "@/components/ContactForm";
 import { getContact } from "@/lib/settings";
 
-export const metadata = { title: "Contact Us" };
+export const metadata = {
+  title: "Contact Us",
+  description:
+    "Contact the Department of Information Technology and Decision Sciences, UENR — email, phone, location and office hours.",
+  alternates: { canonical: "/contact" },
+  openGraph: {
+    type: "website",
+    url: "/contact",
+    title: "Contact Us — ITDS UENR",
+    description: "Get in touch with the Department of Information Technology and Decision Sciences, UENR.",
+  },
+};
 
 export default async function ContactPage() {
   const contact = await getContact();

@@ -2,7 +2,19 @@ import { PageHeader, EmptyState } from "@/components/ui";
 import { LecturerCard } from "@/components/cards";
 import { getLecturers } from "@/lib/data";
 
-export const metadata = { title: "Lecturers" };
+export const metadata = {
+  title: "Lecturers",
+  description:
+    "Meet the lecturers of the Department of Information Technology and Decision Sciences, UENR — faculty profiles, research interests and supervised projects.",
+  alternates: { canonical: "/lecturers" },
+  openGraph: {
+    type: "website",
+    url: "/lecturers",
+    title: "Lecturers — ITDS UENR",
+    description:
+      "Faculty profiles of the Department of Information Technology and Decision Sciences, UENR.",
+  },
+};
 
 export default async function LecturersPage() {
   const lecturers = await getLecturers();

@@ -5,7 +5,19 @@ import { ProjectCard } from "@/components/cards";
 import ProjectsFilter from "@/components/ProjectsFilter";
 import { DEGREE_LABELS, getProjects } from "@/lib/data";
 
-export const metadata = { title: "Project Works" };
+export const metadata = {
+  title: "Project Works",
+  description:
+    "Browse student project works from the Department of Information Technology and Decision Sciences, UENR — filterable by degree level from Undergraduate to PhD.",
+  alternates: { canonical: "/projects" },
+  openGraph: {
+    type: "website",
+    url: "/projects",
+    title: "Project Works — ITDS UENR",
+    description:
+      "Student project works from the Department of Information Technology and Decision Sciences, UENR.",
+  },
+};
 
 export default async function ProjectsPage({
   searchParams,

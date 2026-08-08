@@ -3,6 +3,19 @@ import { CheckCircle, Sparkles, Users } from "lucide-react";
 import { PageHeader, SectionHeading } from "@/components/ui";
 import { getJSONSetting, getStringSetting } from "@/lib/settings";
 
+export const metadata = {
+  title: "Information Technology Society",
+  description:
+    "The Information Technology Society — the official student association of the ITDS Department at UENR and home of the UENR Tech Fair.",
+  alternates: { canonical: "/about/it-society" },
+  openGraph: {
+    type: "website",
+    url: "/about/it-society",
+    title: "IT Society — ITDS UENR",
+    description: "The official student association of the ITDS Department at UENR.",
+  },
+};
+
 export default async function ItSocietyPage() {
   const [story, objectives] = await Promise.all([
     getStringSetting("its_story", ""),

@@ -2,7 +2,18 @@ import Image from "next/image";
 import { PageHeader, EmptyState } from "@/components/ui";
 import { getGallery } from "@/lib/data";
 
-export const metadata = { title: "Department Gallery" };
+export const metadata = {
+  title: "Department Gallery",
+  description:
+    "A photo gallery of life at the Department of Information Technology and Decision Sciences, University of Energy and Natural Resources, Sunyani.",
+  alternates: { canonical: "/gallery" },
+  openGraph: {
+    type: "website",
+    url: "/gallery",
+    title: "Department Gallery — ITDS UENR",
+    description: "Photo gallery of the ITDS Department, UENR.",
+  },
+};
 
 export default async function GalleryPage() {
   const gallery = await getGallery();

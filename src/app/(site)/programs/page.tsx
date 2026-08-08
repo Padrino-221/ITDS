@@ -7,6 +7,14 @@ export const metadata: Metadata = {
   title: "Programmes",
   description:
     "Explore our undergraduate, diploma, and postgraduate programmes in Information Technology & Decision Sciences.",
+  alternates: { canonical: "/programs" },
+  openGraph: {
+    type: "website",
+    url: "/programs",
+    title: "Programmes — ITDS UENR",
+    description:
+      "Undergraduate, diploma and postgraduate programmes in Information Technology & Decision Sciences at UENR.",
+  },
 };
 
 export default async function ProgrammesPage() {

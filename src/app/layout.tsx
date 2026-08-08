@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Space_Grotesk } from "next/font/google";
 import { ToastProvider } from "@/components/admin/Toast";
 import { ConfirmProvider } from "@/components/admin/ConfirmDialog";
+import { SITE_URL } from "@/lib/utils";
 import "./globals.css";
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -17,12 +18,40 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "ITDS | UENR",
     template: "%s | ITDS UENR",
   },
   description:
     "Department of Information Technology and Decision Sciences, University of Energy and Natural Resources, Sunyani, Ghana.",
+  keywords: [
+    "ITDS",
+    "UENR",
+    "Information Technology",
+    "Decision Sciences",
+    "University of Energy and Natural Resources",
+    "Sunyani",
+    "Ghana",
+  ],
+  robots: { index: true, follow: true },
+  openGraph: {
+    type: "website",
+    siteName: "ITDS Department — UENR",
+    locale: "en_GH",
+    url: SITE_URL,
+    title: { default: "ITDS | UENR", template: "%s | ITDS UENR" },
+    description:
+      "Department of Information Technology and Decision Sciences, University of Energy and Natural Resources, Sunyani, Ghana.",
+    images: [{ url: "/logo-512.jpg", width: 512, height: 512, alt: "ITDS Department — UENR" }],
+  },
+  twitter: {
+    card: "summary",
+    title: { default: "ITDS | UENR", template: "%s | ITDS UENR" },
+    description:
+      "Department of Information Technology and Decision Sciences, University of Energy and Natural Resources, Sunyani, Ghana.",
+    images: ["/logo-512.jpg"],
+  },
   icons: {
     icon: [{ url: "/icon.png", sizes: "96x96", type: "image/png" }],
     apple: "/icon.png",

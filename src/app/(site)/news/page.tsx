@@ -4,7 +4,19 @@ import { NewsCard } from "@/components/cards";
 import { getNewsCategories, getNewsPosts } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
-export const metadata = { title: "News & Events" };
+export const metadata = {
+  title: "News & Events",
+  description:
+    "Latest news, events and announcements from the Department of Information Technology and Decision Sciences, UENR — Sunyani, Ghana.",
+  alternates: { canonical: "/news" },
+  openGraph: {
+    type: "website",
+    url: "/news",
+    title: "News & Events — ITDS UENR",
+    description:
+      "Latest news, events and announcements from the Department of Information Technology and Decision Sciences, UENR.",
+  },
+};
 
 export default async function NewsPage({
   searchParams,

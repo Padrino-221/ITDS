@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -31,7 +32,48 @@ import {
   getWelcome,
 } from "@/lib/settings";
 import { getGallery, getNewsPosts, getProjects, getResearchAreas } from "@/lib/data";
-import { cn } from "@/lib/utils";
+import { cn, SITE_URL } from "@/lib/utils";
+
+export const metadata: Metadata = {
+  title: {
+    absolute: "ITDS | UENR — Department of Information Technology & Decision Sciences",
+  },
+  description:
+    "Official website of the Department of Information Technology and Decision Sciences (ITDS) at the University of Energy and Natural Resources (UENR), Sunyani, Ghana — academic programmes, student projects, research areas, news and more.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    url: SITE_URL,
+    title: "ITDS | UENR — Department of Information Technology & Decision Sciences",
+    description:
+      "Academic programmes, student projects, research and news from the Department of Information Technology and Decision Sciences, UENR.",
+  },
+};
+
+const siteJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      url: SITE_URL,
+      name: "ITDS Department — UENR",
+      description:
+        "Department of Information Technology and Decision Sciences, University of Energy and Natural Resources, Sunyani, Ghana.",
+      inLanguage: "en",
+      publisher: { "@id": `${SITE_URL}/#organization` },
+    },
+    {
+      "@type": "CollegeOrUniversity",
+      "@id": `${SITE_URL}/#organization`,
+      url: SITE_URL,
+      name: "Department of Information Technology and Decision Sciences, UENR",
+      alternateName: "ITDS UENR",
+      logo: { "@type": "ImageObject", url: `${SITE_URL}/logo-512.jpg` },
+      image: `${SITE_URL}/logo-512.jpg`,
+    },
+  ],
+};
 
 const linkIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   folder: FolderOpen,
@@ -75,6 +117,11 @@ export default async function HomePage() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
+      />
+
       {/* Hero */}
       <HeroCarousel slides={heroSlides} phone={contact.phone} />
 

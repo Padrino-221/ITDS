@@ -2,6 +2,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { Mail, Home } from "lucide-react";
 
+export const metadata = {
+  title: "Page not found",
+  robots: { index: false, follow: false },
+};
+
 export default function NotFound() {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center bg-forest-950 px-4 text-center text-white">

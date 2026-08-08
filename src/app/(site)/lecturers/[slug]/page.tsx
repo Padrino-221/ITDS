@@ -1,14 +1,39 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Mail, FolderOpen, Sparkles } from "lucide-react";
 import { ProjectCard } from "@/components/cards";
 import { getLecturerBySlug, getLecturers } from "@/lib/data";
-import { initials } from "@/lib/utils";
+import { absoluteUrl, initials } from "@/lib/utils";
 
 export async function generateStaticParams() {
   const lecturers = await getLecturers();
   return lecturers.map((lecturer) => ({ slug: lecturer.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const lecturer = await getLecturerBySlug(slug);
+  if (!lecturer) return {};
+  const description =
+    lecturer.bio?.slice(0, 160) || `${lecturer.title} at the ITDS Department, UENR.`;
+  return {
+    title: `${lecturer.name} — ${lecturer.title}`,
+    description,
+    alternates: { canonical: `/lecturers/${lecturer.slug}` },
+    openGraph: {
+      type: "profile",
+      title: lecturer.name,
+      description,
+      url: absoluteUrl(`/lecturers/${lecturer.slug}`),
+      images: lecturer.photo ? [lecturer.photo] : undefined,
+    },
+  };
 }
 
 export default async function LecturerProfilePage({
@@ -25,8 +50,29 @@ export default async function LecturerProfilePage({
     .map((s) => s.trim())
     .filter(Boolean);
 
+  const lecturerJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: lecturer.name,
+    jobTitle: lecturer.title,
+    url: absoluteUrl(`/lecturers/${lecturer.slug}`),
+    email: lecturer.email ? `mailto:${lecturer.email}` : undefined,
+    image: lecturer.photo ? absoluteUrl(lecturer.photo) : undefined,
+    description: lecturer.bio?.slice(0, 300) ?? undefined,
+    knowsAbout: interests ?? undefined,
+    worksFor: {
+      "@type": "CollegeOrUniversity",
+      name: "Department of Information Technology and Decision Sciences, UENR",
+    },
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(lecturerJsonLd) }}
+      />
+
       <section className="border-b border-forest-100 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
           <Link

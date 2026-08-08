@@ -2,7 +2,18 @@ import Image from "next/image";
 import { PageHeader, SectionHeading } from "@/components/ui";
 import { getResearchAreas } from "@/lib/data";
 
-export const metadata = { title: "Research Areas" };
+export const metadata = {
+  title: "Research Areas",
+  description:
+    "Explore the research areas of the ITDS Department, UENR — Artificial Intelligence, Web Development, Cybersecurity, Data Science, Networking and more.",
+  alternates: { canonical: "/research" },
+  openGraph: {
+    type: "website",
+    url: "/research",
+    title: "Research Areas — ITDS UENR",
+    description: "Research areas of the Department of Information Technology and Decision Sciences, UENR.",
+  },
+};
 
 export default async function ResearchPage() {
   const areas = await getResearchAreas();
