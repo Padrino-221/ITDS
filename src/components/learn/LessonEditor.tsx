@@ -16,7 +16,7 @@ import {
   Trash2,
 } from "lucide-react";
 import type { ContentBlock, QuizQuestion } from "@/lib/learn";
-import { saveLesson } from "@/app/(site)/learn/actions";
+import { saveLesson } from "@/app/learn/actions";
 import { cn } from "@/lib/utils";
 
 type EditorLesson = {

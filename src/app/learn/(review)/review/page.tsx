@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { CheckCircle2, ClipboardCheck, FolderPlus, ListPlus } from "lucide-react";
 import { getReviewQueue, getSubjectsWithTopics, LESSON_STATUS_LABEL } from "@/lib/learn";
-import { createSubject, createTopic } from "@/app/(site)/learn/actions";
+import { createSubject, createTopic } from "@/app/learn/actions";
 import { Select } from "@/components/admin/Dropdown";
 import { requireRole } from "@/lib/auth";
 import { cn, formatDate } from "@/lib/utils";

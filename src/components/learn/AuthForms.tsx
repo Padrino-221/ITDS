@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { AlertCircle, Loader2 } from "lucide-react";
-import { register, signin } from "@/app/(site)/learn/actions";
+import { register, signin } from "@/app/learn/actions";
 
 const inputClass =
   "w-full rounded-xl border border-forest-200 bg-white px-4 py-2.5 text-sm text-forest-950 placeholder:text-ink-soft/60 outline-none transition-all focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20";

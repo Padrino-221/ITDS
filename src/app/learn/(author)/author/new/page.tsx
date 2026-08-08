@@ -1,6 +1,6 @@
 import { FilePlus2 } from "lucide-react";
 import { getSubjectsWithTopics } from "@/lib/learn";
-import { createLesson } from "@/app/(site)/learn/actions";
+import { createLesson } from "@/app/learn/actions";
 import { Select } from "@/components/admin/Dropdown";
 import { requireRole } from "@/lib/auth";
 

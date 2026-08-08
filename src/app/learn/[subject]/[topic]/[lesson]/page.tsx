@@ -19,7 +19,7 @@ import {
   resolvePublishedContent,
 } from "@/lib/learn";
 import { getSession } from "@/lib/auth";
-import { toggleLessonComplete } from "@/app/(site)/learn/actions";
+import { toggleLessonComplete } from "@/app/learn/actions";
 import { cn } from "@/lib/utils";
 
 export default async function LessonPage({

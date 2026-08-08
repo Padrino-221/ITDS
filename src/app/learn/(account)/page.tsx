@@ -23,7 +23,7 @@ export default async function LearnAccountPage() {
         <div>
           <span className="inline-flex items-center gap-2 rounded-lg bg-gold-50 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-gold-600">
             <GraduationCap className="h-4 w-4" />
-            My Learning
+            My Progress
           </span>
           <h1 className="mt-3 font-display text-3xl font-extrabold uppercase tracking-tight text-forest-950">
             Your progress
@@ -79,7 +79,7 @@ export default async function LearnAccountPage() {
             Nothing completed yet
           </p>
           <p className="mt-1 text-sm text-ink-soft">
-            Head to the Learning Hub and mark your first lesson complete.
+            Head to the E-Learning Hub and mark your first lesson complete.
           </p>
           <Link
             href="/learn"

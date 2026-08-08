@@ -16,7 +16,7 @@ export default async function LearnHomePage() {
   return (
     <>
       <PageHeader
-        title="ITDS Learning Hub"
+        title="ITDS E-Learning Hub"
         subtitle={announcement}
         crumbs={[{ label: "Home", href: "/" }, { label: "Learn" }]}
       />

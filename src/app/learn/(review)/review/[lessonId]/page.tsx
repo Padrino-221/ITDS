@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import LessonContent from "@/components/learn/LessonContent";
 import { getLessonForAuthor, resolvePublishedContent } from "@/lib/learn";
-import { approveLesson, requestChanges } from "@/app/(site)/learn/actions";
+import { approveLesson, requestChanges } from "@/app/learn/actions";
 import { requireRole } from "@/lib/auth";
 import { formatDateTime } from "@/lib/utils";
 
@@ -134,7 +134,7 @@ export default async function ReviewLessonPage({
             Approve &amp; publish
           </h3>
           <p className="mt-2 text-sm text-ink-soft">
-            The lesson becomes publicly visible in the Learning Hub immediately.
+            The lesson becomes publicly visible in the E-Learning Hub immediately.
           </p>
           <button
             type="submit"
