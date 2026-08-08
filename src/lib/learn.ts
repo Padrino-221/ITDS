@@ -120,6 +120,63 @@ export const getSubjectWithTopics = cache(async (slug: string) =>
   })
 );
 
+export type LessonSearchResult = {
+  id: string;
+  title: string;
+  slug: string;
+  objective: string;
+  topicTitle: string;
+  topicSlug: string;
+  subjectName: string;
+  subjectSlug: string;
+};
+
+/** All publicly visible lessons, for the /learn catalog search. */
+export const getAllPublishedLessons = cache(async (): Promise<LessonSearchResult[]> =>
+  prisma.lesson
+    .findMany({
+      where: PUBLIC_LESSON_WHERE,
+      orderBy: [
+        { topic: { subject: { name: "asc" } } },
+        { topic: { order: "asc" } },
+        { order: "asc" },
+      ],
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        objective: true,
+        publishedSnapshot: true,
+        topic: {
+          select: {
+            title: true,
+            slug: true,
+            subject: { select: { name: true, slug: true } },
+          },
+        },
+      },
+    })
+    .then((rows) =>
+      rows.map((l) => {
+        const snap =
+          l.publishedSnapshot && typeof l.publishedSnapshot === "object"
+            ? (l.publishedSnapshot as { objective?: unknown })
+            : null;
+        return {
+          id: l.id,
+          title: l.title,
+          slug: l.slug,
+          objective:
+            typeof snap?.objective === "string" ? snap.objective : l.objective,
+          topicTitle: l.topic.title,
+          topicSlug: l.topic.slug,
+          subjectName: l.topic.subject.name,
+          subjectSlug: l.topic.subject.slug,
+        };
+      })
+    )
+);
+
 const lessonSidebarSelect = {
   id: true,
   slug: true,
