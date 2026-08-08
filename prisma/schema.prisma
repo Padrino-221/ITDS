@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum DegreeLevel {
+  UNDERGRADUATE
+  DIPLOMA
+  MSC
+  MPHIL
+  PHD
+}
+
+model Program {
+  id                  String   @id @default(cuid())
+  slug                String   @unique
+  title               String
+  degreeLevel         DegreeLevel @unique
+  overview            String   @default("")
+  learningObjectives  String   @default("")
+  curriculumStructure String   @default("")
+  programmeContact    String   @default("")
+  published          Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  EDITOR
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(EDITOR)
+  createdAt    DateTime @default(now())
+}
+
+model NewsPost {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  excerpt     String?
+  content     String
+  image       String?
+  category    String   @default("General")
+  published   Boolean  @default(true)
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Lecturer {
+  id                String    @id @default(cuid())
+  slug              String    @unique
+  name              String
+  title             String
+  photo             String?
+  bio               String?
+  email             String?
+  researchInterests String?
+  order             Int       @default(0)
+  createdAt         DateTime  @default(now())
+  projects          Project[]
+}
+
+model Project {
+  id           String      @id @default(cuid())
+  slug         String      @unique
+  title        String
+  abstract     String?
+  studentName  String?
+  program      String?
+  degreeLevel  DegreeLevel @default(UNDERGRADUATE)
+  academicYear String?
+  image        String?
+  supervisorId String?
+  supervisor   Lecturer?   @relation(fields: [supervisorId], references: [id], onDelete: SetNull)
+  published    Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+}
+
+model ResearchArea {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String
+  image       String?
+  icon        String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model GalleryImage {
+  id      String  @id @default(cuid())
+  src     String
+  caption String?
+  order   Int     @default(0)
+}
+
+model Setting {
+  key   String @id
+  value String
+}
