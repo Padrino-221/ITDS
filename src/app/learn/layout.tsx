@@ -5,7 +5,6 @@ import { getSubjects } from "@/lib/learn";
 import { getSession } from "@/lib/auth";
 import type { SessionRole } from "@/lib/auth";
 import { signout } from "./actions";
-import { cn } from "@/lib/utils";
 
 const ROLE_LABELS: Record<SessionRole, string> = {
   STUDENT: "Learner",
@@ -101,11 +100,11 @@ export default async function LearnLayout({ children }: { children: React.ReactN
             </div>
           </div>
 
-          {/* Subject row */}
-          <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-forest-50 pt-3 text-sm">
+          {/* Subject row — single line, scrolls horizontally on small screens */}
+          <nav className="scrollbar-hide -mx-1 mt-3 flex items-center gap-x-5 overflow-x-auto border-t border-forest-50 px-1 pt-3 text-sm">
             <Link
               href="/learn"
-              className="inline-flex items-center gap-1.5 font-bold text-forest-950 transition-colors hover:text-forest-600"
+              className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap font-bold text-forest-950 transition-colors hover:text-forest-600"
             >
               <BookOpen className="h-4 w-4 text-forest-500" />
               Home
@@ -114,22 +113,12 @@ export default async function LearnLayout({ children }: { children: React.ReactN
               <Link
                 key={s.id}
                 href={`/learn/${s.slug}`}
-                className="font-semibold text-ink-soft transition-colors hover:text-forest-900"
+                className="shrink-0 whitespace-nowrap font-semibold text-ink-soft transition-colors hover:text-forest-900"
               >
                 {s.name}
               </Link>
             ))}
-            <Link
-              href="/"
-              className={cn(
-                "ml-auto inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-ink-soft",
-                "transition-colors hover:text-forest-900"
-              )}
-            >
-              <ArrowLeft className="h-3.5 w-3.5" />
-              ITDS website
-            </Link>
-          </div>
+          </nav>
         </div>
       </header>
 
