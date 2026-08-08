@@ -80,7 +80,7 @@ export const LESSON_STATUS_LABEL: Record<LessonStatus, string> = {
 
 export const LESSON_STATUS_TONE: Record<LessonStatus, string> = {
   DRAFT: "bg-stone-100 text-stone-600",
-  IN_REVIEW: "bg-gold-50 text-gold-600",
+  IN_REVIEW: "bg-forest-50 text-forest-600",
   CHANGES_REQUESTED: "bg-red-50 text-red-600",
   PUBLISHED: "bg-emerald-50 text-emerald-700",
 };

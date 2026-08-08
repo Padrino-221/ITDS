@@ -6,28 +6,43 @@ export function PageHeader({
   title,
   subtitle,
   crumbs,
+  accent = "gold",
 }: {
   title: string;
   subtitle?: string;
   crumbs?: Array<{ label: string; href?: string }>;
+  accent?: "gold" | "forest";
 }) {
+  const accentGlow =
+    accent === "forest" ? "#3559ad" : "#ec3b6a";
   return (
     <section className="relative overflow-hidden bg-forest-950 py-16 sm:py-20">
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.06]"
         style={{
-          backgroundImage:
-            "radial-gradient(circle at 20% 50%, #ec3b6a 0, transparent 35%), radial-gradient(circle at 80% 20%, #ec3b6a 0, transparent 30%)",
+          backgroundImage: `radial-gradient(circle at 20% 50%, ${accentGlow} 0, transparent 35%), radial-gradient(circle at 80% 20%, ${accentGlow} 0, transparent 30%)`,
         }}
       />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {crumbs && crumbs.length > 0 && (
-          <nav className="mb-5 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-gold-400">
+          <nav
+            className={cn(
+              "mb-5 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider",
+              accent === "forest" ? "text-forest-300" : "text-gold-400"
+            )}
+          >
             {crumbs.map((crumb, i) => (
               <span key={crumb.label} className="flex items-center gap-1.5">
                 {i > 0 && <ChevronRight className="h-3 w-3 text-white/40" />}
                 {crumb.href ? (
-                  <Link href={crumb.href} className="transition-colors hover:text-gold-300">
+                  <Link
+                    href={crumb.href}
+                    className={
+                      accent === "forest"
+                        ? "transition-colors hover:text-forest-200"
+                        : "transition-colors hover:text-gold-300"
+                    }
+                  >
                     {crumb.label}
                   </Link>
                 ) : (

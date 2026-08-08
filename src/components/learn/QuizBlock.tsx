@@ -42,7 +42,7 @@ export default function QuizBlock({ questions }: { questions: QuizQuestion[] }) 
                     className={cn(
                       "flex w-full items-center gap-3 rounded-xl border px-4 py-2.5 text-left text-sm font-medium transition-all",
                       selected && !submitted
-                        ? "border-gold-500 bg-gold-50 text-gold-800"
+                        ? "border-forest-500 bg-forest-50 text-forest-800"
                         : "border-forest-100 bg-white text-ink hover:border-forest-300",
                       isCorrect && "border-emerald-300 bg-emerald-50 text-emerald-800",
                       isWrong && "border-red-300 bg-red-50 text-red-700"

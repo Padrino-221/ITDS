@@ -18,7 +18,7 @@ export default async function AuthorDashboardPage({
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <span className="inline-flex items-center gap-2 rounded-lg bg-gold-50 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-gold-600">
+          <span className="inline-flex items-center gap-2 rounded-lg bg-forest-50 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-forest-600">
             <PenLine className="h-4 w-4" />
             Authoring
           </span>
@@ -40,7 +40,7 @@ export default async function AuthorDashboardPage({
       </div>
 
       {submitted === "1" && (
-        <p className="mt-6 flex items-center gap-2 rounded-lg bg-gold-50 px-4 py-3 text-sm font-semibold text-gold-700">
+        <p className="mt-6 flex items-center gap-2 rounded-lg bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
           <Send className="h-4 w-4" />
           Lesson submitted for review. You&apos;ll be notified of the decision here.
         </p>
@@ -57,7 +57,7 @@ export default async function AuthorDashboardPage({
           </p>
           <Link
             href="/learn/author/new"
-            className="mt-5 inline-flex items-center gap-2 rounded-lg bg-gold-500 px-5 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-gold-600"
+            className="mt-5 inline-flex items-center gap-2 rounded-lg bg-forest-950 px-5 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-forest-800"
           >
             <FilePlus2 className="h-4 w-4" />
             New lesson
@@ -69,7 +69,7 @@ export default async function AuthorDashboardPage({
             <li key={lesson.id}>
               <Link
                 href={`/learn/author/${lesson.id}/edit`}
-                className="flex flex-wrap items-center gap-4 rounded-xl border border-forest-100 bg-white p-4 transition-all hover:-translate-y-0.5 hover:border-gold-300 hover:shadow-md"
+                className="flex flex-wrap items-center gap-4 rounded-xl border border-forest-100 bg-white p-4 transition-all hover:-translate-y-0.5 hover:border-forest-300 hover:shadow-md"
               >
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-forest-50">
                   <PenLine className="h-5 w-5 text-forest-700" />

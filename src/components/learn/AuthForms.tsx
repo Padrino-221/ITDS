@@ -6,7 +6,7 @@ import { AlertCircle, Loader2 } from "lucide-react";
 import { register, signin } from "@/app/learn/actions";
 
 const inputClass =
-  "w-full rounded-xl border border-forest-200 bg-white px-4 py-2.5 text-sm text-forest-950 placeholder:text-ink-soft/60 outline-none transition-all focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20";
+  "w-full rounded-xl border border-forest-200 bg-white px-4 py-2.5 text-sm text-forest-950 placeholder:text-ink-soft/60 outline-none transition-all focus:border-forest-500 focus:ring-2 focus:ring-forest-500/20";
 
 function Field({
   label,
@@ -55,7 +55,7 @@ export function SignInForm() {
       </button>
       <p className="text-center text-sm text-ink-soft">
         New here?{" "}
-        <Link href="/learn/account/register" className="font-bold text-gold-600 hover:text-gold-700">
+        <Link href="/learn/account/register" className="font-bold text-forest-600 hover:text-forest-700">
           Create an account
         </Link>
       </p>
@@ -96,7 +96,7 @@ export function RegisterForm() {
       </button>
       <p className="text-center text-sm text-ink-soft">
         Already have an account?{" "}
-        <Link href="/learn/account/signin" className="font-bold text-gold-600 hover:text-gold-700">
+        <Link href="/learn/account/signin" className="font-bold text-forest-600 hover:text-forest-700">
           Sign in
         </Link>
       </p>

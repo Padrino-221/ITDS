@@ -41,7 +41,7 @@ export default async function ReviewLessonPage({
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <span className="inline-flex items-center gap-2 rounded-lg bg-gold-50 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-gold-600">
+          <span className="inline-flex items-center gap-2 rounded-lg bg-forest-50 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-forest-600">
             <ClipboardCheck className="h-4 w-4" />
             In review
           </span>
@@ -62,8 +62,8 @@ export default async function ReviewLessonPage({
         </h2>
 
         {content.objective && (
-          <div className="mt-5 flex items-start gap-3 rounded-xl border-l-4 border-gold-500 bg-gold-50/70 p-4">
-            <Target className="mt-0.5 h-4 w-4 shrink-0 text-gold-600" />
+          <div className="mt-5 flex items-start gap-3 rounded-xl bg-forest-50/70 p-4">
+            <Target className="mt-0.5 h-4 w-4 shrink-0 text-forest-600" />
             <p className="text-sm leading-relaxed text-forest-900">{content.objective}</p>
           </div>
         )}
@@ -75,7 +75,7 @@ export default async function ReviewLessonPage({
         {content.hasPlayground && content.starterCode && (
           <div className="mt-8">
             <h3 className="flex items-center gap-2 font-display text-base font-extrabold text-forest-950">
-              <MonitorPlay className="h-4 w-4 text-gold-500" />
+              <MonitorPlay className="h-4 w-4 text-forest-500" />
               Playground ({content.playgroundLang ?? "code"})
             </h3>
             <pre className="mt-3 overflow-x-auto rounded-xl bg-forest-950 p-4 text-[13px] text-emerald-100">
@@ -87,7 +87,7 @@ export default async function ReviewLessonPage({
         {content.exercisePrompt && (
           <div className="mt-8 rounded-xl bg-forest-50/60 p-4">
             <h3 className="flex items-center gap-2 font-display text-base font-extrabold text-forest-950">
-              <Dumbbell className="h-4 w-4 text-gold-500" />
+              <Dumbbell className="h-4 w-4 text-forest-500" />
               Practice exercise
             </h3>
             <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-ink">
@@ -99,7 +99,7 @@ export default async function ReviewLessonPage({
         {content.quiz && content.quiz.length > 0 && (
           <div className="mt-8">
             <h3 className="flex items-center gap-2 font-display text-base font-extrabold text-forest-950">
-              <List className="h-4 w-4 text-gold-500" />
+              <List className="h-4 w-4 text-forest-500" />
               Quiz ({content.quiz.length} question{content.quiz.length === 1 ? "" : "s"})
             </h3>
             <div className="mt-3 space-y-4">
