@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   CircleUserRound,
   LogOut,
@@ -34,9 +35,11 @@ export default function AccountMenu() {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
     fetch("/api/learn/session", { cache: "no-store" })
       .then((r) => r.json())
       .then((data) => {
@@ -51,7 +54,7 @@ export default function AccountMenu() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     if (!open) return;
@@ -71,7 +74,7 @@ export default function AccountMenu() {
     };
   }, [open]);
 
-  if (loading) {
+  if (loading && !session) {
     return <span aria-hidden className="h-10 w-20 animate-pulse rounded-lg bg-forest-100" />;
   }
 

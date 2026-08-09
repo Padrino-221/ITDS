@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getPrograms, DEGREE_LABELS } from "@/lib/data";
-import { ArrowRight, GraduationCap, BookOpen } from "lucide-react";
+import { ArrowRight, BookOpen } from "lucide-react";
+import { PageHeader } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "Programmes",
@@ -22,26 +23,14 @@ export default async function ProgrammesPage() {
 
   return (
     <main className="bg-white">
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-forest-950 py-24 text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(236,59,106,0.12),transparent_60%)]" />
-        <div className="relative mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-          <span className="badge-pill mb-6 inline-flex items-center gap-1.5 bg-white/10 text-xs font-semibold text-gold-300">
-            <GraduationCap className="h-3.5 w-3.5" />
-            Academic Programmes
-          </span>
-          <h1 className="display-heading text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
-            Shape Your Future in{" "}
-            <span className="bg-gradient-to-r from-gold-400 to-gold-300 bg-clip-text text-transparent">
-              Technology
-            </span>
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-forest-100">
-            From diploma to doctoral studies, we offer a range of programmes designed
-            to equip you with the skills and knowledge for a successful career in IT.
-          </p>
-        </div>
-      </section>
+      <PageHeader
+        title="Academic Programmes"
+        subtitle="From diploma to doctoral studies, we offer a range of programmes designed to equip you with the skills and knowledge for a successful career in IT."
+        crumbs={[
+          { label: "Home", href: "/" },
+          { label: "Programmes" },
+        ]}
+      />
 
       {/* Programmes Grid */}
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">

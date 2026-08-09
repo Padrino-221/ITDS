@@ -3,16 +3,14 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Phone } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { HeroSlide } from "@/lib/settings";
 
 export default function HeroCarousel({
   slides,
-  phone,
 }: {
   slides: HeroSlide[];
-  phone: string;
 }) {
   const [index, setIndex] = useState(0);
   const count = slides.length;
@@ -84,22 +82,6 @@ export default function HeroCarousel({
                 >
                   Learn About Us
                 </Link>
-
-                {/* Call block */}
-                <a
-                  href={`tel:${phone.replace(/\s/g, "")}`}
-                  className="group flex items-center gap-3"
-                >
-                  <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-gold-500 text-white transition-transform group-hover:scale-105">
-                    <Phone className="h-5 w-5" />
-                  </span>
-                  <span className="leading-tight">
-                    <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">
-                      Call Us
-                    </span>
-                    <span className="block text-sm font-bold text-white">{phone}</span>
-                  </span>
-                </a>
               </div>
             </div>
           </div>

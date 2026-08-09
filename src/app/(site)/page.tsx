@@ -22,7 +22,6 @@ import TeamSection from "@/components/TeamSection";
 import NewsletterSection from "@/components/NewsletterSection";
 import { NewsCard, ProjectCard, ResearchAreaCard } from "@/components/cards";
 import {
-  getContact,
   getFeaturedLinks,
   getHeroSlides,
   getStats,
@@ -99,7 +98,6 @@ export default async function HomePage() {
     researchAreas,
     projects,
     gallery,
-    contact,
   ] = await Promise.all([
     getHeroSlides(),
     getStats(),
@@ -109,7 +107,6 @@ export default async function HomePage() {
     getResearchAreas(),
     getProjects("ALL", 4),
     getGallery(),
-    getContact(),
   ]);
 
   return (
@@ -120,7 +117,7 @@ export default async function HomePage() {
       />
 
       {/* Hero */}
-      <HeroCarousel slides={heroSlides} phone={contact.phone} />
+      <HeroCarousel slides={heroSlides} />
 
       {/* Scrolling marquee */}
       <Marquee items={serviceMarquee} />
@@ -219,7 +216,7 @@ export default async function HomePage() {
       {featuredLinks.length > 0 && (
         <section className="border-y border-forest-100 bg-white py-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
+            <div className="text-left">
               <span className="inline-flex items-center gap-2 rounded-lg bg-gold-50 px-4 py-2 text-xs font-bold uppercase tracking-wider text-gold-600">
                 Our Approach
               </span>
@@ -326,7 +323,7 @@ export default async function HomePage() {
       {/* Research areas */}
       <section className="bg-paper py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
+          <div className="text-left">
             <span className="inline-flex items-center gap-2 rounded-lg bg-gold-50 px-4 py-2 text-xs font-bold uppercase tracking-wider text-gold-600">
               <BookOpen className="h-4 w-4" />
               Research
@@ -334,7 +331,7 @@ export default async function HomePage() {
             <h2 className="display-heading mt-5 text-3xl font-extrabold uppercase tracking-tight text-forest-950 sm:text-4xl">
               Our Research Areas
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-ink-soft">
+            <p className="mt-4 max-w-2xl text-ink-soft">
               The core research domains shaping student projects and postgraduate study.
             </p>
           </div>
@@ -394,7 +391,7 @@ export default async function HomePage() {
       {gallery.length > 0 && (
         <section className="bg-forest-950 py-20 overflow-hidden">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
+            <div className="text-left">
               <span className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-wider text-gold-400">
                 <Images className="h-4 w-4" />
                 Moments
