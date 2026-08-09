@@ -494,6 +494,23 @@ export async function updateSettings(formData: FormData) {
     }
   }
 
+  // Remove hero slide images that were dropped or replaced.
+  try {
+    const prevSlides = JSON.parse(
+      (await prisma.setting.findUnique({ where: { key: "hero_slides" } }))?.value ?? "[]"
+    ) as Array<{ image?: string }>;
+    const nextSlides = JSON.parse(str(formData, "hero_slides")) as Array<{
+      image?: string;
+    }>;
+    for (const prev of prevSlides) {
+      if (!prev?.image) continue;
+      const stillUsed = nextSlides.some((s) => s?.image === prev.image);
+      if (!stillUsed) await removeUploadFile(prev.image);
+    }
+  } catch {
+    // Nothing to clean up when hero_slides is empty or invalid.
+  }
+
   // Validate + store raw JSON textareas
   for (const key of jsonFields) {
     const raw = str(formData, key);

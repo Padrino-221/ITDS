@@ -168,7 +168,7 @@ export default async function HomePage() {
             <Reveal>
               <div className="overflow-hidden rounded-2xl">
                 <Image
-                  src={welcome.image || "/images/about/hod.jpg"}
+                  src={welcome.image || "/images/about/students.jpg"}
                   alt={welcome.name}
                   width={400}
                   height={520}

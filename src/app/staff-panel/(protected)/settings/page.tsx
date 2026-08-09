@@ -1,16 +1,11 @@
 import { prisma } from "@/lib/prisma";
-import {
-  AdminCard,
-  AdminPageHeader,
-  Field,
-  PrimaryButton,
-  TextArea,
-  TextInput,
-} from "@/components/admin/ui";
+import { AdminCard, AdminPageHeader, Field, PrimaryButton, TextArea, TextInput } from "@/components/admin/ui";
 import { SavedToast } from "@/components/admin/SavedToast";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import { HeroSlidesEditor } from "@/components/admin/HeroSlidesEditor";
 import { updateSettings } from "@/app/staff-panel/actions";
 import { parseSetting } from "@/lib/settings";
+import type { HeroSlide } from "@/lib/settings";
 
 function JSONTextArea({
   name,
@@ -46,6 +41,7 @@ export default async function AdminSettingsPage({
   const welcome = parseSetting<Record<string, string>>(settings.get("welcome"), {});
   const contact = parseSetting<Record<string, string>>(settings.get("contact"), {});
   const socials = parseSetting<Record<string, string>>(settings.get("socials"), {});
+  const heroSlides = parseSetting<HeroSlide[]>(settings.get("hero_slides"), []);
 
   return (
     <div className="space-y-6">
@@ -71,13 +67,19 @@ export default async function AdminSettingsPage({
         </AdminCard>
 
         {/* Homepage */}
-        <AdminCard title="Homepage">
+        <AdminCard title="Homepage Hero Slides">
+          <div className="mt-5">
+            <Field
+              label="Hero slides"
+              hint="Upload a background photo and customise the headline, subtitle and button for each carousel slide."
+            >
+              <HeroSlidesEditor name="hero_slides" defaultValue={heroSlides} />
+            </Field>
+          </div>
+        </AdminCard>
+
+        <AdminCard title="Homepage Stats & Links">
           <div className="mt-5 grid gap-5">
-            <JSONTextArea
-              name="hero_slides"
-              value={settings.get("hero_slides") ?? "[]"}
-              hint='JSON array of slides: [{"title","subtitle","image","cta":{"label","href"}}]'
-            />
             <JSONTextArea
               name="stats"
               value={settings.get("stats") ?? "[]"}

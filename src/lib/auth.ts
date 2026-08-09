@@ -3,7 +3,7 @@ import { compare, hash } from "bcryptjs";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "./prisma";
-import { SITE_URL } from "./utils";
+import { LEARN_URL, SITE_URL } from "./utils";
 
 const COOKIE_NAME = "itds_session";
 const MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7 days
@@ -16,11 +16,26 @@ const secret = () =>
 /**
  * The registrable domain (e.g. ".itdsuenr.com") the session cookie is scoped
  * to, so a single sign-in carries across the main site and the /learn
- * subdomain. Only applied behind HTTPS — local development over plain HTTP
- * keeps a host-only cookie (".localhost" would never match).
+ * subdomain. The domain is resolved from the *actual request host* (not the
+ * configured SITE_URL) so host-only cookies are kept on hosts that are not on
+ * the registered domain — e.g. Vercel preview hosts where a `.itdsuenr.com`
+ * domain would silently break sessions and every authenticated call.
+ *
+ * Only applied behind HTTPS — local development over plain HTTP keeps a
+ * host-only cookie (".localhost" would never match).
  */
-const cookieDomain = () =>
-  `.${new URL(SITE_URL).hostname.replace(/^www\./i, "")}`;
+async function cookieDomain(): Promise<string> {
+  const host = (await headers()).get("x-forwarded-host") ?? (await headers()).get("host");
+  if (!host) return "";
+  const hostname = host.replace(/^www\./i, "").split(":")[0].toLowerCase();
+  const strip = (h: string) => h.replace(/^www\./i, "").toLowerCase();
+  const main = strip(new URL(SITE_URL).hostname);
+  const learn = strip(new URL(LEARN_URL).hostname);
+  const match = [main, learn].find(
+    (d) => d && (hostname === d || hostname.endsWith(`.${d}`))
+  );
+  return match ? `.${match}` : "";
+}
 
 export type SessionRole = "ADMIN" | "EDITOR" | "LECTURER" | "STUDENT";
 
@@ -58,14 +73,16 @@ export async function createSession(user: SessionUser): Promise<void> {
   // HTTPS (e.g. behind a reverse proxy / on Vercel), so local testing with
   // `npm start` over plain HTTP still works.
   const proto = (await headers()).get("x-forwarded-proto") ?? "http";
-  cookieStore.set(COOKIE_NAME, token, {
+  const domain = proto === "https" ? await cookieDomain() : "";
+  const attrs: Record<string, string | number | boolean> = {
     httpOnly: true,
     sameSite: "lax",
     secure: proto === "https",
     maxAge: MAX_AGE_SECONDS,
     path: "/",
-    ...(proto === "https" ? { domain: cookieDomain() } : {}),
-  });
+  };
+  if (domain) attrs.domain = domain;
+  cookieStore.set(COOKIE_NAME, token, attrs);
 }
 
 export async function destroySession(): Promise<void> {
@@ -77,7 +94,7 @@ export async function destroySession(): Promise<void> {
     secure: proto === "https",
     maxAge: 0,
     path: "/",
-    ...(proto === "https" ? { domain: cookieDomain() } : {}),
+    ...(proto === "https" ? { domain: await cookieDomain() } : {}),
   });
 }
 

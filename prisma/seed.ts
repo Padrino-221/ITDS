@@ -86,22 +86,22 @@ async function main() {
           title: "Where Technology Meets Decision Science",
           subtitle:
             "The Department of Information Technology & Decision Sciences prepares students to design, build, and lead the digital future.",
-          image: img("hero/slide-1.jpg"),
-          cta: { label: "Explore Project Works", href: "/projects" },
+image: img("hero/slide.jpg"),
+              cta: { label: "Explore Project Works", href: "/projects" },
         },
         {
           title: "Over 4,000 Students. One Community of Innovators.",
           subtitle:
             "From machine learning to mobile development, our students turn ideas into working systems.",
-          image: img("hero/slide-2.jpg"),
-          cta: { label: "Meet Our Lecturers", href: "/lecturers" },
+image: img("hero/slide2.jpg"),
+              cta: { label: "Meet Our Lecturers", href: "/lecturers" },
         },
         {
           title: "The UENR Tech Fair — Our Flagship Event",
           subtitle:
             "An annual showcase of student innovation, industry partnerships and cutting-edge research.",
-          image: img("hero/slide-3.jpg"),
-          cta: { label: "Latest News", href: "/news" },
+image: img("hero/slide3.jpg"),
+              cta: { label: "Latest News", href: "/news" },
         },
       ]),
     ],
@@ -120,7 +120,7 @@ async function main() {
         heading: "Welcome Message From HOD",
         name: "Prof. Peter Appiahene",
         title: "Associate Professor & Head of Department",
-        image: img("about/hod.jpg"),
+        image: img("about/students.jpg"),
         message:
           "Welcome to the Department of Information Technology and Decision Sciences at the University of Energy and Natural Resources. We are a young and rapidly growing department, committed to academic excellence, innovation and service to society. Our Student Project Management System (SPMS) keeps a comprehensive record of every final-year project, making our students' research visible to the world. I invite you to explore our website, learn about our programmes, and join us on this exciting journey.",
       }),
@@ -615,12 +615,11 @@ async function main() {
   // Gallery
   // ------------------------------------------------------------------
   const gallery = [
-    { src: img("gallery/graduation.jpg"), caption: "Graduation Day", order: 1 },
-    { src: img("gallery/campus.jpg"), caption: "Main Campus", order: 2 },
-    { src: img("gallery/lecture.jpg"), caption: "Lecture Session", order: 3 },
-    { src: img("gallery/collaborative.jpg"), caption: "Collaborative Learning", order: 4 },
-    { src: img("gallery/techfair.jpg"), caption: "UENR Tech Fair", order: 5 },
-    { src: img("gallery/students.jpg"), caption: "Students at Work", order: 6 },
+    { src: img("gallery/campus.jpg"), caption: "Main Campus", order: 1 },
+    { src: img("gallery/lecture.jpg"), caption: "Lecture Session", order: 2 },
+    { src: img("gallery/collaborative.jpg"), caption: "Collaborative Learning", order: 3 },
+    { src: img("gallery/techfair.jpg"), caption: "UENR Tech Fair", order: 4 },
+    { src: img("gallery/students.jpg"), caption: "Students at Work", order: 5 },
   ];
 
   for (const g of gallery) {

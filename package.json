@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "prebuild": "node scripts/db-migrate.mjs && npm run db:bootstrap",
+    "prebuild": "node --env-file-if-exists=.env scripts/db-migrate.mjs && npm run db:bootstrap",
     "start": "next start",
     "lint": "eslint",
     "db:migrate": "prisma migrate dev",
