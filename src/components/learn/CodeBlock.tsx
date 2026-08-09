@@ -31,10 +31,10 @@ export default function CodeBlock({
         onClick={copy}
         aria-label={copied ? "Code copied" : "Copy code"}
         title={copied ? "Copied" : "Copy code"}
-        className="absolute right-2.5 top-2.5 inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-200 transition-all hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400/70"
+        className="absolute right-2.5 top-2.5 inline-flex items-center gap-1 sm:gap-1.5 rounded-lg bg-white/10 px-2 py-1.5 sm:px-2.5 text-[11px] font-bold uppercase tracking-wider text-emerald-200 transition-all hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400/70"
       >
-        {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-        {copied ? "Copied" : language ?? "Copy"}
+        {copied ? <Check className="h-3.5 w-3.5 shrink-0" /> : <Copy className="h-3.5 w-3.5 shrink-0" />}
+        <span className="hidden sm:inline">{copied ? "Copied" : language ?? "Copy"}</span>
       </button>
       <pre className="overflow-x-auto rounded-xl bg-forest-950 p-4 pr-14 pt-11 text-[13px] leading-relaxed text-emerald-100">
         <code>{code}</code>
