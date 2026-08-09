@@ -36,10 +36,11 @@ export default function AccountMenu() {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const mountedRef = useRef(true);
 
   useEffect(() => {
+    mountedRef.current = true;
     let cancelled = false;
-    setLoading(true);
     fetch("/api/learn/session", { cache: "no-store" })
       .then((r) => r.json())
       .then((data) => {
@@ -49,10 +50,12 @@ export default function AccountMenu() {
         if (!cancelled) setSession(null);
       })
       .finally(() => {
-        if (!cancelled) setLoading(false);
+        if (cancelled) return;
+        if (mountedRef.current) setLoading(false);
       });
     return () => {
       cancelled = true;
+      mountedRef.current = false;
     };
   }, [pathname]);
 

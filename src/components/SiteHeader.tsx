@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { BadgeCheck, ChevronDown, Mail, Menu, X, MapPin, Phone } from "lucide-react";
+import { BadgeCheck, ChevronDown, Menu, X } from "lucide-react";
 import { cn, LEARN_URL } from "@/lib/utils";
 
 type NavChild = { label: string; href: string };
@@ -36,19 +36,10 @@ const NAV: NavItem[] = [
   { label: "E-Learning", href: LEARN_URL },
 ];
 
-const socialLinks = [
-  { label: "Facebook", href: "https://facebook.com" },
-  { label: "Twitter / X", href: "https://x.com" },
-  { label: "Instagram", href: "https://instagram.com" },
-  { label: "LinkedIn", href: "https://linkedin.com" },
-];
-
 export default function SiteHeader({
   announcement,
-  email,
 }: {
   announcement: string;
-  email: string;
 }) {
   const [open, setOpen] = useState(false);
   const [mobileChildren, setMobileChildren] = useState<Record<string, boolean>>({});

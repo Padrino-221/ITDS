@@ -1,11 +1,8 @@
 import SiteHeader from "./SiteHeader";
-import { getContact, getStringSetting } from "@/lib/settings";
+import { getStringSetting } from "@/lib/settings";
 
 export default async function Header() {
-  const [announcement, contact] = await Promise.all([
-    getStringSetting("announcement", ""),
-    getContact(),
-  ]);
+  const announcement = await getStringSetting("announcement", "");
 
-  return <SiteHeader announcement={announcement} email={contact.email} />;
+  return <SiteHeader announcement={announcement} />;
 }

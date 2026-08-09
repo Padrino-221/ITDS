@@ -47,15 +47,6 @@ function str(formData: FormData, key: string): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function opt(formData: FormData, key: string): string | null {
-  const value = str(formData, key);
-  return value ? value : null;
-}
-
-function bool(formData: FormData, key: string): boolean {
-  return formData.get(key) === "on";
-}
-
 function revalidateLearn() {
   revalidatePath("/learn", "layout");
   revalidatePath("/", "layout");

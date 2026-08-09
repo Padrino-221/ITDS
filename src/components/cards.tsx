@@ -3,17 +3,13 @@ import Link from "next/link";
 import {
   ArrowRight,
   Bookmark,
-  Briefcase,
   Brain,
   CalendarDays,
   ChartPie,
-  Clock,
   FolderOpen,
   Globe,
-  GraduationCap,
   Shield,
   Smartphone,
-  Star,
   User,
 } from "lucide-react";
 import type { NewsPost, Project, Lecturer, ResearchArea } from "@prisma/client";

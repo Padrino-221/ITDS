@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Bookmark, Briefcase, GraduationCap, Star, User } from "lucide-react";
+import { ArrowRight, Bookmark, User } from "lucide-react";
 import { getLecturers } from "@/lib/data";
 import { initials } from "@/lib/utils";
 
