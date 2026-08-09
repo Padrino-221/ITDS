@@ -70,7 +70,7 @@ export default function AdminSidebar({ user }: { user: SessionUser }) {
     <div className="flex h-full flex-col bg-forest-950 text-forest-100">
       <div className="flex items-center gap-3 px-5 py-5">
         <Image
-          src="/logo-512.jpg"
+          src="/itds-logo.png"
           alt="ITDS Department Logo"
           width={40}
           height={40}

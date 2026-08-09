@@ -16,7 +16,7 @@ export default async function LoginPage() {
         <div className="rounded-xl border border-white/10 bg-white p-8 sm:p-10">
           <div className="flex flex-col items-center text-center">
             <Image
-              src="/logo-512.jpg"
+              src="/itds-logo.png"
               alt="ITDS Department Logo"
               width={64}
               height={64}

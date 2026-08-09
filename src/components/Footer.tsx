@@ -76,7 +76,7 @@ export default async function Footer() {
           <div className="lg:col-span-4">
             <Link href="/" className="flex items-center gap-3">
               <Image
-                src="/logo-512.jpg"
+                src="/itds-logo.png"
                 alt="ITDS Department Logo"
                 width={48}
                 height={48}

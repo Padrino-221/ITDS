@@ -19,7 +19,7 @@ export default async function LearnLayout({ children }: { children: React.ReactN
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
             <Link href={learnUrl("/")} className="flex items-center gap-2.5">
               <Image
-                src="/logo-512.jpg"
+                src="/itds-logo.png"
                 alt="ITDS Department Logo"
                 width={40}
                 height={40}

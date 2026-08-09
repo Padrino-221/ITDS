@@ -77,7 +77,7 @@ export default function SiteHeader({
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
             <Image
-              src="/logo-512.jpg"
+              src="/itds-logo.png"
               alt="ITDS Department Logo"
               width={48}
               height={48}

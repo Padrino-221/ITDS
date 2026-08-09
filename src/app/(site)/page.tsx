@@ -65,8 +65,8 @@ const siteJsonLd = {
       url: SITE_URL,
       name: "Department of Information Technology and Decision Sciences, UENR",
       alternateName: "ITDS UENR",
-      logo: { "@type": "ImageObject", url: `${SITE_URL}/logo-512.jpg` },
-      image: `${SITE_URL}/logo-512.jpg`,
+      logo: { "@type": "ImageObject", url: `${SITE_URL}/itds-logo.png` },
+      image: `${SITE_URL}/itds-logo.png`,
     },
   ],
 };

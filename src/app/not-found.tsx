@@ -11,7 +11,7 @@ export default function NotFound() {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center bg-forest-950 px-4 text-center text-white">
       <Image
-        src="/logo-512.jpg"
+        src="/itds-logo.png"
         alt="ITDS Department Logo"
         width={64}
         height={64}

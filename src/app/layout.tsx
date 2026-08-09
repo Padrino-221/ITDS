@@ -43,14 +43,14 @@ export const metadata: Metadata = {
     title: { default: "ITDS | UENR", template: "%s | ITDS UENR" },
     description:
       "Department of Information Technology and Decision Sciences, University of Energy and Natural Resources, Sunyani, Ghana.",
-    images: [{ url: "/logo-512.jpg", width: 512, height: 512, alt: "ITDS Department — UENR" }],
+    images: [{ url: "/itds-logo.png", width: 512, height: 512, alt: "ITDS Department — UENR" }],
   },
   twitter: {
     card: "summary",
     title: { default: "ITDS | UENR", template: "%s | ITDS UENR" },
     description:
       "Department of Information Technology and Decision Sciences, University of Energy and Natural Resources, Sunyani, Ghana.",
-    images: ["/logo-512.jpg"],
+    images: ["/itds-logo.png"],
   },
   icons: {
     icon: [{ url: "/icon.png", sizes: "96x96", type: "image/png" }],
