@@ -141,16 +141,16 @@ export default async function HomePage() {
               <Reveal
                 key={stat.label}
                 delay={i * 100}
-                className="flex items-center gap-4 rounded-xl border border-forest-100 bg-white p-5"
+                className="flex items-center gap-3 rounded-xl border border-forest-100 bg-white p-3 sm:gap-4 sm:p-5"
               >
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gold-50">
-                  <Icon className="h-7 w-7 text-gold-600" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gold-50 sm:h-14 sm:w-14">
+                  <Icon className="h-5 w-5 text-gold-600 sm:h-7 sm:w-7" />
                 </div>
                 <div>
-                  <p className="display-heading text-3xl font-extrabold text-forest-950 sm:text-4xl">
+                  <p className="display-heading text-2xl font-extrabold text-forest-950 sm:text-3xl lg:text-4xl">
                     <CountUp value={num} suffix={suffix} />
                   </p>
-                  <p className="text-xs font-bold uppercase tracking-wider text-ink-soft">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-ink-soft sm:text-xs">
                     {stat.label}
                   </p>
                 </div>

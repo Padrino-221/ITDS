@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, BookOpen } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { getSubjects } from "@/lib/learn";
 import { SITE_URL, learnUrl } from "@/lib/utils";
 import AccountMenu from "@/components/learn/AccountMenu";
@@ -40,13 +40,6 @@ export default async function LearnLayout({ children }: { children: React.ReactN
 
           {/* Subject row — single line, scrolls horizontally on small screens */}
           <nav className="scrollbar-hide -mx-1 mt-3 flex items-center gap-x-5 overflow-x-auto border-t border-forest-50 px-1 pt-3 text-sm">
-            <Link
-              href={learnUrl("/")}
-              className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap font-bold text-forest-950 transition-colors hover:text-gold-600"
-            >
-              <BookOpen className="h-4 w-4 text-gold-500" />
-              Home
-            </Link>
             {subjects.map((s) => (
               <Link
                 key={s.id}
