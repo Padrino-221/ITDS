@@ -12,7 +12,7 @@ export function PageHeader({
   crumbs?: Array<{ label: string; href?: string }>;
 }) {
   return (
-    <section className="relative overflow-hidden bg-forest-950 py-16 sm:py-20">
+    <section className="relative overflow-hidden bg-forest-950 py-12 sm:py-16 lg:py-20">
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.06]"
         style={{

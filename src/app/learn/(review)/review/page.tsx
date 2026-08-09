@@ -13,11 +13,11 @@ export default async function ReviewQueuePage({
   searchParams: Promise<{ done?: string; created?: string }>;
 }) {
   const { done, created } = await searchParams;
-  await requireRole(["ADMIN"], "/learn/account/signin");
+  await requireRole(["ADMIN"], "/account/signin");
   const [queue, subjects] = await Promise.all([getReviewQueue(), getSubjectsWithTopics()]);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
       <div>
         <span className="inline-flex items-center gap-2 rounded-lg bg-gold-50 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-gold-600">
           <ClipboardCheck className="h-4 w-4" />
@@ -55,7 +55,7 @@ export default async function ReviewQueuePage({
           {queue.map((lesson) => (
             <li key={lesson.id}>
               <Link
-                href={`/learn/review/${lesson.id}`}
+                href={`/review/${lesson.id}`}
                 className="flex flex-wrap items-center gap-4 rounded-xl border border-forest-100 bg-white p-4 transition-all hover:-translate-y-0.5 hover:border-gold-300 hover:shadow-md"
               >
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gold-50">

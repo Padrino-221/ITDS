@@ -124,6 +124,20 @@ export default async function AdminSettingsPage({
               <TextArea name="about_story" rows={4} defaultValue={settings.get("about_story") ?? ""} />
             </Field>
             <div className="grid gap-5 sm:grid-cols-2">
+              <ImageUpload
+                name="about_image_story"
+                label="About — story image"
+                hint="Photo beside the story paragraph on the About page."
+                defaultValue={settings.get("about_image_story") ?? "/images/about/campus.jpg"}
+              />
+              <ImageUpload
+                name="about_image_spms"
+                label="About — SPMS image"
+                hint="Photo in the SPMS section on the About page."
+                defaultValue={settings.get("about_image_spms") ?? "/images/about/students.jpg"}
+              />
+            </div>
+            <div className="grid gap-5 sm:grid-cols-2">
               <Field label="Vision">
                 <TextArea name="about_vision" rows={3} defaultValue={settings.get("about_vision") ?? ""} />
               </Field>

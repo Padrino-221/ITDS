@@ -9,8 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           "/staff-panel",
           "/learn/account",
-          "/learn/author",
-          "/learn/review",
         ],
       },
     ],

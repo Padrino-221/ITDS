@@ -50,6 +50,9 @@ jobs:
       - name: Apply database migrations
         run: npx prisma migrate deploy
 
+      - name: Seed database
+        run: npm run db:seed
+
       - name: Typecheck
         run: npx tsc --noEmit
 

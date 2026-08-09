@@ -6,7 +6,7 @@ import { ArrowLeft, Calendar, Tag } from "lucide-react";
 import { Badge } from "@/components/ui";
 import { getNewsBySlug, getNewsPosts } from "@/lib/data";
 import { NewsCard } from "@/components/cards";
-import { absoluteUrl, formatDate, paragraphs } from "@/lib/utils";
+import { absoluteUrl, contentBlocks, formatDate } from "@/lib/utils";
 
 export async function generateStaticParams() {
   const posts = await getNewsPosts();
@@ -132,9 +132,26 @@ export default async function NewsDetailPage({
       {/* Body */}
       <article className="mx-auto max-w-4xl px-4 py-14 sm:px-6">
         <div className="prose-content">
-          {paragraphs(post.content).map((paragraph, i) => (
-            <p key={i}>{paragraph}</p>
-          ))}
+          {contentBlocks(post.content).map((block, i) =>
+            block.type === "image" ? (
+              <figure key={i} className="my-6 overflow-hidden rounded-xl">
+                <Image
+                  src={block.src}
+                  alt={block.alt || "News image"}
+                  width={800}
+                  height={450}
+                  className="w-full object-cover"
+                />
+                {block.alt && (
+                  <figcaption className="mt-2 text-center text-xs text-ink-soft">
+                    {block.alt}
+                  </figcaption>
+                )}
+              </figure>
+            ) : (
+              <p key={i}>{block.text}</p>
+            )
+          )}
         </div>
 
         <div className="mt-10 flex items-center gap-2 border-t border-forest-100 pt-6 text-sm text-ink-soft">

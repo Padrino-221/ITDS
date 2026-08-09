@@ -3,6 +3,7 @@ import { compare, hash } from "bcryptjs";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "./prisma";
+import { SITE_URL } from "./utils";
 
 const COOKIE_NAME = "itds_session";
 const MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7 days
@@ -11,6 +12,15 @@ const secret = () =>
   new TextEncoder().encode(
     process.env.AUTH_SECRET ?? "itds-dev-secret-change-me-in-production"
   );
+
+/**
+ * The registrable domain (e.g. ".itdsuenr.com") the session cookie is scoped
+ * to, so a single sign-in carries across the main site and the /learn
+ * subdomain. Only applied behind HTTPS — local development over plain HTTP
+ * keeps a host-only cookie (".localhost" would never match).
+ */
+const cookieDomain = () =>
+  `.${new URL(SITE_URL).hostname.replace(/^www\./i, "")}`;
 
 export type SessionRole = "ADMIN" | "EDITOR" | "LECTURER" | "STUDENT";
 
@@ -54,12 +64,21 @@ export async function createSession(user: SessionUser): Promise<void> {
     secure: proto === "https",
     maxAge: MAX_AGE_SECONDS,
     path: "/",
+    ...(proto === "https" ? { domain: cookieDomain() } : {}),
   });
 }
 
 export async function destroySession(): Promise<void> {
   const cookieStore = await cookies();
-  cookieStore.delete(COOKIE_NAME);
+  const proto = (await headers()).get("x-forwarded-proto") ?? "http";
+  cookieStore.set(COOKIE_NAME, "", {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: proto === "https",
+    maxAge: 0,
+    path: "/",
+    ...(proto === "https" ? { domain: cookieDomain() } : {}),
+  });
 }
 
 export async function getSession(): Promise<SessionUser | null> {
@@ -105,11 +124,11 @@ export async function requireAdmin(): Promise<SessionUser> {
  */
 export async function requireRole(
   roles: SessionRole[],
-  loginPath = "/learn/account/signin"
+  loginPath = "/account/signin"
 ): Promise<SessionUser> {
   const user = await getSession();
   if (!user) redirect(loginPath);
-  if (!roles.includes(user.role)) redirect("/learn");
+  if (!roles.includes(user.role)) redirect("/");
   return user;
 }
 

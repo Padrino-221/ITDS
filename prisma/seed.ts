@@ -7,7 +7,12 @@ const prisma = new PrismaClient();
 const img = (path: string) => `/images/${path}`;
 
 async function main() {
-  console.log("Seeding database…");
+  // Bootstrap mode (set by prisma/bootstrap.ts for deployments) fills in only
+  // rows that don't exist yet, so re-running the seed against a live database
+  // never overwrites curated content. The plain `npm run db:seed` keeps the
+  // full reset/resync behaviour for local development.
+  const bootstrap = process.env.SEED_BOOTSTRAP === "true";
+  console.log(bootstrap ? "Bootstrapping database (missing rows only)…" : "Seeding database…");
 
   // ------------------------------------------------------------------
   // Users
@@ -203,6 +208,10 @@ async function main() {
   ];
 
   for (const [key, value] of settings) {
+    if (bootstrap) {
+      const existing = await prisma.setting.findUnique({ where: { key } });
+      if (existing) continue;
+    }
     await prisma.setting.upsert({
       where: { key },
       update: { value },
@@ -277,6 +286,10 @@ async function main() {
   ];
 
   for (const l of lecturers) {
+    if (bootstrap) {
+      const existing = await prisma.lecturer.findUnique({ where: { slug: l.slug } });
+      if (existing) continue;
+    }
     await prisma.lecturer.upsert({
       where: { slug: l.slug },
       update: { ...l },
@@ -361,6 +374,10 @@ async function main() {
   ];
 
   for (const n of news) {
+    if (bootstrap) {
+      const existing = await prisma.newsPost.findUnique({ where: { slug: n.slug } });
+      if (existing) continue;
+    }
     await prisma.newsPost.upsert({
       where: { slug: n.slug },
       update: { ...n },
@@ -420,6 +437,10 @@ async function main() {
   ];
 
   for (const r of researchAreas) {
+    if (bootstrap) {
+      const existing = await prisma.researchArea.findUnique({ where: { slug: r.slug } });
+      if (existing) continue;
+    }
     await prisma.researchArea.upsert({
       where: { slug: r.slug },
       update: { ...r },
@@ -579,6 +600,10 @@ async function main() {
 
   for (const p of projects) {
     const { supervisor, ...data } = p;
+    if (bootstrap) {
+      const existing = await prisma.project.findUnique({ where: { slug: p.slug } });
+      if (existing) continue;
+    }
     await prisma.project.upsert({
       where: { slug: p.slug },
       update: { ...data, supervisorId: bySlug[supervisor] },
@@ -602,6 +627,7 @@ async function main() {
     const { src, ...rest } = g;
     const existing = await prisma.galleryImage.findFirst({ where: { src } });
     if (existing) {
+      if (bootstrap) continue;
       await prisma.galleryImage.update({ where: { id: existing.id }, data: { ...rest } });
     } else {
       await prisma.galleryImage.create({ data: { ...g } });
@@ -755,6 +781,7 @@ Thesis writing, Internal review, External examination, Thesis defense & viva voc
   for (const program of programs) {
     const existing = await prisma.program.findUnique({ where: { slug: program.slug } });
     if (existing) {
+      if (bootstrap) continue;
       await prisma.program.update({ where: { id: existing.id }, data: program });
     } else {
       await prisma.program.create({ data: program });
@@ -764,7 +791,7 @@ Thesis writing, Internal review, External examination, Thesis defense & viva voc
   // ------------------------------------------------------------------
   // E-Learning platform (/learn) — subjects, topics and lessons live in
   // prisma/seed-learn.ts
-  await seedLearn(prisma);
+  await seedLearn(prisma, bootstrap);
 
   console.log("Seed complete ✅");
   console.log("Admin login:   admin@itds.uenr.edu.gh / itds-admin123");

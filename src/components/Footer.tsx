@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Mail, MapPin, Phone, ArrowUpRight } from "lucide-react";
 import { getContact, getSocials, getStringSetting } from "@/lib/settings";
+import { LEARN_URL } from "@/lib/utils";
 
 const brandPaths = {
   Facebook:
@@ -43,7 +44,7 @@ const footerLinks = {
   resources: [
     { label: "Student Projects", href: "/projects" },
     { label: "IT Society", href: "/about/it-society" },
-    { label: "E-Learning Hub", href: "/learn" },
+    { label: "E-Learning Hub", href: LEARN_URL },
   ],
 };
 

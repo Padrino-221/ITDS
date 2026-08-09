@@ -61,10 +61,10 @@ export default async function SubjectPage({
       <PageHeader
         title={subject.name}
         subtitle={subject.description ?? undefined}
-        crumbs={[{ label: "Home", href: "/" }, { label: "Learn", href: "/learn" }, { label: subject.name }]}
+        crumbs={[{ label: "Home", href: "/" }, { label: "Learn", href: "/" }, { label: subject.name }]}
       />
 
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16 lg:px-8">
         <div className="space-y-8">
           {subject.topics.map((topic) => (
             <div
@@ -83,16 +83,16 @@ export default async function SubjectPage({
                 {topic.lessons.map((lesson, i) => (
                   <li key={lesson.id}>
                     <Link
-                      href={`/learn/${subject.slug}/${topic.slug}/${lesson.slug}`}
-                      className="group flex items-center gap-4 px-6 py-4 transition-colors hover:bg-gold-50/60"
+                      href={`/${subject.slug}/${topic.slug}/${lesson.slug}`}
+                      className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-gold-50/60 sm:px-6 sm:py-4"
                     >
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-forest-50 text-sm font-extrabold text-forest-700 transition-colors group-hover:bg-gold-500 group-hover:text-white">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-forest-50 text-sm font-extrabold text-forest-700 transition-colors group-hover:bg-gold-500 group-hover:text-white sm:h-9 sm:w-9">
                         {i + 1}
                       </span>
-                      <span className="flex-1 font-semibold text-forest-900 group-hover:text-gold-700">
+                      <span className="flex-1 min-w-0 font-semibold text-forest-900 group-hover:text-gold-700 text-sm sm:text-base">
                         {lesson.title}
                       </span>
-                      <PlayCircle className="h-5 w-5 text-forest-300 transition-colors group-hover:text-gold-500" />
+                      <PlayCircle className="h-4 w-4 text-forest-300 transition-colors group-hover:text-gold-500 sm:h-5 sm:w-5" />
                     </Link>
                   </li>
                 ))}
@@ -115,7 +115,7 @@ export default async function SubjectPage({
         )}
 
         <Link
-          href="/learn"
+          href="/"
           className="mt-10 inline-flex items-center gap-1.5 text-sm font-bold text-gold-600 hover:text-gold-700"
         >
           <ChevronRight className="h-4 w-4 rotate-180" />

@@ -23,7 +23,7 @@ export default async function ReviewLessonPage({
   params: Promise<{ lessonId: string }>;
 }) {
   const { lessonId } = await params;
-  await requireRole(["ADMIN"], "/learn/account/signin");
+  await requireRole(["ADMIN"], "/account/signin");
 
   const lesson = await getLessonForAuthor(lessonId);
   if (!lesson) notFound();
@@ -31,9 +31,9 @@ export default async function ReviewLessonPage({
   const content = resolvePublishedContent(lesson);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
+    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-12">
       <Link
-        href="/learn/review"
+        href="/review"
         className="inline-flex items-center gap-1.5 text-sm font-bold text-ink-soft transition-colors hover:text-forest-900"
       >
         <ArrowLeft className="h-4 w-4" />

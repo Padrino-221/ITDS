@@ -28,6 +28,9 @@
 prisma/dev.db
 prisma/dev.db-journal
 
+# local helper database (opencode/freebuff desktop artifact)
+/.freebuff/
+
 # uploaded files (served via /uploads route, not from public/)
 /uploads/
 

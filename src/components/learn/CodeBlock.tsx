@@ -36,7 +36,7 @@ export default function CodeBlock({
         {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
         {copied ? "Copied" : language ?? "Copy"}
       </button>
-      <pre className="overflow-x-auto rounded-xl bg-forest-950 p-4 pt-11 text-[13px] leading-relaxed text-emerald-100">
+      <pre className="overflow-x-auto rounded-xl bg-forest-950 p-4 pr-14 pt-11 text-[13px] leading-relaxed text-emerald-100">
         <code>{code}</code>
       </pre>
     </div>

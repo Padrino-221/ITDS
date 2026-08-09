@@ -10,6 +10,7 @@ import {
   FolderOpen,
   Gear,
   GraduationCap,
+  ImageSquare,
   List,
   Newspaper,
   SignOut,
@@ -39,6 +40,7 @@ const sections: Array<{
       { href: "/staff-panel/lecturers", label: "Lecturers", icon: GraduationCap },
       { href: "/staff-panel/research", label: "Research Areas", icon: ChartBar },
       { href: "/staff-panel/programs", label: "Programmes", icon: BookOpen },
+      { href: "/staff-panel/gallery", label: "Gallery", icon: ImageSquare },
     ],
   },
   {
@@ -82,7 +84,7 @@ export default function AdminSidebar({ user }: { user: SessionUser }) {
         </div>
       </div>
 
-      <nav className="flex-1 space-y-6 overflow-y-auto px-3 py-4">
+      <nav className="scrollbar-hide flex-1 space-y-6 overflow-y-auto px-3 py-4">
         {sections.map((section) => (
           <div key={section.label}>
             <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-forest-400">

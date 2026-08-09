@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Sign in — ITDS E-Learning Hub" };
 
 export default function SignInPage() {
   return (
-    <div className="mx-auto flex max-w-md flex-col px-4 py-16 sm:px-6">
+    <div className="mx-auto flex max-w-md flex-col px-4 py-12 sm:px-6 sm:py-16">
       <div className="rounded-2xl border border-forest-100 bg-white p-8 shadow-sm">
         <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-gold-50">
           <BookOpen className="h-6 w-6 text-gold-600" />

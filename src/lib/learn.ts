@@ -271,14 +271,6 @@ export const getLessonForAuthor = cache(async (id: string) =>
   })
 );
 
-export const getMyLessons = cache(async (authorId: string) =>
-  prisma.lesson.findMany({
-    where: { authorId },
-    orderBy: { updatedAt: "desc" },
-    include: { topic: { include: { subject: true } } },
-  })
-);
-
 export const getReviewQueue = cache(async () =>
   prisma.lesson.findMany({
     where: { status: "IN_REVIEW" },

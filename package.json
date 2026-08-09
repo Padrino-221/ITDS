@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
+    "db:bootstrap": "tsx prisma/bootstrap.ts",
     "db:studio": "prisma studio",
     "db:push": "prisma db push",
     "postinstall": "prisma generate"

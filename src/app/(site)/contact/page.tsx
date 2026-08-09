@@ -16,6 +16,9 @@ export const metadata = {
   },
 };
 
+// Re-generate when the contact settings change (on-demand ISR); 1h fallback.
+export const revalidate = 3600;
+
 export default async function ContactPage() {
   const contact = await getContact();
 

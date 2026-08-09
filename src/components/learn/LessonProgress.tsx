@@ -134,7 +134,7 @@ export default function LessonProgress({
         ) : (
           <p className="mt-3 text-sm leading-relaxed text-ink-soft">
             <Link
-              href="/learn/account/signin"
+              href="/account/signin"
               className="font-bold text-gold-600 hover:text-gold-700"
             >
               Sign in
@@ -157,7 +157,7 @@ export default function LessonProgress({
             return (
               <li key={l.id}>
                 <Link
-                  href={`/learn/${subjectSlug}/${topicSlug}/${l.slug}`}
+                  href={`/${subjectSlug}/${topicSlug}/${l.slug}`}
                   className={cn(
                     "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                     active

@@ -53,7 +53,7 @@ export function SignInForm() {
       </button>
       <p className="text-center text-sm text-ink-soft">
         New here?{" "}
-        <Link href="/learn/account/register" className="font-bold text-gold-600 hover:text-gold-700">
+        <Link href="/account/register" className="font-bold text-gold-600 hover:text-gold-700">
           Create an account
         </Link>
       </p>
@@ -94,7 +94,7 @@ export function RegisterForm() {
       </button>
       <p className="text-center text-sm text-ink-soft">
         Already have an account?{" "}
-        <Link href="/learn/account/signin" className="font-bold text-gold-600 hover:text-gold-700">
+        <Link href="/account/signin" className="font-bold text-gold-600 hover:text-gold-700">
           Sign in
         </Link>
       </p>

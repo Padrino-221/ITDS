@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { BadgeCheck, ChevronDown, Mail, Menu, X, MapPin, Phone } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, LEARN_URL } from "@/lib/utils";
 
 type NavChild = { label: string; href: string };
 type NavItem = { label: string; href?: string; children?: NavChild[] };
@@ -33,7 +33,7 @@ const NAV: NavItem[] = [
     ],
   },
   { label: "Lecturers", href: "/lecturers" },
-  { label: "E-Learning", href: "/learn" },
+  { label: "E-Learning", href: LEARN_URL },
 ];
 
 const socialLinks = [

@@ -5,7 +5,10 @@ import { PrismaClient, Prisma, LessonStatus } from "@prisma/client";
  * catalogue for /learn. Kept separate from the main site seed so the
  * (much larger) learning material data stays in one focused file.
  */
-export async function seedLearn(prisma: PrismaClient): Promise<void> {
+export async function seedLearn(
+  prisma: PrismaClient,
+  bootstrap = false
+): Promise<void> {
   const lecturerUser = await prisma.user.findUniqueOrThrow({
     where: { email: "lecturer@itds.uenr.edu.gh" },
   });
@@ -1694,6 +1697,10 @@ export async function seedLearn(prisma: PrismaClient): Promise<void> {
   ];
 
   for (const s of learnSubjects) {
+    const existing = bootstrap
+      ? await prisma.subject.findUnique({ where: { slug: s.slug } })
+      : null;
+    if (existing) continue;
     await prisma.subject.upsert({
       where: { slug: s.slug },
       update: { name: s.name, description: s.description },
@@ -1704,6 +1711,12 @@ export async function seedLearn(prisma: PrismaClient): Promise<void> {
   for (const s of learnSubjects) {
     const subject = await prisma.subject.findUniqueOrThrow({ where: { slug: s.slug } });
     for (const t of s.topics) {
+      const existing = bootstrap
+        ? await prisma.topic.findUnique({
+            where: { subjectId_slug: { subjectId: subject.id, slug: t.slug } },
+          })
+        : null;
+      if (existing) continue;
       await prisma.topic.upsert({
         where: { subjectId_slug: { subjectId: subject.id, slug: t.slug } },
         update: { title: t.title, order: t.order },
@@ -1736,6 +1749,7 @@ export async function seedLearn(prisma: PrismaClient): Promise<void> {
           where: { topicId: topic.id, slug: l.slug },
         });
         if (existing) {
+          if (bootstrap) continue;
           await prisma.lesson.update({ where: { id: existing.id }, data });
         } else {
           await prisma.lesson.create({ data: { ...data, topicId: topic.id, slug: l.slug } });

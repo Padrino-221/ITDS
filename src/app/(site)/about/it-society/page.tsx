@@ -16,6 +16,9 @@ export const metadata = {
   },
 };
 
+// Re-generate when the IT Society settings change (on-demand ISR); 1h fallback.
+export const revalidate = 3600;
+
 export default async function ItSocietyPage() {
   const [story, objectives] = await Promise.all([
     getStringSetting("its_story", ""),

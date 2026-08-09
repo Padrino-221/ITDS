@@ -31,8 +31,12 @@ export const metadata = {
   },
 };
 
+// Re-generate this page when the About settings change (on-demand ISR) and at
+// most once per hour as a fallback — it reads text/images from the DB settings.
+export const revalidate = 3600;
+
 export default async function AboutPage() {
-  const [story, vision, mission, coreValues, acronymValues, highlights] =
+  const [story, vision, mission, coreValues, acronymValues, highlights, storyImage, spmsImage] =
     await Promise.all([
       getStringSetting("about_story", ""),
       getStringSetting("about_vision", ""),
@@ -40,6 +44,8 @@ export default async function AboutPage() {
       getJSONSetting<CoreValue[]>("core_values", []),
       getJSONSetting<AcronymValue[]>("acronym_values", []),
       getJSONSetting<Highlight[]>("spms_highlights", []),
+      getStringSetting("about_image_story", "/images/about/campus.jpg"),
+      getStringSetting("about_image_spms", "/images/about/students.jpg"),
     ]);
 
   return (
@@ -77,7 +83,7 @@ export default async function AboutPage() {
             <div className="absolute -right-4 -top-4 h-28 w-28 rounded-tr-3xl border-r-4 border-t-4 border-gold-400" />
             <div className="relative overflow-hidden rounded-xl">
               <Image
-                src="/images/about/campus.jpg"
+                src={storyImage}
                 alt="UENR campus"
                 width={720}
                 height={540}
@@ -126,7 +132,7 @@ export default async function AboutPage() {
           <div className="order-2 lg:order-1">
             <div className="relative overflow-hidden rounded-xl">
               <Image
-                src="/images/about/students.jpg"
+                src={spmsImage}
                 alt="Students working"
                 width={720}
                 height={540}

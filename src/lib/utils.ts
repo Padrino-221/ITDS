@@ -11,6 +11,9 @@ export function slugify(input: string): string {
 /** Canonical production origin — single source for sitemaps and structured data. */
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://itdsuenr.com";
 
+/** Canonical origin of the E-Learning Hub (served on its own subdomain). */
+export const LEARN_URL = process.env.NEXT_PUBLIC_LEARN_URL ?? "https://learn.itdsuenr.com";
+
 /** Resolve a path (e.g. "/news/foo") or absolute URL to a full canonical URL. */
 export function absoluteUrl(path: string): string {
   if (/^https?:\/\//i.test(path)) return path;
@@ -43,6 +46,28 @@ export function paragraphs(text: string): string[] {
     .split(/\n\s*\n/)
     .map((p) => p.trim())
     .filter(Boolean);
+}
+
+export type ContentBlock =
+  | { type: "paragraph"; text: string }
+  | { type: "image"; alt: string; src: string };
+
+/**
+ * Split a multi-paragraph string into content blocks, hoisting lines written
+ * as ![alt](url) into image blocks so images can sit between paragraphs.
+ */
+export function contentBlocks(text: string): ContentBlock[] {
+  const blocks: ContentBlock[] = [];
+  for (const chunk of text.split(/\n\s*\n/)) {
+    const trimmed = chunk.trim();
+    const image = trimmed.match(/^!\[([\s\S]*?)\]\(([\s\S]*?)\)\s*$/);
+    if (image) {
+      blocks.push({ type: "image", alt: image[1], src: image[2].trim() });
+    } else if (trimmed) {
+      blocks.push({ type: "paragraph", text: trimmed });
+    }
+  }
+  return blocks;
 }
 
 export function initials(name: string): string {

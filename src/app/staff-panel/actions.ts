@@ -73,6 +73,9 @@ async function uniqueSlug(
 
 function revalidateAll() {
   revalidatePath("/", "layout");
+  revalidatePath("/about");
+  revalidatePath("/about/it-society");
+  revalidatePath("/contact");
   revalidatePath("/staff-panel", "layout");
 }
 
@@ -433,6 +436,8 @@ export async function updateSettings(formData: FormData) {
     "about_vision",
     "about_mission",
     "its_story",
+    "about_image_story",
+    "about_image_spms",
   ] as const;
 
   const updates: Array<[string, string]> = [];
@@ -478,6 +483,16 @@ export async function updateSettings(formData: FormData) {
   });
 
   updates.push(["welcome", welcome], ["contact", contact], ["socials", socials]);
+
+  // Remove replaced About-page images (only files under /uploads/ are deleted;
+  // the default /images/about/*.jpg live in the repo and are left intact).
+  for (const key of ["about_image_story", "about_image_spms"] as const) {
+    const prev = (await prisma.setting.findUnique({ where: { key } }))?.value ?? "";
+    const next = str(formData, key);
+    if (prev && next && prev !== next) {
+      await removeUploadFile(prev);
+    }
+  }
 
   // Validate + store raw JSON textareas
   for (const key of jsonFields) {
@@ -592,3 +607,59 @@ export async function updateUserRole(id: string, formData: FormData) {
   });
   revalidatePath("/staff-panel/users");
 }
+
+// ------------------------------------------------------------------
+// Gallery
+// ------------------------------------------------------------------
+
+const galleryImageSchema = z.object({
+  src: z.string().min(1, "An image is required."),
+  caption: z.string().optional(),
+  order: z.coerce.number().int().min(0).default(0),
+});
+
+export async function createGalleryImage(formData: FormData) {
+  await requireAuth();
+  const parsed = galleryImageSchema.safeParse({
+    src: str(formData, "src"),
+    caption: opt(formData, "caption") ?? undefined,
+    order: Number(formData.get("order") ?? 0),
+  });
+  if (!parsed.success) {
+    throw new Error(parsed.error.issues[0]?.message ?? "Invalid input.");
+  }
+  await prisma.galleryImage.create({ data: parsed.data });
+  revalidateAll();
+  redirect("/staff-panel/gallery?saved=1");
+}
+
+export async function updateGalleryImage(id: string, formData: FormData) {
+  await requireAuth();
+  const existing = await prisma.galleryImage.findUnique({ where: { id } });
+  const parsed = galleryImageSchema.safeParse({
+    src: str(formData, "src"),
+    caption: opt(formData, "caption") ?? undefined,
+    order: Number(formData.get("order") ?? 0),
+  });
+  if (!parsed.success) {
+    throw new Error(parsed.error.issues[0]?.message ?? "Invalid input.");
+  }
+  await prisma.galleryImage.update({
+    where: { id },
+    data: parsed.data,
+  });
+  if (existing?.src && parsed.data.src && existing.src !== parsed.data.src) {
+    await removeUploadFile(existing.src);
+  }
+  revalidateAll();
+  redirect("/staff-panel/gallery?saved=1");
+}
+
+export async function deleteGalleryImage(id: string) {
+  await requireAuth();
+  const existing = await prisma.galleryImage.findUnique({ where: { id } });
+  await prisma.galleryImage.delete({ where: { id } });
+  if (existing?.src) await removeUploadFile(existing.src);
+  revalidateAll();
+}
+

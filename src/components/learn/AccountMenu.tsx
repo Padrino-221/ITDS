@@ -6,7 +6,6 @@ import {
   CircleUserRound,
   LogOut,
   Menu,
-  PenLine,
   ShieldCheck,
   X,
 } from "lucide-react";
@@ -78,7 +77,7 @@ export default function AccountMenu() {
   if (!session) {
     return (
       <Link
-        href="/learn/account/signin"
+        href="/account/signin"
         className="rounded-lg bg-forest-950 px-4 py-2 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-forest-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/60"
       >
         Sign in
@@ -91,17 +90,9 @@ export default function AccountMenu() {
 
   const accountLinks = staff ? (
     <>
-      <Link
-        href="/learn/author"
-        className={linkClass}
-        onClick={() => setOpen(false)}
-      >
-        <PenLine className="h-4 w-4" />
-        Author
-      </Link>
       {user.role === "ADMIN" && (
         <Link
-          href="/learn/review"
+          href="/review"
           className={linkClass}
           onClick={() => setOpen(false)}
         >
@@ -112,7 +103,7 @@ export default function AccountMenu() {
     </>
   ) : (
     <Link
-      href="/learn/account"
+      href="/account"
       className={linkClass}
       onClick={() => setOpen(false)}
     >
