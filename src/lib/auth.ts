@@ -121,6 +121,30 @@ export async function getSession(): Promise<SessionUser | null> {
   }
 }
 
+/** The only session role that counts as a signed-in learner on /learn. */
+export const LEARNER_ROLES: SessionRole[] = ["STUDENT"];
+
+/**
+ * Learner-scoped session for the e-learning platform. The whole app shares
+ * one session cookie, so a Staff Panel login (editor/admin) would otherwise
+ * look like a signed-in account on /learn. Only STUDENT accounts may use the
+ * e-learning hub.
+ */
+export async function getLearnerSession(): Promise<SessionUser | null> {
+  const user = await getSession();
+  if (!user || !LEARNER_ROLES.includes(user.role)) return null;
+  return user;
+}
+
+/** Guard the e-learning platform for learner accounts only. */
+export async function requireLearner(
+  loginPath = learnUrl("/account/signin")
+): Promise<SessionUser> {
+  const user = await getLearnerSession();
+  if (!user) redirect(loginPath);
+  return user;
+}
+
 /** Guard for any signed-in user. Redirects to the given login page. */
 export async function requireAuth(redirectTo = "/staff-panel/login"): Promise<SessionUser> {
   const user = await getSession();

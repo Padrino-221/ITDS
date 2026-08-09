@@ -9,8 +9,9 @@ import {
   authenticate,
   createSession,
   destroySession,
-  getSession,
+  getLearnerSession,
   hashPassword,
+  requireLearner,
   requireRole,
 } from "@/lib/auth";
 import type { SessionRole } from "@/lib/auth";
@@ -132,10 +133,7 @@ export async function signout() {
 // ---------------------------------------------------------------------------
 
 export async function toggleLessonComplete(lessonId: string) {
-  const user = await requireRole(
-    ["STUDENT", "LECTURER", "EDITOR", "ADMIN"],
-    "/account/signin"
-  );
+  const user = await requireLearner();
   const lesson = await prisma.lesson.findUnique({ where: { id: lessonId }, select: { id: true } });
   if (!lesson) throw new Error("Lesson not found.");
 
@@ -161,7 +159,7 @@ export async function toggleLessonComplete(lessonId: string) {
  * in the browser either way).
  */
 export async function saveQuizScore(lessonId: string, score: number, total: number) {
-  const user = await getSession();
+  const user = await getLearnerSession();
   if (!user) return;
   if (!Number.isInteger(score) || !Number.isInteger(total) || total < 1 || score < 0 || score > total) {
     return;

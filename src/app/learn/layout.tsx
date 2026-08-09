@@ -64,10 +64,13 @@ export default async function LearnLayout({ children }: { children: React.ReactN
 
       {/* Slim learn footer */}
       <footer className="border-t border-forest-100 bg-white">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-6 text-xs text-ink-soft sm:flex-row sm:px-6 lg:px-8">
-          <p>
-            ITDS E-Learning · Department of Information Technology &amp; Decision
-            Sciences, UENR
+        <div className="mx-auto flex max-w-7xl flex-col items-center gap-3 px-4 py-6 text-xs text-ink-soft sm:flex-row sm:justify-between sm:px-6 lg:px-8">
+          <p className="text-center sm:text-left">
+            <span className="sm:hidden">ITDS E-Learning · UENR</span>
+            <span className="hidden sm:inline">
+              ITDS E-Learning · Department of Information Technology &amp;
+              Decision Sciences, UENR
+            </span>
           </p>
           <Link
             href={SITE_URL}

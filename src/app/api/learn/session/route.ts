@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getSession } from "@/lib/auth";
+import { getLearnerSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -9,8 +9,11 @@ export const dynamic = "force-dynamic";
  * server-rendered public pages is what lets /learn and its lessons be
  * statically generated with ISR instead of rendering dynamically on every
  * request.
+ *
+ * Learner-scoped: the whole app shares one session cookie (Staff Panel logins
+ * included), but only STUDENT accounts count as signed-in on the hub.
  */
 export async function GET() {
-  const user = await getSession();
+  const user = await getLearnerSession();
   return NextResponse.json({ user }, { headers: { "Cache-Control": "no-store" } });
 }

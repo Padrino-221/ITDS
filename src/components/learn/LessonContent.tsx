@@ -6,7 +6,7 @@ export default function LessonContent({ blocks }: { blocks: ContentBlock[] }) {
     return <p className="text-ink-soft">No content yet.</p>;
   }
   return (
-    <div>
+    <div className="min-w-0">
       {blocks.map((block, i) => {
         switch (block.type) {
           case "heading":

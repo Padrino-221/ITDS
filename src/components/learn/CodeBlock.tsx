@@ -25,7 +25,7 @@ export default function CodeBlock({
   }
 
   return (
-    <div className={`relative mt-4 ${className ?? ""}`}>
+    <div className={`relative mt-4 min-w-0 ${className ?? ""}`}>
       <button
         type="button"
         onClick={copy}

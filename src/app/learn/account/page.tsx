@@ -14,12 +14,12 @@ import {
   getQuizScores,
   getSubjects,
 } from "@/lib/learn";
-import { requireAuth } from "@/lib/auth";
+import { requireLearner } from "@/lib/auth";
 import { formatDate, learnUrl } from "@/lib/utils";
 
 export default async function LearnAccountPage() {
   const [session, subjects] = await Promise.all([
-    requireAuth(learnUrl("/account/signin")),
+    requireLearner(),
     getSubjects(),
   ]);
   const [myProgress, continueLessons, quizScores] = await Promise.all([

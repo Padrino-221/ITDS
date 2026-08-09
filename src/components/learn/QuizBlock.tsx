@@ -47,7 +47,7 @@ export default function QuizBlock({
                       )
                     }
                     className={cn(
-                      "flex w-full items-center gap-3 rounded-xl border px-4 py-2.5 text-left text-sm font-medium transition-all",
+                      "flex w-fit items-center gap-3 rounded-xl border px-4 py-2.5 text-left text-sm font-medium transition-all",
                       selected && !submitted
                         ? "border-forest-500 bg-forest-50 text-forest-800"
                         : "border-forest-100 bg-white text-ink hover:border-forest-300",

@@ -110,7 +110,7 @@ export default async function LessonPage({
 
       <div className="mt-6 grid gap-10 lg:grid-cols-[1fr_300px]">
         {/* Main content */}
-        <article>
+        <article className="min-w-0">
           <h1 className="display-heading text-balance text-2xl font-extrabold uppercase tracking-tight text-forest-950 sm:text-3xl lg:text-4xl">
             {lessonRow.title}
           </h1>
@@ -204,7 +204,7 @@ export default async function LessonPage({
                 href={learnUrl(`/${subject.slug}/${topicSlug}/${nextLesson.slug}`)}
                 className={cn(
                   "group min-w-0 rounded-xl border border-forest-100 bg-white p-4 text-right transition-all hover:border-gold-300 hover:shadow-md",
-                  !prevLesson ? "col-span-2" : "sm:ml-auto"
+                  !prevLesson ? "col-span-2 justify-self-end" : "sm:ml-auto"
                 )}
               >
                 <span className="flex items-center justify-end gap-1 text-xs font-bold uppercase tracking-wider text-ink-soft">
