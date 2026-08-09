@@ -131,6 +131,19 @@ model Setting {
   value String
 }
 
+// Uploaded image files. Named with unique timestamps, so the name doubles as
+// a public cache key (see /uploads/[path]/route.ts). Stored in Postgres —
+// Vercel serverless runs have an ephemeral read-only filesystem, so the old
+// on-disk uploads/ directory could not survive between requests there.
+model Upload {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  contentType String
+  size        Int
+  data        Bytes
+  createdAt   DateTime @default(now())
+}
+
 // ---------------------------------------------------------------------------
 // E-Learning platform (/learn)
 // ---------------------------------------------------------------------------

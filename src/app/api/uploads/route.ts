@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import { randomUUID } from "crypto";
-import { writeFile } from "fs/promises";
 import { getSession } from "@/lib/auth";
 import type { SessionRole } from "@/lib/auth";
-import { ensureUploadsDir, extForMime, MAX_UPLOAD_BYTES } from "@/lib/uploads";
+import { extForMime, MAX_UPLOAD_BYTES, saveUpload } from "@/lib/uploads";
 
 // Only staff accounts may upload files — students self-register on /learn and
 // must never be able to write to the server.
@@ -64,10 +63,9 @@ export async function POST(request: Request) {
     );
   }
 
-  const bytes = Buffer.from(await file.arrayBuffer());
+  const bytes = new Uint8Array(await file.arrayBuffer());
   const name = `${Date.now()}-${randomUUID().slice(0, 8)}${extForMime(file.type)}`;
-  const dir = await ensureUploadsDir();
-  await writeFile(`${dir}/${name}`, bytes);
+  await saveUpload(name, file.type, bytes);
 
   return NextResponse.json({ url: `/uploads/${name}` });
 }
