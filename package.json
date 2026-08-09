@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "prebuild": "prisma migrate deploy && npm run db:bootstrap",
+    "prebuild": "node scripts/db-migrate.mjs && npm run db:bootstrap",
     "start": "next start",
     "lint": "eslint",
     "db:migrate": "prisma migrate dev",
