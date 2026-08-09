@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import type { SessionRole, SessionUser } from "@/lib/auth";
 import { signout } from "@/app/learn/actions";
+import { learnUrl } from "@/lib/utils";
 
 const ROLE_LABELS: Record<SessionRole, string> = {
   STUDENT: "Learner",
@@ -77,7 +78,7 @@ export default function AccountMenu() {
   if (!session) {
     return (
       <Link
-        href="/account/signin"
+        href={learnUrl("/account/signin")}
         className="rounded-lg bg-forest-950 px-4 py-2 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-forest-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/60"
       >
         Sign in
@@ -92,7 +93,7 @@ export default function AccountMenu() {
     <>
       {user.role === "ADMIN" && (
         <Link
-          href="/review"
+          href={learnUrl("/review")}
           className={linkClass}
           onClick={() => setOpen(false)}
         >
@@ -103,7 +104,7 @@ export default function AccountMenu() {
     </>
   ) : (
     <Link
-      href="/account"
+      href={learnUrl("/account")}
       className={linkClass}
       onClick={() => setOpen(false)}
     >

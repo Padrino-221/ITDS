@@ -19,7 +19,10 @@ export default async function AdminNewsPage({
   searchParams: Promise<{ saved?: string }>;
 }) {
   const { saved } = await searchParams;
-  const posts = await prisma.newsPost.findMany({ orderBy: { publishedAt: "desc" } });
+  const posts = await prisma.newsPost.findMany({
+    select: { id: true, title: true, category: true, publishedAt: true, published: true },
+    orderBy: { publishedAt: "desc" },
+  });
 
   return (
     <div className="space-y-6">

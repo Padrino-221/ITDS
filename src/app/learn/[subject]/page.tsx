@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { BookOpenCheck, ChevronRight, PlayCircle } from "lucide-react";
 import { PageHeader, EmptyState } from "@/components/ui";
 import { getSubjectWithTopics, getSubjects } from "@/lib/learn";
+import { learnUrl } from "@/lib/utils";
 
 export const revalidate = 3600;
 
@@ -61,7 +62,11 @@ export default async function SubjectPage({
       <PageHeader
         title={subject.name}
         subtitle={subject.description ?? undefined}
-        crumbs={[{ label: "Home", href: "/" }, { label: "Learn", href: "/" }, { label: subject.name }]}
+        crumbs={[
+  { label: "Home", href: learnUrl("/") },
+  { label: "Learn", href: learnUrl("/") },
+  { label: subject.name },
+]}
       />
 
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16 lg:px-8">
@@ -83,7 +88,7 @@ export default async function SubjectPage({
                 {topic.lessons.map((lesson, i) => (
                   <li key={lesson.id}>
                     <Link
-                      href={`/${subject.slug}/${topic.slug}/${lesson.slug}`}
+                      href={learnUrl(`/${subject.slug}/${topic.slug}/${lesson.slug}`)}
                       className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-gold-50/60 sm:px-6 sm:py-4"
                     >
                       <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-forest-50 text-sm font-extrabold text-forest-700 transition-colors group-hover:bg-gold-500 group-hover:text-white sm:h-9 sm:w-9">
@@ -115,7 +120,7 @@ export default async function SubjectPage({
         )}
 
         <Link
-          href="/"
+          href={learnUrl("/")}
           className="mt-10 inline-flex items-center gap-1.5 text-sm font-bold text-gold-600 hover:text-gold-700"
         >
           <ChevronRight className="h-4 w-4 rotate-180" />

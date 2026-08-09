@@ -23,7 +23,10 @@ export default async function AdminUsersPage({
 }) {
   const { saved } = await searchParams;
   const session = await requireAdmin();
-  const users = await prisma.user.findMany({ orderBy: { createdAt: "asc" } });
+  const users = await prisma.user.findMany({
+    select: { id: true, name: true, email: true, role: true, createdAt: true },
+    orderBy: { createdAt: "asc" },
+  });
 
   return (
     <div className="space-y-6">

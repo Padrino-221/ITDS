@@ -18,8 +18,13 @@ export default async function AdminLecturersPage({
 }) {
   const { saved } = await searchParams;
   const lecturers = await prisma.lecturer.findMany({
+    select: {
+      id: true,
+      name: true,
+      title: true,
+      _count: { select: { projects: true } },
+    },
     orderBy: [{ order: "asc" }, { name: "asc" }],
-    include: { _count: { select: { projects: true } } },
   });
 
   return (

@@ -15,7 +15,7 @@ import CodeBlock from "@/components/learn/CodeBlock";
 import { getLessonForAuthor, resolvePublishedContent } from "@/lib/learn";
 import { approveLesson, requestChanges } from "@/app/learn/actions";
 import { requireRole } from "@/lib/auth";
-import { formatDateTime } from "@/lib/utils";
+import { formatDateTime, learnUrl } from "@/lib/utils";
 
 export default async function ReviewLessonPage({
   params,
@@ -23,7 +23,7 @@ export default async function ReviewLessonPage({
   params: Promise<{ lessonId: string }>;
 }) {
   const { lessonId } = await params;
-  await requireRole(["ADMIN"], "/account/signin");
+  await requireRole(["ADMIN"], learnUrl("/account/signin"));
 
   const lesson = await getLessonForAuthor(lessonId);
   if (!lesson) notFound();
@@ -33,7 +33,7 @@ export default async function ReviewLessonPage({
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-12">
       <Link
-        href="/review"
+        href={learnUrl("/review")}
         className="inline-flex items-center gap-1.5 text-sm font-bold text-ink-soft transition-colors hover:text-forest-900"
       >
         <ArrowLeft className="h-4 w-4" />

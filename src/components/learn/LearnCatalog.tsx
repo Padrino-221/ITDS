@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 import type { LessonSearchResult } from "@/lib/learn";
+import { learnUrl } from "@/lib/utils";
 
 export type CatalogSubject = {
   name: string;
@@ -162,7 +163,7 @@ export default function LearnCatalog({
               {results.map((l) => (
                 <li key={l.id}>
                   <Link
-                    href={`/${l.subjectSlug}/${l.topicSlug}/${l.slug}`}
+                    href={learnUrl(`/${l.subjectSlug}/${l.topicSlug}/${l.slug}`)}
                     className="group flex items-center gap-4 rounded-2xl border border-forest-100 bg-white p-4 transition-all hover:-translate-y-0.5 hover:border-gold-300 hover:shadow-md sm:p-5"
                   >
                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-forest-50 text-forest-700 transition-colors group-hover:bg-gold-500 group-hover:text-white">
@@ -195,7 +196,7 @@ export default function LearnCatalog({
             {subjects.map((subject, i) => (
               <Link
                 key={subject.slug}
-                href={`/${subject.slug}`}
+                href={learnUrl(`/${subject.slug}`)}
                 className="group flex flex-col rounded-2xl border border-forest-100 bg-white p-6 transition-all duration-300 hover:-translate-y-1.5 hover:border-gold-300 hover:shadow-xl hover:shadow-forest-950/5"
               >
                 <span

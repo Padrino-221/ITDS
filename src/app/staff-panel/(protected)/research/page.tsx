@@ -17,7 +17,10 @@ export default async function AdminResearchPage({
   searchParams: Promise<{ saved?: string }>;
 }) {
   const { saved } = await searchParams;
-  const areas = await prisma.researchArea.findMany({ orderBy: { order: "asc" } });
+  const areas = await prisma.researchArea.findMany({
+    select: { id: true, title: true, description: true, order: true },
+    orderBy: { order: "asc" },
+  });
 
   return (
     <div className="space-y-6">

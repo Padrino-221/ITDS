@@ -3,6 +3,7 @@ import { PageHeader } from "@/components/ui";
 import LearnCatalog from "@/components/learn/LearnCatalog";
 import { getAllPublishedLessons, getSubjects } from "@/lib/learn";
 import { getStringSetting } from "@/lib/settings";
+import { learnUrl } from "@/lib/utils";
 
 export const revalidate = 3600;
 
@@ -27,7 +28,7 @@ export default async function LearnHomePage() {
       <PageHeader
         title="ITDS E-Learning Hub"
         subtitle={announcement}
-        crumbs={[{ label: "Home", href: "/" }, { label: "Learn" }]}
+        crumbs={[{ label: "Home", href: learnUrl("/") }, { label: "Learn" }]}
       />
 
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16 lg:px-8">

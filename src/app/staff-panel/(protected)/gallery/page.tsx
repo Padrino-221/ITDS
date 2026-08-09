@@ -18,7 +18,10 @@ export default async function AdminGalleryPage({
   searchParams: Promise<{ saved?: string }>;
 }) {
   const { saved } = await searchParams;
-  const images = await prisma.galleryImage.findMany({ orderBy: { order: "asc" } });
+  const images = await prisma.galleryImage.findMany({
+    select: { id: true, src: true, caption: true, order: true },
+    orderBy: { order: "asc" },
+  });
 
   return (
     <div className="space-y-6">

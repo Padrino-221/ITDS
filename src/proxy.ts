@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
+import { LEARN_URL, LEARN_AS_PATH } from "@/lib/utils";
 
-const LEARN_URL = process.env.NEXT_PUBLIC_LEARN_URL ?? "https://learn.itdsuenr.com";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://itdsuenr.com";
 
 /**
@@ -11,10 +11,16 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://itdsuenr.com";
  * On the learning subdomain (learn.itdsuenr.com) we serve that tree from the
  * root URL, and on the main site we 301 /learn traffic to the subdomain so
  * there is a single canonical home for it.
+ *
+ * When LEARN_URL is pointed at the same host as SITE_URL (e.g. a Vercel
+ * public URL in path mode), none of this applies — the /learn tree already
+ * resolves at its real paths, so we pass everything through untouched.
  */
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   const host = request.nextUrl.hostname.replace(/^www\./i, "");
+
+  if (LEARN_AS_PATH) return NextResponse.next();
 
   if (host === new URL(LEARN_URL).hostname) {
     // API routes and framework/static assets already resolve at their real

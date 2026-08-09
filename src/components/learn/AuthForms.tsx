@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { register, signin } from "@/app/learn/actions";
 import { inputClass } from "@/lib/styles";
+import { learnUrl } from "@/lib/utils";
 
 function Field({
   label,
@@ -53,7 +54,7 @@ export function SignInForm() {
       </button>
       <p className="text-center text-sm text-ink-soft">
         New here?{" "}
-        <Link href="/account/register" className="font-bold text-gold-600 hover:text-gold-700">
+        <Link href={learnUrl("/account/register")} className="font-bold text-gold-600 hover:text-gold-700">
           Create an account
         </Link>
       </p>
@@ -94,7 +95,7 @@ export function RegisterForm() {
       </button>
       <p className="text-center text-sm text-ink-soft">
         Already have an account?{" "}
-        <Link href="/account/signin" className="font-bold text-gold-600 hover:text-gold-700">
+        <Link href={learnUrl("/account/signin")} className="font-bold text-gold-600 hover:text-gold-700">
           Sign in
         </Link>
       </p>

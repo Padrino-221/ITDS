@@ -20,7 +20,7 @@ import {
   readingMinutes,
   resolvePublishedContent,
 } from "@/lib/learn";
-import { cn, LEARN_URL } from "@/lib/utils";
+import { cn, LEARN_URL, learnUrl } from "@/lib/utils";
 
 export const revalidate = 3600;
 
@@ -97,11 +97,11 @@ export default async function LessonPage({
 
       {/* Breadcrumbs */}
       <nav className="flex flex-wrap items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-ink-soft">
-        <Link href="/" className="transition-colors hover:text-gold-600">
+        <Link href={learnUrl("/")} className="transition-colors hover:text-gold-600">
           Learn
         </Link>
         <span className="text-forest-300">/</span>
-        <Link href={`/${subject.slug}`} className="transition-colors hover:text-gold-600">
+        <Link href={learnUrl(`/${subject.slug}`)} className="transition-colors hover:text-gold-600">
           {subject.name}
         </Link>
         <span className="text-forest-300">/</span>
@@ -184,7 +184,7 @@ export default async function LessonPage({
           <div className="mt-12 grid grid-cols-2 gap-3 border-t border-forest-100 pt-8 sm:flex sm:items-start sm:gap-4">
             {prevLesson && (
               <Link
-                href={`/${subject.slug}/${topicSlug}/${prevLesson.slug}`}
+                href={learnUrl(`/${subject.slug}/${topicSlug}/${prevLesson.slug}`)}
                 className={cn(
                   "group min-w-0 rounded-xl border border-forest-100 bg-white p-4 transition-all hover:border-gold-300 hover:shadow-md",
                   !nextLesson && "col-span-2"
@@ -201,7 +201,7 @@ export default async function LessonPage({
             )}
             {nextLesson && (
               <Link
-                href={`/${subject.slug}/${topicSlug}/${nextLesson.slug}`}
+                href={learnUrl(`/${subject.slug}/${topicSlug}/${nextLesson.slug}`)}
                 className={cn(
                   "group min-w-0 rounded-xl border border-forest-100 bg-white p-4 text-right transition-all hover:border-gold-300 hover:shadow-md",
                   !prevLesson ? "col-span-2" : "sm:ml-auto"

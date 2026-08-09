@@ -15,11 +15,11 @@ import {
   getSubjects,
 } from "@/lib/learn";
 import { requireAuth } from "@/lib/auth";
-import { formatDate } from "@/lib/utils";
+import { formatDate, learnUrl } from "@/lib/utils";
 
 export default async function LearnAccountPage() {
   const [session, subjects] = await Promise.all([
-    requireAuth("/account/signin"),
+    requireAuth(learnUrl("/account/signin")),
     getSubjects(),
   ]);
   const [myProgress, continueLessons, quizScores] = await Promise.all([
@@ -55,7 +55,7 @@ export default async function LearnAccountPage() {
           </h1>
         </div>
         <Link
-          href="/"
+          href={learnUrl("/")}
           className="inline-flex items-center gap-2 rounded-lg bg-forest-950 px-5 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-forest-800 hover:shadow-lg"
         >
           Continue learning <ArrowRight className="h-4 w-4" />
@@ -115,7 +115,7 @@ export default async function LearnAccountPage() {
             {continueLessons.slice(0, 3).map((c) => (
               <li key={c.lessonId}>
                 <Link
-                  href={`/${c.subjectSlug}/${c.topicSlug}/${c.slug}`}
+                  href={learnUrl(`/${c.subjectSlug}/${c.topicSlug}/${c.slug}`)}
                   className="group flex h-full flex-col rounded-2xl border border-forest-100 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-gold-300 hover:shadow-md"
                 >
                   <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gold-600">
@@ -155,7 +155,7 @@ export default async function LearnAccountPage() {
             Head to the E-Learning Hub and mark your first lesson complete.
           </p>
           <Link
-            href="/"
+            href={learnUrl("/")}
             className="mt-5 inline-flex items-center gap-2 rounded-lg bg-gold-500 px-5 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-gold-600"
           >
             Browse subjects <ArrowRight className="h-4 w-4" />
@@ -168,7 +168,7 @@ export default async function LearnAccountPage() {
             return (
               <li key={item.id}>
                 <Link
-                  href={`/${item.lesson.topic.subject.slug}/${item.lesson.topic.slug}/${item.lesson.slug}`}
+                  href={learnUrl(`/${item.lesson.topic.subject.slug}/${item.lesson.topic.slug}/${item.lesson.slug}`)}
                   className="flex items-center gap-4 rounded-xl border border-forest-100 bg-white p-4 transition-all hover:-translate-y-0.5 hover:border-gold-300 hover:shadow-md"
                 >
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-50">

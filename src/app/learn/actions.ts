@@ -14,7 +14,7 @@ import {
   requireRole,
 } from "@/lib/auth";
 import type { SessionRole } from "@/lib/auth";
-import { slugify } from "@/lib/utils";
+import { slugify, learnUrl } from "@/lib/utils";
 
 const ADMIN_ROLES: SessionRole[] = ["ADMIN"];
 
@@ -96,7 +96,7 @@ export async function register(prev: { error?: string }, formData: FormData) {
     },
   });
   await createSession({ id: user.id, name: user.name, email: user.email, role: user.role });
-  redirect("/account");
+  redirect(learnUrl("/account"));
 }
 
 export async function signin(prev: { error?: string }, formData: FormData) {
@@ -119,12 +119,12 @@ export async function signin(prev: { error?: string }, formData: FormData) {
     };
   }
   await createSession(user);
-  redirect("/account");
+  redirect(learnUrl("/account"));
 }
 
 export async function signout() {
   await destroySession();
-  redirect("/");
+  redirect(learnUrl("/"));
 }
 
 // ---------------------------------------------------------------------------
@@ -221,7 +221,7 @@ export async function approveLesson(lessonId: string) {
     },
   });
   revalidateLearn();
-  redirect("/review?done=1");
+  redirect(learnUrl("/review?done=1"));
 }
 
 export async function requestChanges(lessonId: string, formData: FormData) {
@@ -236,7 +236,7 @@ export async function requestChanges(lessonId: string, formData: FormData) {
     data: { status: "CHANGES_REQUESTED", reviewerId: reviewer.id, reviewNote: note },
   });
   revalidateLearn();
-  redirect("/review?done=1");
+  redirect(learnUrl("/review?done=1"));
 }
 
 // ---------------------------------------------------------------------------
@@ -255,7 +255,7 @@ export async function createSubject(formData: FormData) {
 
   await prisma.subject.create({ data: { name, slug, description: description || null } });
   revalidateLearn();
-  redirect("/review?created=subject");
+  redirect(learnUrl("/review?created=subject"));
 }
 
 export async function createTopic(formData: FormData) {
@@ -273,6 +273,6 @@ export async function createTopic(formData: FormData) {
 
   await prisma.topic.create({ data: { subjectId, title, slug, order } });
   revalidateLearn();
-  redirect("/review?created=topic");
+  redirect(learnUrl("/review?created=topic"));
 }
 

@@ -11,8 +11,33 @@ export function slugify(input: string): string {
 /** Canonical production origin — single source for sitemaps and structured data. */
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://itdsuenr.com";
 
-/** Canonical origin of the E-Learning Hub (served on its own subdomain). */
+/**
+ * Canonical origin of the E-Learning Hub. Defaults to its own subdomain, but
+ * can be pointed at the same host as SITE_URL (e.g. a Vercel public URL) to
+ * serve the hub at a path such as /learn instead of a separate domain.
+ */
 export const LEARN_URL = process.env.NEXT_PUBLIC_LEARN_URL ?? "https://learn.itdsuenr.com";
+
+/** True when the hub lives on the same host as the main site (path mode). */
+export const LEARN_AS_PATH = new URL(SITE_URL).host === new URL(LEARN_URL).host;
+
+/**
+ * Base path the E-Learning app sits at relative to the request origin:
+ * "" on the subdomain (the proxy maps the root), or the /learn path in
+ * path mode so internal links stay on the hub. (The app's own route tree is
+ * always under /learn — the proxy rewrites the subdomain root onto it.)
+ */
+export const LEARN_BASE = (() => {
+  const learn = new URL(LEARN_URL);
+  const site = new URL(SITE_URL);
+  if (learn.host === site.host) return learn.pathname.replace(/\/+$/, "") || "/learn";
+  return "";
+})();
+
+/** Resolve a learn-app-relative path (e.g. "/" or "/intro") to a real route. */
+export function learnUrl(path: string): string {
+  return `${LEARN_BASE}${path.startsWith("/") ? path : `/${path}`}`;
+}
 
 /** Resolve a path (e.g. "/news/foo") or absolute URL to a full canonical URL. */
 export function absoluteUrl(path: string): string {

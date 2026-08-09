@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { CheckCircle2, Circle, ListChecks, SignpostBig } from "lucide-react";
 import { toggleLessonComplete } from "@/app/learn/actions";
-import { cn } from "@/lib/utils";
+import { cn, learnUrl } from "@/lib/utils";
 
 export type TopicLesson = { id: string; slug: string; title: string };
 
@@ -134,7 +134,7 @@ export default function LessonProgress({
         ) : (
           <p className="mt-3 text-sm leading-relaxed text-ink-soft">
             <Link
-              href="/account/signin"
+              href={learnUrl("/account/signin")}
               className="font-bold text-gold-600 hover:text-gold-700"
             >
               Sign in
@@ -157,7 +157,7 @@ export default function LessonProgress({
             return (
               <li key={l.id}>
                 <Link
-                  href={`/${subjectSlug}/${topicSlug}/${l.slug}`}
+                  href={learnUrl(`/${subjectSlug}/${topicSlug}/${l.slug}`)}
                   className={cn(
                     "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                     active

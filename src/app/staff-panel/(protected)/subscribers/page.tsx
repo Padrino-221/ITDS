@@ -9,6 +9,7 @@ export const metadata = { title: "Subscribers — Admin" };
 
 export default async function AdminSubscribersPage() {
   const subscribers = await prisma.newsletterSubscriber.findMany({
+    select: { id: true, email: true, createdAt: true },
     orderBy: { createdAt: "desc" },
   });
 

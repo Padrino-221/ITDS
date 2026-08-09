@@ -4,7 +4,7 @@ import { getReviewQueue, getSubjectsWithTopics, LESSON_STATUS_LABEL } from "@/li
 import { createSubject, createTopic } from "@/app/learn/actions";
 import { Select } from "@/components/admin/Dropdown";
 import { requireRole } from "@/lib/auth";
-import { cn, formatDate } from "@/lib/utils";
+import { cn, formatDate, learnUrl } from "@/lib/utils";
 import { inputClass } from "@/lib/styles";
 
 export default async function ReviewQueuePage({
@@ -13,7 +13,7 @@ export default async function ReviewQueuePage({
   searchParams: Promise<{ done?: string; created?: string }>;
 }) {
   const { done, created } = await searchParams;
-  await requireRole(["ADMIN"], "/account/signin");
+  await requireRole(["ADMIN"], learnUrl("/account/signin"));
   const [queue, subjects] = await Promise.all([getReviewQueue(), getSubjectsWithTopics()]);
 
   return (
@@ -55,7 +55,7 @@ export default async function ReviewQueuePage({
           {queue.map((lesson) => (
             <li key={lesson.id}>
               <Link
-                href={`/review/${lesson.id}`}
+                href={learnUrl(`/review/${lesson.id}`)}
                 className="flex flex-wrap items-center gap-4 rounded-xl border border-forest-100 bg-white p-4 transition-all hover:-translate-y-0.5 hover:border-gold-300 hover:shadow-md"
               >
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gold-50">

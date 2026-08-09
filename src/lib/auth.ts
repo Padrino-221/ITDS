@@ -3,7 +3,7 @@ import { compare, hash } from "bcryptjs";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "./prisma";
-import { LEARN_URL, SITE_URL } from "./utils";
+import { LEARN_URL, SITE_URL, learnUrl } from "./utils";
 
 const COOKIE_NAME = "itds_session";
 const MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7 days
@@ -141,11 +141,11 @@ export async function requireAdmin(): Promise<SessionUser> {
  */
 export async function requireRole(
   roles: SessionRole[],
-  loginPath = "/account/signin"
+  loginPath = learnUrl("/account/signin")
 ): Promise<SessionUser> {
   const user = await getSession();
   if (!user) redirect(loginPath);
-  if (!roles.includes(user.role)) redirect("/");
+  if (!roles.includes(user.role)) redirect(learnUrl("/"));
   return user;
 }
 

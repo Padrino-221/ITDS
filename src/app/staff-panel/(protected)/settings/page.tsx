@@ -3,31 +3,17 @@ import { AdminCard, AdminPageHeader, Field, PrimaryButton, TextArea, TextInput }
 import { SavedToast } from "@/components/admin/SavedToast";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { HeroSlidesEditor } from "@/components/admin/HeroSlidesEditor";
+import { SettingsListEditor } from "@/components/admin/SettingsListEditor";
 import { updateSettings } from "@/app/staff-panel/actions";
 import { parseSetting } from "@/lib/settings";
 import type { HeroSlide } from "@/lib/settings";
 
-function JSONTextArea({
-  name,
-  value,
-  hint,
-}: {
-  name: string;
-  value: string;
-  hint?: string;
-}) {
-  return (
-    <Field label={name} hint={hint}>
-      <TextArea
-        name={name}
-        rows={5}
-        defaultValue={value}
-        spellCheck={false}
-        className="font-mono text-xs"
-      />
-    </Field>
-  );
-}
+const featuredLinkIconOptions = [
+  { value: "folder", label: "Folder" },
+  { value: "newspaper", label: "Newspaper" },
+  { value: "clipboard", label: "Clipboard" },
+  { value: "image", label: "Image" },
+];
 
 export default async function AdminSettingsPage({
   searchParams,
@@ -42,6 +28,12 @@ export default async function AdminSettingsPage({
   const contact = parseSetting<Record<string, string>>(settings.get("contact"), {});
   const socials = parseSetting<Record<string, string>>(settings.get("socials"), {});
   const heroSlides = parseSetting<HeroSlide[]>(settings.get("hero_slides"), []);
+  const stats = parseSetting<Array<{ value: string; label: string }>>(settings.get("stats"), []);
+  const featuredLinks = parseSetting<Array<{ title: string; description: string; href: string; icon: string }>>(settings.get("featured_links"), []);
+  const coreValues = parseSetting<Array<{ title: string; description: string }>>(settings.get("core_values"), []);
+  const acronymValues = parseSetting<Array<{ letter: string; word: string; description: string }>>(settings.get("acronym_values"), []);
+  const highlights = parseSetting<Array<{ title: string; description: string }>>(settings.get("spms_highlights"), []);
+  const objectives = parseSetting<string[]>(settings.get("its_objectives"), []);
 
   return (
     <div className="space-y-6">
@@ -80,16 +72,41 @@ export default async function AdminSettingsPage({
 
         <AdminCard title="Homepage Stats & Links">
           <div className="mt-5 grid gap-5">
-            <JSONTextArea
-              name="stats"
-              value={settings.get("stats") ?? "[]"}
-              hint='JSON array: [{"value":"4000+","label":"Registered Students"}]'
-            />
-            <JSONTextArea
-              name="featured_links"
-              value={settings.get("featured_links") ?? "[]"}
-              hint='JSON array: [{"title","description","href","icon"}] — icons: folder, newspaper, clipboard, image'
-            />
+            <Field
+              label="Homepage stats"
+              hint="The numbers shown across the stats band on the homepage. Use plain text values (e.g. 4000+)."
+            >
+              <SettingsListEditor
+                name="stats"
+                itemLabel="Stat"
+                defaultValue={stats}
+                addLabel="Add stat"
+                columns={1}
+                fields={[
+                  { key: "value", label: "Value", placeholder: "e.g. 4000+" },
+                  { key: "label", label: "Label", placeholder: "e.g. Registered Students" },
+                ]}
+              />
+            </Field>
+            <Field
+              label="Featured links"
+              hint="The cards on the homepage under “Our Approach”."
+            >
+              <SettingsListEditor
+                name="featured_links"
+                itemLabel="Link"
+                defaultValue={featuredLinks}
+                addLabel="Add link"
+                cardColumns={1}
+                columns={3}
+                fields={[
+                  { key: "icon", label: "Icon", type: "select", options: featuredLinkIconOptions },
+                  { key: "title", label: "Title", placeholder: "e.g. Student Projects" },
+                  { key: "href", label: "Link", type: "text", placeholder: "/projects" },
+                  { key: "description", label: "Description", type: "textarea", rows: 2 },
+                ]}
+              />
+            </Field>
           </div>
         </AdminCard>
 
@@ -147,29 +164,56 @@ export default async function AdminSettingsPage({
                 <TextArea name="about_mission" rows={3} defaultValue={settings.get("about_mission") ?? ""} />
               </Field>
             </div>
-            <JSONTextArea
-              name="core_values"
-              value={settings.get("core_values") ?? "[]"}
-              hint='JSON array: [{"title","description"}]'
-            />
-            <JSONTextArea
-              name="acronym_values"
-              value={settings.get("acronym_values") ?? "[]"}
-              hint='JSON array: [{"letter":"I","word":"Innovation","description":"…"}]'
-            />
-            <JSONTextArea
-              name="spms_highlights"
-              value={settings.get("spms_highlights") ?? "[]"}
-              hint='JSON array: [{"title","description"}]'
-            />
+            <Field label="Core values" hint="Cards shown in the “ITDS Core Values” section on the About page.">
+              <SettingsListEditor
+                name="core_values"
+                itemLabel="Value"
+                defaultValue={coreValues}
+                addLabel="Add core value"
+                fields={[
+                  { key: "title", label: "Title", placeholder: "e.g. Innovation" },
+                  { key: "description", label: "Description", type: "textarea", rows: 2 },
+                ]}
+              />
+            </Field>
+            <Field label="ITDS acronym" hint="Letters that spell out ITDS, shown in the “What ITDS Stands For” section.">
+              <SettingsListEditor
+                name="acronym_values"
+                itemLabel="Letter"
+                defaultValue={acronymValues}
+                addLabel="Add letter"
+                fields={[
+                  { key: "letter", label: "Letter", placeholder: "I" },
+                  { key: "word", label: "Word", placeholder: "Innovation" },
+                  { key: "description", label: "Description", type: "textarea", rows: 2 },
+                ]}
+              />
+            </Field>
+            <Field label="SPMS highlights" hint="Numbered highlights in the Student Project Management System section.">
+              <SettingsListEditor
+                name="spms_highlights"
+                itemLabel="Highlight"
+                defaultValue={highlights}
+                addLabel="Add highlight"
+                fields={[
+                  { key: "title", label: "Title", placeholder: "e.g. Searchable repository" },
+                  { key: "description", label: "Description", type: "textarea", rows: 2 },
+                ]}
+              />
+            </Field>
             <Field label="IT Society — story">
               <TextArea name="its_story" rows={4} defaultValue={settings.get("its_story") ?? ""} />
             </Field>
-            <JSONTextArea
-              name="its_objectives"
-              value={settings.get("its_objectives") ?? "[]"}
-              hint='JSON array of strings: ["objective one", "objective two"]'
-            />
+            <Field label="IT Society objectives" hint="The objectives listed on the IT Society page.">
+              <SettingsListEditor
+                name="its_objectives"
+                itemLabel="Objective"
+                defaultValue={objectives.map((o) => ({ text: o }))}
+                stringItems
+                addLabel="Add objective"
+                fields={[{ key: "text", label: "Objective", placeholder: "e.g. Organise the annual UENR Tech Fair" }]}
+              />
+            </Field>
           </div>
         </AdminCard>
 

@@ -20,7 +20,14 @@ export default async function AdminProjectsPage({
 }) {
   const { saved } = await searchParams;
   const projects = await prisma.project.findMany({
-    include: { supervisor: true },
+    select: {
+      id: true,
+      title: true,
+      degreeLevel: true,
+      studentName: true,
+      published: true,
+      supervisor: { select: { name: true } },
+    },
     orderBy: { createdAt: "desc" },
   });
 

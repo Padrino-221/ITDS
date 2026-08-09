@@ -16,7 +16,10 @@ export default async function AdminProgramsPage({
   searchParams: Promise<{ saved?: string }>;
 }) {
   const { saved } = await searchParams;
-  const programs = await prisma.program.findMany({ orderBy: { createdAt: "asc" } });
+  const programs = await prisma.program.findMany({
+    select: { id: true, title: true, degreeLevel: true, overview: true },
+    orderBy: { createdAt: "asc" },
+  });
 
   return (
     <div className="space-y-6">
