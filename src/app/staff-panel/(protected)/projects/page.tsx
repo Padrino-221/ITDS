@@ -5,6 +5,7 @@ import { DEGREE_LABELS } from "@/lib/data";
 import {
   AdminPageHeader,
   DataTable,
+  PAGE_SIZE,
   PrimaryLink,
   SecondaryLink,
   StatusBadge,
@@ -16,20 +17,28 @@ import { deleteProject } from "@/app/staff-panel/actions";
 export default async function AdminProjectsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string }>;
+  searchParams: Promise<{ saved?: string; page?: string }>;
 }) {
-  const { saved } = await searchParams;
-  const projects = await prisma.project.findMany({
-    select: {
-      id: true,
-      title: true,
-      degreeLevel: true,
-      studentName: true,
-      published: true,
-      supervisor: { select: { name: true } },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const { saved, page: pageParam } = await searchParams;
+  const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
+  const [projects, total] = await Promise.all([
+    prisma.project.findMany({
+      select: {
+        id: true,
+        title: true,
+        degreeLevel: true,
+        studentName: true,
+        published: true,
+        supervisor: { select: { name: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.project.count(),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
 
   return (
     <div className="space-y-6">
@@ -49,6 +58,7 @@ export default async function AdminProjectsPage({
         rows={projects}
         getKey={(project) => project.id}
         emptyMessage="No projects yet. Create your first one."
+        pagination={{ page: safePage, totalPages, basePath: "/staff-panel/projects" }}
         columns={[
           {
             key: "title",

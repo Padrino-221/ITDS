@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import {
   AdminPageHeader,
   DataTable,
+  PAGE_SIZE,
   PrimaryLink,
   SecondaryLink,
 } from "@/components/admin/ui";
@@ -14,18 +15,26 @@ import { deleteLecturer } from "@/app/staff-panel/actions";
 export default async function AdminLecturersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string }>;
+  searchParams: Promise<{ saved?: string; page?: string }>;
 }) {
-  const { saved } = await searchParams;
-  const lecturers = await prisma.lecturer.findMany({
-    select: {
-      id: true,
-      name: true,
-      title: true,
-      _count: { select: { projects: true } },
-    },
-    orderBy: [{ order: "asc" }, { name: "asc" }],
-  });
+  const { saved, page: pageParam } = await searchParams;
+  const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
+  const [lecturers, total] = await Promise.all([
+    prisma.lecturer.findMany({
+      select: {
+        id: true,
+        name: true,
+        title: true,
+        _count: { select: { projects: true } },
+      },
+      orderBy: [{ order: "asc" }, { name: "asc" }],
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.lecturer.count(),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
 
   return (
     <div className="space-y-6">
@@ -45,6 +54,7 @@ export default async function AdminLecturersPage({
         rows={lecturers}
         getKey={(lecturer) => lecturer.id}
         emptyMessage="No lecturers yet. Create your first one."
+        pagination={{ page: safePage, totalPages, basePath: "/staff-panel/lecturers" }}
         columns={[
           {
             key: "name",

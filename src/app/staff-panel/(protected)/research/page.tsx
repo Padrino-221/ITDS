@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import {
   AdminPageHeader,
   DataTable,
+  PAGE_SIZE,
   PrimaryLink,
   SecondaryLink,
 } from "@/components/admin/ui";
@@ -14,13 +15,21 @@ import { deleteResearchArea } from "@/app/staff-panel/actions";
 export default async function AdminResearchPage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string }>;
+  searchParams: Promise<{ saved?: string; page?: string }>;
 }) {
-  const { saved } = await searchParams;
-  const areas = await prisma.researchArea.findMany({
-    select: { id: true, title: true, description: true, order: true },
-    orderBy: { order: "asc" },
-  });
+  const { saved, page: pageParam } = await searchParams;
+  const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
+  const [areas, total] = await Promise.all([
+    prisma.researchArea.findMany({
+      select: { id: true, title: true, description: true, order: true },
+      orderBy: { order: "asc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.researchArea.count(),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
 
   return (
     <div className="space-y-6">
@@ -40,6 +49,7 @@ export default async function AdminResearchPage({
         rows={areas}
         getKey={(area) => area.id}
         emptyMessage="No research areas yet. Create your first one."
+        pagination={{ page: safePage, totalPages, basePath: "/staff-panel/research" }}
         columns={[
           {
             key: "title",

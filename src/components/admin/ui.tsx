@@ -247,11 +247,52 @@ export function AdminCard({
   );
 }
 
+export const PAGE_SIZE = 20;
+
+export function Pagination({
+  page,
+  totalPages,
+  basePath,
+}: {
+  page: number;
+  totalPages: number;
+  basePath: string;
+}) {
+  const href = (p: number) => `${basePath}?page=${p}`;
+
+  return (
+    <nav className="flex items-center justify-between rounded-xl border border-forest-100 bg-white px-5 py-3 text-sm" aria-label="Pagination">
+      <span className="text-ink-soft">
+        Page {page} of {totalPages}
+      </span>
+      <div className="flex gap-2">
+        {page > 1 && (
+          <Link
+            href={href(page - 1)}
+            className="rounded-lg border border-forest-200 bg-white px-3 py-1.5 text-xs font-semibold text-forest-800 transition-colors hover:border-forest-400"
+          >
+            Previous
+          </Link>
+        )}
+        {page < totalPages && (
+          <Link
+            href={href(page + 1)}
+            className="rounded-lg border border-forest-200 bg-white px-3 py-1.5 text-xs font-semibold text-forest-800 transition-colors hover:border-forest-400"
+          >
+            Next
+          </Link>
+        )}
+      </div>
+    </nav>
+  );
+}
+
 export function DataTable<T>({
   columns,
   rows,
   getKey,
   emptyMessage = "No items yet.",
+  pagination,
 }: {
   columns: Array<{
     key: string;
@@ -263,6 +304,11 @@ export function DataTable<T>({
   rows: T[];
   getKey: (row: T) => string;
   emptyMessage?: string;
+  pagination?: {
+    page: number;
+    totalPages: number;
+    basePath: string;
+  };
 }) {
   if (rows.length === 0) {
     return (
@@ -273,30 +319,14 @@ export function DataTable<T>({
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-forest-100 bg-white">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b border-forest-100 bg-forest-50/60 text-xs font-semibold uppercase tracking-wider text-ink-soft">
-            <tr>
-              {columns.map((col) => (
-                <th
-                  key={col.key}
-                  className={cn(
-                    "px-5 py-3.5",
-                    col.align === "right" && "text-right",
-                    col.className
-                  )}
-                >
-                  {col.header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-forest-50">
-            {rows.map((row) => (
-              <tr key={getKey(row)} className="transition-colors hover:bg-forest-50/40">
+    <div className="space-y-3">
+      <div className="overflow-hidden rounded-xl border border-forest-100 bg-white">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="border-b border-forest-100 bg-forest-50/60 text-xs font-semibold uppercase tracking-wider text-ink-soft">
+              <tr>
                 {columns.map((col) => (
-                  <td
+                  <th
                     key={col.key}
                     className={cn(
                       "px-5 py-3.5",
@@ -304,14 +334,33 @@ export function DataTable<T>({
                       col.className
                     )}
                   >
-                    {col.cell(row)}
-                  </td>
+                    {col.header}
+                  </th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-forest-50">
+              {rows.map((row) => (
+                <tr key={getKey(row)} className="transition-colors hover:bg-forest-50/40">
+                  {columns.map((col) => (
+                    <td
+                      key={col.key}
+                      className={cn(
+                        "px-5 py-3.5",
+                        col.align === "right" && "text-right",
+                        col.className
+                      )}
+                    >
+                      {col.cell(row)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
+      {pagination && <Pagination {...pagination} />}
     </div>
   );
 }

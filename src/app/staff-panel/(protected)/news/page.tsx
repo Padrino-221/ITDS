@@ -5,6 +5,7 @@ import { formatDate } from "@/lib/utils";
 import {
   AdminPageHeader,
   DataTable,
+  PAGE_SIZE,
   PrimaryLink,
   SecondaryLink,
   StatusBadge,
@@ -16,13 +17,21 @@ import { deleteNews } from "@/app/staff-panel/actions";
 export default async function AdminNewsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string }>;
+  searchParams: Promise<{ saved?: string; page?: string }>;
 }) {
-  const { saved } = await searchParams;
-  const posts = await prisma.newsPost.findMany({
-    select: { id: true, title: true, category: true, publishedAt: true, published: true },
-    orderBy: { publishedAt: "desc" },
-  });
+  const { saved, page: pageParam } = await searchParams;
+  const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
+  const [posts, total] = await Promise.all([
+    prisma.newsPost.findMany({
+      select: { id: true, title: true, category: true, publishedAt: true, published: true },
+      orderBy: { publishedAt: "desc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.newsPost.count(),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
 
   return (
     <div className="space-y-6">
@@ -42,6 +51,7 @@ export default async function AdminNewsPage({
         rows={posts}
         getKey={(post) => post.id}
         emptyMessage="No posts yet. Create your first one."
+        pagination={{ page: safePage, totalPages, basePath: "/staff-panel/news" }}
         columns={[
           {
             key: "title",

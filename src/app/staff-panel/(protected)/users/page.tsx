@@ -7,6 +7,7 @@ import {
   AdminPageHeader,
   DataTable,
   Field,
+  PAGE_SIZE,
   PrimaryButton,
   SecondaryButton,
   TextInput,
@@ -19,14 +20,22 @@ import { createUser, deleteUser, updateUserRole } from "@/app/staff-panel/action
 export default async function AdminUsersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string }>;
+  searchParams: Promise<{ saved?: string; page?: string }>;
 }) {
-  const { saved } = await searchParams;
+  const { saved, page: pageParam } = await searchParams;
+  const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
   const session = await requireAdmin();
-  const users = await prisma.user.findMany({
-    select: { id: true, name: true, email: true, role: true, createdAt: true },
-    orderBy: { createdAt: "asc" },
-  });
+  const [users, total] = await Promise.all([
+    prisma.user.findMany({
+      select: { id: true, name: true, email: true, role: true, createdAt: true },
+      orderBy: { createdAt: "asc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.user.count(),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
 
   return (
     <div className="space-y-6">
@@ -78,6 +87,7 @@ export default async function AdminUsersPage({
         rows={users}
         getKey={(user) => user.id}
         emptyMessage="No users yet."
+        pagination={{ page: safePage, totalPages, basePath: "/staff-panel/users" }}
         columns={[
           {
             key: "name",

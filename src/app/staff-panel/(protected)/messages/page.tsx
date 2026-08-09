@@ -1,14 +1,27 @@
 import { Mail, MailOpen } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { formatDateTime } from "@/lib/utils";
-import { AdminCard, AdminPageHeader, SecondaryButton } from "@/components/admin/ui";
+import { AdminCard, AdminPageHeader, Pagination, PAGE_SIZE, SecondaryButton } from "@/components/admin/ui";
 import DeleteButton from "@/components/admin/DeleteButton";
 import { deleteMessage, toggleMessageRead } from "@/app/staff-panel/actions";
 
-export default async function AdminMessagesPage() {
-  const messages = await prisma.contactMessage.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+export default async function AdminMessagesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page: pageParam } = await searchParams;
+  const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
+  const [messages, total] = await Promise.all([
+    prisma.contactMessage.findMany({
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.contactMessage.count(),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
   const unread = messages.filter((m) => !m.read).length;
 
   return (
@@ -70,6 +83,7 @@ export default async function AdminMessagesPage() {
               </p>
             </div>
           ))}
+          <Pagination page={safePage} totalPages={totalPages} basePath="/staff-panel/messages" />
         </div>
       )}
     </div>

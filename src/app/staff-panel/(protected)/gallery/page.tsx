@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import {
   AdminPageHeader,
   DataTable,
+  PAGE_SIZE,
   PrimaryLink,
   SecondaryLink,
 } from "@/components/admin/ui";
@@ -15,13 +16,21 @@ import { deleteGalleryImage } from "@/app/staff-panel/actions";
 export default async function AdminGalleryPage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string }>;
+  searchParams: Promise<{ saved?: string; page?: string }>;
 }) {
-  const { saved } = await searchParams;
-  const images = await prisma.galleryImage.findMany({
-    select: { id: true, src: true, caption: true, order: true },
-    orderBy: { order: "asc" },
-  });
+  const { saved, page: pageParam } = await searchParams;
+  const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
+  const [images, total] = await Promise.all([
+    prisma.galleryImage.findMany({
+      select: { id: true, src: true, caption: true, order: true },
+      orderBy: { order: "asc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.galleryImage.count(),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
 
   return (
     <div className="space-y-6">
@@ -41,6 +50,7 @@ export default async function AdminGalleryPage({
         rows={images}
         getKey={(item) => item.id}
         emptyMessage="No gallery images yet. Add your first one."
+        pagination={{ page: safePage, totalPages, basePath: "/staff-panel/gallery" }}
         columns={[
           {
             key: "image",

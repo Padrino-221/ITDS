@@ -270,6 +270,7 @@ export function Select({
               role="option"
               aria-selected={option.value === current}
               onMouseEnter={() => setHighlight(i)}
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => selectOption(option)}
               className={cn(
                 "flex w-full cursor-pointer items-center justify-between gap-2 px-3.5 py-2 text-sm transition-colors",
