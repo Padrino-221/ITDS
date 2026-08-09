@@ -27,7 +27,7 @@ export default function HeroCarousel({
 
   return (
     <section className="relative overflow-hidden bg-forest-950">
-      <div className="relative h-[560px] sm:h-[620px] lg:h-[680px]">
+      <div className="relative h-[480px] sm:h-[620px] lg:h-[680px]">
         {slides.map((slide, i) => (
           <div
             key={i}

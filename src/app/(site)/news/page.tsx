@@ -46,6 +46,7 @@ export default async function NewsPage({
           <div className="mb-10 flex flex-wrap gap-2">
             <Link
               href="/news"
+              aria-pressed={!category}
               className={cn(
                 "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
                 !category
@@ -59,6 +60,7 @@ export default async function NewsPage({
               <Link
                 key={c}
                 href={`/news?category=${encodeURIComponent(c)}`}
+                aria-pressed={category === c}
                 className={cn(
                   "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
                   category === c

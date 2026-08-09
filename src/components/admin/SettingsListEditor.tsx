@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
+import { Select } from "./Dropdown";
 
 type FieldDef =
   | { key: string; label: string; type?: "text"; placeholder?: string }
@@ -47,18 +48,13 @@ function FieldInput({
   }
   if (field.type === "select") {
     return (
-      <select
+      <Select
+        size="sm"
         value={value}
-        onChange={(e) => onPatch(e.target.value)}
-        className={inputClass}
-      >
-        <option value="">{field.placeholder ?? "Select an option"}</option>
-        {field.options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
+        onChange={onPatch}
+        placeholder={field.placeholder ?? "Select an option"}
+        options={field.options}
+      />
     );
   }
   return (

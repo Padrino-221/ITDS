@@ -130,6 +130,27 @@
   * {
     border-color: var(--color-border);
   }
+
+  /*
+   * Accessible keyboard focus: a visible ring for any interactive element
+   * that doesn't already define its own focus-visible styles (text links,
+   * plain nav items, etc.). Components that need custom rings override this.
+   */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible,
+  [tabindex]:not([tabindex="-1"]):focus-visible {
+    outline: none;
+  }
+  a:not([class*="ring"]):not([class*="focus:"]):focus-visible,
+  button:not([class*="ring"]):not([class*="focus:"]):focus-visible,
+  [tabindex]:not([tabindex="-1"]):not([class*="ring"]):not([class*="focus:"]):focus-visible {
+    outline: 2px solid var(--color-gold-500);
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+  }
 }
 
 @layer utilities {

@@ -143,6 +143,7 @@ export default function AccountMenu() {
         aria-label={open ? "Close account menu" : "Open account menu"}
         aria-expanded={open}
         aria-haspopup="menu"
+        aria-controls={open ? "learn-account-menu" : undefined}
         className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-forest-200 text-ink-soft transition-colors hover:border-gold-400 hover:text-gold-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/50 sm:hidden"
       >
         {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -150,6 +151,7 @@ export default function AccountMenu() {
 
       {open && (
         <div
+          id="learn-account-menu"
           role="menu"
           className="absolute right-0 top-full z-50 mt-2 w-60 rounded-2xl border border-forest-100 bg-white p-2 shadow-xl animate-scale-in sm:hidden"
         >

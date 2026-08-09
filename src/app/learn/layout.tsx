@@ -4,12 +4,15 @@ import { ArrowLeft } from "lucide-react";
 import { getSubjects } from "@/lib/learn";
 import { SITE_URL, learnUrl } from "@/lib/utils";
 import AccountMenu from "@/components/learn/AccountMenu";
+import SkipLink from "@/components/SkipLink";
+import BackToTop from "@/components/BackToTop";
 
 export default async function LearnLayout({ children }: { children: React.ReactNode }) {
   const subjects = await getSubjects();
 
   return (
     <div className="flex min-h-dvh flex-col bg-paper">
+      <SkipLink />
       {/* Learn header — the e-learning app has its own chrome */}
       <header className="sticky top-0 z-50 border-b border-forest-100 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
@@ -44,7 +47,7 @@ export default async function LearnLayout({ children }: { children: React.ReactN
               <Link
                 key={s.id}
                 href={learnUrl(`/${s.slug}`)}
-                className="shrink-0 whitespace-nowrap font-semibold text-ink-soft transition-colors hover:text-forest-900"
+                className="shrink-0 whitespace-nowrap font-semibold text-ink-soft transition-colors hover:text-forest-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/40 rounded"
               >
                 {s.name}
               </Link>
@@ -53,7 +56,9 @@ export default async function LearnLayout({ children }: { children: React.ReactN
         </div>
       </header>
 
-      <main className="flex-1">{children}</main>
+      <main id="main-content" className="flex-1">
+        {children}
+      </main>
 
       {/* Slim learn footer */}
       <footer className="border-t border-forest-100 bg-white">
@@ -74,6 +79,8 @@ export default async function LearnLayout({ children }: { children: React.ReactN
           </Link>
         </div>
       </footer>
+
+      <BackToTop />
     </div>
   );
 }

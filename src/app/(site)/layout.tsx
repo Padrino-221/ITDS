@@ -1,5 +1,7 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import SkipLink from "@/components/SkipLink";
+import BackToTop from "@/components/BackToTop";
 
 // Public pages are statically generated at build time and re-generated
 // whenever a CMS save triggers revalidatePath("/", "layout") in the admin
@@ -8,9 +10,13 @@ import Footer from "@/components/Footer";
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col">
+      <SkipLink />
       <Header />
-      <main className="flex-1">{children}</main>
+      <main id="main-content" className="flex-1">
+        {children}
+      </main>
       <Footer />
+      <BackToTop />
     </div>
   );
 }

@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
-  Award,
   BookOpen,
   ClipboardList,
   FolderOpen,
@@ -11,7 +10,6 @@ import {
   Images,
   Newspaper,
   Quote,
-  Star,
   Trophy,
   Users,
 } from "lucide-react";
@@ -22,7 +20,6 @@ import Marquee from "@/components/Marquee";
 import FAQSection from "@/components/FAQSection";
 import TeamSection from "@/components/TeamSection";
 import NewsletterSection from "@/components/NewsletterSection";
-import { SectionHeading } from "@/components/ui";
 import { NewsCard, ProjectCard, ResearchAreaCard } from "@/components/cards";
 import {
   getContact,
@@ -407,7 +404,7 @@ export default async function HomePage() {
               </h2>
             </div>
           </div>
-          <div className="mt-12 flex gap-4 animate-[marquee_40s_linear_infinite] w-max">
+          <div className="mt-12 flex gap-4 w-max animate-[marquee_40s_linear_infinite] motion-reduce:animate-none">
             {[...gallery, ...gallery, ...gallery].map((item, i) => (
               <figure
                 key={`${item.id}-${i}`}
@@ -427,7 +424,7 @@ export default async function HomePage() {
             ))}
           </div>
           {/* Reverse row */}
-          <div className="mt-4 flex gap-4 animate-[marquee_40s_linear_infinite_reverse] w-max">
+          <div className="mt-4 flex gap-4 w-max animate-[marquee_40s_linear_infinite_reverse] motion-reduce:animate-none">
             {[...gallery, ...gallery, ...gallery].map((item, i) => (
               <figure
                 key={`${item.id}-rev-${i}`}

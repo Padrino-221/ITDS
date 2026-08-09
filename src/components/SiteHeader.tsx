@@ -152,7 +152,9 @@ export default function SiteHeader({
 
           {/* Mobile toggle */}
           <button
-            aria-label="Toggle menu"
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            aria-controls="site-mobile-menu"
             className="rounded-lg border border-forest-200 p-2 text-forest-950 lg:hidden"
             onClick={() => setOpen((v) => !v)}
           >
@@ -162,7 +164,7 @@ export default function SiteHeader({
 
         {/* Mobile menu */}
         {open && (
-          <div className="border-t border-forest-100 bg-white lg:hidden">
+          <div id="site-mobile-menu" className="border-t border-forest-100 bg-white lg:hidden">
             <nav className="mx-auto max-w-7xl space-y-1 px-4 py-4 sm:px-6">
               {NAV.map((item) =>
                 item.children ? (

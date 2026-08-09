@@ -22,6 +22,7 @@ export default function ProjectsFilter() {
       {TABS.map((tab) => (
         <button
           key={tab.value}
+          aria-pressed={level === tab.value}
           onClick={() =>
             router.push(tab.value === "ALL" ? "/projects" : `/projects?level=${tab.value}`)
           }

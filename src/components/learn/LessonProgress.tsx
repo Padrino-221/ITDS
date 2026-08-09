@@ -86,7 +86,8 @@ export default function LessonProgress({
   }
 
   return (
-    <div className="space-y-5">
+    <>
+      <div className="space-y-5">
       {/* Progress */}
       <div className="rounded-2xl border border-forest-100 bg-white p-5">
         <h3 className="flex items-center gap-2 font-display text-sm font-extrabold uppercase tracking-wider text-forest-950">
@@ -143,8 +144,6 @@ export default function LessonProgress({
           </p>
         )}
       </div>
-
-      {/* Topic lessons */}
       <div className="rounded-2xl border border-forest-100 bg-white p-5">
         <h3 className="flex items-center gap-2 font-display text-sm font-extrabold uppercase tracking-wider text-forest-950">
           <SignpostBig className="h-4 w-4 text-gold-500" />
@@ -188,5 +187,49 @@ export default function LessonProgress({
         </ol>
       </div>
     </div>
+
+    {/* Mobile-only sticky bar — lives inside the aside which stacks below
+        the article on small screens, so a bottom-fixed bar keeps the toggle
+        one thumb-swipe away. Hidden on lg+ where the sidebar inline button
+        is already visible. */}
+    {signedIn && (
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-forest-100 bg-white/95 p-3 backdrop-blur lg:hidden">
+        <div className="flex items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-ink-soft">
+              {done} / {topicLessons.length} lessons
+            </p>
+            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-forest-100">
+              <div
+                className="h-full rounded-full bg-gold-500"
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onToggle}
+            disabled={saving}
+            className={cn(
+              "inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold transition-all disabled:opacity-60",
+              isCompleted
+                ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
+                : "bg-forest-950 text-white hover:bg-forest-800"
+            )}
+          >
+            {isCompleted ? (
+              <>
+                <CheckCircle2 className="h-4 w-4" /> Completed
+              </>
+            ) : (
+              <>
+                <Circle className="h-4 w-4" /> Mark complete
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    )}
+    </>
   );
 }

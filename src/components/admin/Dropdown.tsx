@@ -120,17 +120,23 @@ export function Select({
   required,
   size = "md",
   className,
+  value,
+  onChange,
 }: {
-  name: string;
+  name?: string;
   options: Array<{ value: string; label: string }>;
   defaultValue?: string;
   placeholder?: string;
   required?: boolean;
   size?: "sm" | "md";
   className?: string;
+  /** Controlled mode: when both `value` and `onChange` are provided the
+   *  select reports changes through the callback instead of its own state. */
+  value?: string;
+  onChange?: (value: string) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(defaultValue);
+  const [internalValue, setInternalValue] = useState(defaultValue);
   const [highlight, setHighlight] = useState(0);
   const rootRef = useRef<HTMLDivElement>(null);
   const listboxRef = useRef<HTMLUListElement>(null);
@@ -138,7 +144,17 @@ export function Select({
   const listboxId = `select-listbox-${autoId}`;
   const triggerId = `select-trigger-${autoId}`;
 
-  const selected = options.find((o) => o.value === value);
+  const controlled = value !== undefined && onChange !== undefined;
+  const current = controlled ? value : internalValue;
+  const selected = options.find((o) => o.value === current);
+
+  const setValue = (next: string) => {
+    if (controlled) {
+      onChange(next);
+    } else {
+      setInternalValue(next);
+    }
+  };
 
   // Close on outside click
   useEffect(() => {
@@ -160,7 +176,7 @@ export function Select({
   }, [open, highlight]);
 
   const openSelect = () => {
-    const index = options.findIndex((o) => o.value === value);
+    const index = options.findIndex((o) => o.value === current);
     setHighlight(index >= 0 ? index : 0);
     setOpen(true);
   };
@@ -252,22 +268,24 @@ export function Select({
             <li
               key={option.value}
               role="option"
-              aria-selected={option.value === value}
+              aria-selected={option.value === current}
               onMouseEnter={() => setHighlight(i)}
               onClick={() => selectOption(option)}
               className={cn(
                 "flex w-full cursor-pointer items-center justify-between gap-2 px-3.5 py-2 text-sm transition-colors",
                 i === highlight && "bg-forest-50",
-                option.value === value ? "font-semibold text-forest-800" : "text-ink"
+                option.value === current ? "font-semibold text-forest-800" : "text-ink"
               )}
             >
               <span className="truncate">{option.label}</span>
-              {option.value === value && <Check className="h-4 w-4 shrink-0 text-forest-600" />}
+              {option.value === current && <Check className="h-4 w-4 shrink-0 text-forest-600" />}
             </li>
           ))}
         </ul>
       )}
-      <input type="hidden" name={name} value={value} aria-required={required} />
+      {!controlled && (
+        <input type="hidden" name={name} value={current} aria-required={required} />
+      )}
     </div>
   );
 }
