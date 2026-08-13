@@ -8,8 +8,9 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Only staff roles may use the admin panel. Students (who can self-register
-  // on /learn) and lecturers must NOT reach content management here.
+  // Only staff roles that manage content may use the admin panel. Lecturers
+  // (who author e-learning lessons on /learn) are intentionally kept out —
+  // they sign in here but land on their /author dashboard instead.
   const user = await requireRole(["ADMIN", "EDITOR"], "/staff-panel/login");
 
   return (

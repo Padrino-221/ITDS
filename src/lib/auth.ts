@@ -3,7 +3,7 @@ import { compare, hash } from "bcryptjs";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "./prisma";
-import { LEARN_URL, SITE_URL, learnUrl } from "./utils";
+import { LEARN_URL, SITE_URL } from "./utils";
 
 const COOKIE_NAME = "itds_session";
 const MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7 days
@@ -14,7 +14,7 @@ const secret = () =>
   );
 
 /**
- * The registrable domain (e.g. ".itdsuenr.com") the session cookie is scoped
+ * The registrable domain (e.g. ".itdsuenr.com") a session cookie is scoped
  * to, so a single sign-in carries across the main site and the /learn
  * subdomain. The domain is resolved from the *actual request host* (not the
  * configured SITE_URL) so host-only cookies are kept on hosts that are not on
@@ -23,8 +23,11 @@ const secret = () =>
  *
  * Only applied behind HTTPS — local development over plain HTTP keeps a
  * host-only cookie (".localhost" would never match).
+ *
+ * Shared by the staff session cookie (auth.ts) and the learner session
+ * cookie (learn-auth.ts).
  */
-async function cookieDomain(): Promise<string> {
+export async function cookieDomain(): Promise<string> {
   const host = (await headers()).get("x-forwarded-host") ?? (await headers()).get("host");
   if (!host) return "";
   const hostname = host.replace(/^www\./i, "").split(":")[0].toLowerCase();
@@ -37,7 +40,7 @@ async function cookieDomain(): Promise<string> {
   return match ? `.${match}` : "";
 }
 
-export type SessionRole = "ADMIN" | "EDITOR" | "LECTURER" | "STUDENT";
+export type SessionRole = "ADMIN" | "EDITOR" | "LECTURER";
 
 export type SessionUser = {
   id: string;
@@ -46,7 +49,7 @@ export type SessionUser = {
   role: SessionRole;
 };
 
-const VALID_ROLES: SessionRole[] = ["ADMIN", "EDITOR", "LECTURER", "STUDENT"];
+const VALID_ROLES: SessionRole[] = ["ADMIN", "EDITOR", "LECTURER"];
 
 export async function hashPassword(password: string): Promise<string> {
   return hash(password, 12);
@@ -121,30 +124,6 @@ export async function getSession(): Promise<SessionUser | null> {
   }
 }
 
-/** The only session role that counts as a signed-in learner on /learn. */
-export const LEARNER_ROLES: SessionRole[] = ["STUDENT"];
-
-/**
- * Learner-scoped session for the e-learning platform. The whole app shares
- * one session cookie, so a Staff Panel login (editor/admin) would otherwise
- * look like a signed-in account on /learn. Only STUDENT accounts may use the
- * e-learning hub.
- */
-export async function getLearnerSession(): Promise<SessionUser | null> {
-  const user = await getSession();
-  if (!user || !LEARNER_ROLES.includes(user.role)) return null;
-  return user;
-}
-
-/** Guard the e-learning platform for learner accounts only. */
-export async function requireLearner(
-  loginPath = learnUrl("/account/signin")
-): Promise<SessionUser> {
-  const user = await getLearnerSession();
-  if (!user) redirect(loginPath);
-  return user;
-}
-
 /** Guard for any signed-in user. Redirects to the given login page. */
 export async function requireAuth(redirectTo = "/staff-panel/login"): Promise<SessionUser> {
   const user = await getSession();
@@ -165,11 +144,11 @@ export async function requireAdmin(): Promise<SessionUser> {
  */
 export async function requireRole(
   roles: SessionRole[],
-  loginPath = learnUrl("/account/signin")
+  loginPath = "/staff-panel/login"
 ): Promise<SessionUser> {
   const user = await getSession();
   if (!user) redirect(loginPath);
-  if (!roles.includes(user.role)) redirect(learnUrl("/"));
+  if (!roles.includes(user.role)) redirect("/staff-panel");
   return user;
 }
 

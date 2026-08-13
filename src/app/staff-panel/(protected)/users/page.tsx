@@ -1,21 +1,19 @@
-import { Plus, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import { formatDate } from "@/lib/utils";
 import {
-  AdminCard,
   AdminPageHeader,
   DataTable,
-  Field,
   PAGE_SIZE,
-  PrimaryButton,
   SecondaryButton,
-  TextInput,
 } from "@/components/admin/ui";
 import { Select } from "@/components/admin/Dropdown";
 import { SavedToast } from "@/components/admin/SavedToast";
 import DeleteButton from "@/components/admin/DeleteButton";
-import { createUser, deleteUser, updateUserRole } from "@/app/staff-panel/actions";
+import AddUserModal from "@/components/admin/AddUserModal";
+import ResetPasswordModal from "@/components/admin/ResetPasswordModal";
+import { deleteUser, updateUserRole } from "@/app/staff-panel/actions";
 
 export default async function AdminUsersPage({
   searchParams,
@@ -42,46 +40,9 @@ export default async function AdminUsersPage({
       <AdminPageHeader
         title="Users"
         description="Manage staff accounts that can edit website content. Only administrators can access this page."
+        action={<AddUserModal />}
       />
       <SavedToast saved={saved} />
-
-      <AdminCard
-        title={
-          <>
-            <Plus className="h-5 w-5 text-gold-600" />
-            Add a User
-          </>
-        }
-      >
-        <form action={createUser} className="mt-5 grid gap-5 sm:grid-cols-2">
-          <Field label="Full name" required>
-            <TextInput name="name" required minLength={2} placeholder="e.g. Ama Owusu" />
-          </Field>
-          <Field label="Email" required>
-            <TextInput name="email" type="email" required placeholder="user@uenr.edu.gh" />
-          </Field>
-          <Field label="Password" required hint="At least 8 characters.">
-            <TextInput name="password" type="password" required minLength={8} autoComplete="new-password" />
-          </Field>
-          <Field label="Role" required>
-            <Select
-              name="role"
-              defaultValue="EDITOR"
-              options={[
-                { value: "EDITOR", label: "Editor — can manage content" },
-                { value: "LECTURER", label: "Lecturer — can author e-learning lessons" },
-                { value: "ADMIN", label: "Admin — full access" },
-              ]}
-            />
-          </Field>
-          <div className="sm:col-span-2">
-            <PrimaryButton type="submit">
-              <Plus className="h-4 w-4" />
-              Create User
-            </PrimaryButton>
-          </div>
-        </form>
-      </AdminCard>
 
       <DataTable
         rows={users}
@@ -140,11 +101,16 @@ export default async function AdminUsersPage({
             header: "Actions",
             align: "right",
             cell: (user) => (
-              <div className="flex justify-end">
+              <div className="flex justify-end gap-2">
+                {user.id !== session.id && (
+                  <ResetPasswordModal userId={user.id} userName={user.name} />
+                )}
                 {user.id !== session.id && (
                   <DeleteButton
                     action={deleteUser.bind(null, user.id)}
                     confirmText={`Remove ${user.name}? They will no longer be able to sign in.`}
+                    label=""
+                    className="inline-flex items-center justify-center rounded-lg border border-red-200 bg-white p-1.5 text-red-600 transition-colors hover:bg-red-600 hover:text-white disabled:opacity-50"
                   />
                 )}
               </div>

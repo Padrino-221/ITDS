@@ -15,7 +15,8 @@ export default function SignInPage() {
           Welcome back
         </h1>
         <p className="mt-1 text-sm text-ink-soft">
-          Sign in as a learner to track your progress across the E-Learning Hub.
+          Learners sign in to track progress. Staff (lecturers, editors, admins)
+          sign in here to reach the author dashboard and review tools.
         </p>
         <div className="mt-6">
           <SignInForm />

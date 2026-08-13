@@ -13,7 +13,7 @@ import {
 import LessonContent from "@/components/learn/LessonContent";
 import QuizBlock from "@/components/learn/QuizBlock";
 import LessonProgress from "@/components/learn/LessonProgress";
-import CodeBlock from "@/components/learn/CodeBlock";
+import Playground from "@/components/learn/Playground";
 import {
   getAllLessonPaths,
   getPublicLesson,
@@ -145,7 +145,7 @@ export default async function LessonPage({
             <LessonContent blocks={content.contentBody} />
           </div>
 
-          {/* Worked example / starter code */}
+          {/* Worked example / interactive playground */}
           {content.hasPlayground && content.starterCode && (
             <div className="mt-10">
               <h2 className="flex items-center gap-2 font-display text-lg font-extrabold text-forest-950">
@@ -153,10 +153,12 @@ export default async function LessonPage({
                 Code playground
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-                An interactive playground for {content.playgroundLang ?? "this language"} is
-                coming soon. For now, study the starter code:
+                Run and edit the starter code — experiment freely.
               </p>
-              <CodeBlock code={content.starterCode} language={content.playgroundLang ?? undefined} />
+              <Playground
+                lang={content.playgroundLang ?? "python"}
+                starterCode={content.starterCode}
+              />
             </div>
           )}
 

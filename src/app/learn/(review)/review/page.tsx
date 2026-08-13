@@ -1,20 +1,13 @@
 import Link from "next/link";
-import { CheckCircle2, ClipboardCheck, FolderPlus, ListPlus } from "lucide-react";
-import { getReviewQueue, getSubjectsWithTopics, LESSON_STATUS_LABEL } from "@/lib/learn";
-import { createSubject, createTopic } from "@/app/learn/actions";
-import { Select } from "@/components/admin/Dropdown";
+import { ClipboardCheck, ListTree } from "lucide-react";
+import { getReviewQueue, LESSON_STATUS_LABEL } from "@/lib/learn";
+import { QueryToast } from "@/components/admin/QueryToast";
 import { requireRole } from "@/lib/auth";
-import { cn, formatDate, learnUrl } from "@/lib/utils";
-import { inputClass } from "@/lib/styles";
+import { absoluteUrl, formatDate, learnUrl } from "@/lib/utils";
 
-export default async function ReviewQueuePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ done?: string; created?: string }>;
-}) {
-  const { done, created } = await searchParams;
-  await requireRole(["ADMIN"], learnUrl("/account/signin"));
-  const [queue, subjects] = await Promise.all([getReviewQueue(), getSubjectsWithTopics()]);
+export default async function ReviewQueuePage() {
+  await requireRole(["ADMIN"], absoluteUrl("/staff-panel/login"));
+  const queue = await getReviewQueue();
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
@@ -31,14 +24,7 @@ export default async function ReviewQueuePage({
         </p>
       </div>
 
-      {(done === "1" || created) && (
-        <p className="mt-6 flex items-center gap-2 rounded-lg bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
-          <CheckCircle2 className="h-4 w-4" />
-          {created === "subject" && "Subject created."}
-          {created === "topic" && "Topic created."}
-          {done === "1" && "Review decision saved."}
-        </p>
-      )}
+      <QueryToast param="done" message="Review decision saved." />
 
       {queue.length === 0 ? (
         <div className="mt-8 rounded-2xl border border-dashed border-forest-200 bg-white px-6 py-16 text-center">
@@ -81,71 +67,22 @@ export default async function ReviewQueuePage({
         </ul>
       )}
 
-      {/* Structure management */}
-      <div className="mt-14 grid gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl border border-forest-100 bg-white p-6">
-          <h2 className="flex items-center gap-2 font-display text-lg font-extrabold text-forest-950">
-            <FolderPlus className="h-5 w-5 text-gold-500" />
-            New subject
-          </h2>
-          <form action={createSubject} className="mt-4 space-y-3">
-            <input
-              name="name"
-              required
-              minLength={2}
-              placeholder="Subject name, e.g. Web Development"
-              className={inputClass}
-            />
-            <textarea
-              name="description"
-              rows={2}
-              placeholder="Short description (optional)"
-              className={cn(inputClass, "resize-y")}
-            />
-            <button
-              type="submit"
-              className="rounded-lg bg-forest-950 px-4 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-forest-800"
-            >
-              Create subject
-            </button>
-          </form>
-        </div>
-
-        <div className="rounded-2xl border border-forest-100 bg-white p-6">
-          <h2 className="flex items-center gap-2 font-display text-lg font-extrabold text-forest-950">
-            <ListPlus className="h-5 w-5 text-gold-500" />
-            New topic
-          </h2>
-          <form action={createTopic} className="mt-4 space-y-3">
-            <Select
-              name="subjectId"
-              required
-              placeholder="Choose a subject…"
-              options={subjects.map((s) => ({ value: s.id, label: s.name }))}
-            />
-            <input
-              name="title"
-              required
-              minLength={2}
-              placeholder="Topic title, e.g. HTML & CSS Basics"
-              className={inputClass}
-            />
-            <input
-              name="order"
-              type="number"
-              min={0}
-              defaultValue={0}
-              placeholder="Order (0 first)"
-              className={cn(inputClass, "max-w-[160px]")}
-            />
-            <button
-              type="submit"
-              className="rounded-lg bg-forest-950 px-4 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-forest-800"
-            >
-              Create topic
-            </button>
-          </form>
-        </div>
+      {/* Curriculum structure is managed separately */}
+      <div className="mt-14 rounded-2xl border border-forest-100 bg-white p-6">
+        <h2 className="flex items-center gap-2 font-display text-lg font-extrabold text-forest-950">
+          <ListTree className="h-5 w-5 text-gold-500" />
+          Courses &amp; topics
+        </h2>
+        <p className="mt-1 text-sm text-ink-soft">
+          Create, rename, reorder or delete courses and topics — including lesson counts —
+          on the curriculum manager.
+        </p>
+        <Link
+          href={learnUrl("/manage")}
+          className="mt-4 inline-flex rounded-lg bg-forest-950 px-4 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-forest-800"
+        >
+          Manage curriculum
+        </Link>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getLearnerSession } from "@/lib/auth";
+import { getLearnerSession } from "@/lib/learn-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -10,8 +10,8 @@ export const dynamic = "force-dynamic";
  * statically generated with ISR instead of rendering dynamically on every
  * request.
  *
- * Learner-scoped: the whole app shares one session cookie (Staff Panel logins
- * included), but only STUDENT accounts count as signed-in on the hub.
+ * Learner-scoped: reads the hub's own cookie (`itds_learn_session`), so a
+ * Staff Panel login is never treated as a learner here.
  */
 export async function GET() {
   const user = await getLearnerSession();

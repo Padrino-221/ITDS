@@ -41,7 +41,6 @@ async function main() {
     },
   });
   const lecturerPassword = await hash("lecturer123", 12);
-  const studentPassword = await hash("student123", 12);
   await prisma.user.upsert({
     where: { email: "lecturer@itds.uenr.edu.gh" },
     update: {},
@@ -52,14 +51,17 @@ async function main() {
       role: Role.LECTURER,
     },
   });
-  await prisma.user.upsert({
+
+  // Learner account for the E-Learning Hub — separate table/session from the
+  // staff accounts above (see src/lib/learn-auth.ts).
+  const studentPassword = await hash("student123", 12);
+  await prisma.learner.upsert({
     where: { email: "student@itds.uenr.edu.gh" },
     update: {},
     create: {
       name: "Ama Owusu",
       email: "student@itds.uenr.edu.gh",
       passwordHash: studentPassword,
-      role: Role.STUDENT,
     },
   });
 

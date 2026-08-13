@@ -88,7 +88,7 @@ export default async function SubjectPage({
         {subject.topics.length === 0 && (
           <EmptyState
             title="No topics yet"
-            description="Topics for this subject are being structured by the department."
+            description="Topics for this course are being structured by the department."
           />
         )}
 
@@ -97,7 +97,7 @@ export default async function SubjectPage({
           className="mt-10 inline-flex items-center gap-1.5 text-sm font-bold text-gold-600 hover:text-gold-700"
         >
           <ChevronRight className="h-4 w-4 rotate-180" />
-          All subjects
+          All courses
         </Link>
       </section>
     </>

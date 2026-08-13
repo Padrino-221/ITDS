@@ -108,8 +108,8 @@ export default function LearnCatalog({
                 inputRef.current?.blur();
               }
             }}
-            placeholder="Search lessons, topics or subjects… e.g. Python, SQL, bubble sort"
-            aria-label="Search lessons across all subjects"
+            placeholder="Search lessons, topics or courses… e.g. Python, SQL, bubble sort"
+            aria-label="Search lessons across all courses"
             className="w-full rounded-2xl border border-forest-200 bg-white py-3.5 pl-12 pr-11 text-sm text-forest-950 shadow-sm outline-none transition-all placeholder:text-ink-soft/60 focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20"
           />
           {query && (
@@ -127,11 +127,11 @@ export default function LearnCatalog({
           {searching ? (
             <>
               {results.length} {results.length === 1 ? "lesson" : "lessons"}{" "}
-              found across {subjects.length} subjects
+              found across {subjects.length} courses
             </>
           ) : (
             <>
-              Search across {subjects.length} subjects and {lessons.length}{" "}
+              Search across {subjects.length} courses and {lessons.length}{" "}
               lessons
             </>
           )}
@@ -148,7 +148,7 @@ export default function LearnCatalog({
                 No lessons match “{query.trim()}”
               </p>
               <p className="mt-1 text-sm text-ink-soft">
-                Try a different keyword — a topic name, subject or concept.
+                Try a different keyword — a topic name, course or concept.
               </p>
               <button
                 type="button"

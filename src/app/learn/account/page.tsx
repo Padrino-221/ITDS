@@ -14,7 +14,7 @@ import {
   getQuizScores,
   getSubjects,
 } from "@/lib/learn";
-import { requireLearner } from "@/lib/auth";
+import { requireLearner } from "@/lib/learn-auth";
 import { formatDate, learnUrl } from "@/lib/utils";
 
 export default async function LearnAccountPage() {
@@ -88,7 +88,7 @@ export default async function LearnAccountPage() {
             {subjects.length}
           </p>
           <p className="text-xs font-bold uppercase tracking-wider text-ink-soft">
-            Subjects available
+            Courses available
           </p>
         </div>
         <div className="rounded-2xl border border-forest-100 bg-white p-5">
@@ -97,7 +97,7 @@ export default async function LearnAccountPage() {
             {new Set(myProgress.map((p) => p.lesson.topic.subject.slug)).size}
           </p>
           <p className="text-xs font-bold uppercase tracking-wider text-ink-soft">
-            Subjects explored
+            Courses explored
           </p>
         </div>
       </div>
@@ -109,7 +109,7 @@ export default async function LearnAccountPage() {
             Continue where you left off
           </h2>
           <p className="mt-1 text-sm text-ink-soft">
-            Pick up the next unfinished lesson in each subject you&apos;ve started.
+            Pick up the next unfinished lesson in each course you&apos;ve started.
           </p>
           <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {continueLessons.slice(0, 3).map((c) => (
@@ -158,7 +158,7 @@ export default async function LearnAccountPage() {
             href={learnUrl("/")}
             className="mt-5 inline-flex items-center gap-2 rounded-lg bg-gold-500 px-5 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-gold-600"
           >
-            Browse subjects <ArrowRight className="h-4 w-4" />
+            Browse courses <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       ) : (

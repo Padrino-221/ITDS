@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useId } from "react";
+import { createPortal } from "react-dom";
 import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -130,14 +131,13 @@ export function Select({
   required?: boolean;
   size?: "sm" | "md";
   className?: string;
-  /** Controlled mode: when both `value` and `onChange` are provided the
-   *  select reports changes through the callback instead of its own state. */
   value?: string;
   onChange?: (value: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [internalValue, setInternalValue] = useState(defaultValue);
   const [highlight, setHighlight] = useState(0);
+  const [listboxPos, setListboxPos] = useState<{ top: number; left: number; width: number } | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const listboxRef = useRef<HTMLUListElement>(null);
   const autoId = useId();
@@ -156,16 +156,18 @@ export function Select({
     }
   };
 
-  // Close on outside click
+  // Close on outside click (also covers portal listbox clicks)
   useEffect(() => {
+    if (!open) return;
     const handleClickOutside = (e: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
+      const target = e.target as Node;
+      if (rootRef.current?.contains(target)) return;
+      if (listboxRef.current?.contains(target)) return;
+      setOpen(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [open]);
 
   // Keep the highlighted option in view
   useEffect(() => {
@@ -178,6 +180,11 @@ export function Select({
   const openSelect = () => {
     const index = options.findIndex((o) => o.value === current);
     setHighlight(index >= 0 ? index : 0);
+    // Position the portal listbox below the trigger button
+    if (rootRef.current) {
+      const rect = rootRef.current.getBoundingClientRect();
+      setListboxPos({ top: rect.bottom + 8, left: rect.left, width: rect.width });
+    }
     setOpen(true);
   };
 
@@ -225,12 +232,45 @@ export function Select({
     }
   };
 
+  const listbox = open && listboxPos ? createPortal(
+    <ul
+      id={listboxId}
+      ref={listboxRef}
+      role="listbox"
+      aria-labelledby={triggerId}
+      className="fixed z-[9999] max-h-64 overflow-auto rounded-xl border border-forest-100 bg-white py-1.5 shadow-lg animate-scale-in"
+      style={{ top: listboxPos.top, left: listboxPos.left, minWidth: listboxPos.width }}
+    >
+      {options.map((option, i) => (
+        <li
+          key={option.value}
+          role="option"
+          aria-selected={option.value === current}
+          onMouseEnter={() => setHighlight(i)}
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => selectOption(option)}
+          className={cn(
+            "flex w-full cursor-pointer items-center justify-between gap-2 px-3.5 py-2 text-sm transition-colors",
+            i === highlight && "bg-forest-50",
+            option.value === current ? "font-semibold text-forest-800" : "text-ink"
+          )}
+        >
+          <span className="truncate">{option.label}</span>
+          {option.value === current && <Check className="h-4 w-4 shrink-0 text-forest-600" />}
+        </li>
+      ))}
+    </ul>,
+    document.body
+  ) : null;
+
   return (
     <div
       ref={rootRef}
       className={cn("relative", className)}
       onBlur={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setOpen(false);
+        if (!rootRef.current?.contains(e.relatedTarget as Node | null) && !listboxRef.current?.contains(e.relatedTarget as Node | null)) {
+          setOpen(false);
+        }
       }}
     >
       <button
@@ -256,34 +296,7 @@ export function Select({
           )}
         />
       </button>
-      {open && (
-        <ul
-          id={listboxId}
-          ref={listboxRef}
-          role="listbox"
-          aria-labelledby={triggerId}
-          className="absolute z-50 mt-2 max-h-64 w-full overflow-auto rounded-xl border border-forest-100 bg-white py-1.5 shadow-lg animate-scale-in"
-        >
-          {options.map((option, i) => (
-            <li
-              key={option.value}
-              role="option"
-              aria-selected={option.value === current}
-              onMouseEnter={() => setHighlight(i)}
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => selectOption(option)}
-              className={cn(
-                "flex w-full cursor-pointer items-center justify-between gap-2 px-3.5 py-2 text-sm transition-colors",
-                i === highlight && "bg-forest-50",
-                option.value === current ? "font-semibold text-forest-800" : "text-ink"
-              )}
-            >
-              <span className="truncate">{option.label}</span>
-              {option.value === current && <Check className="h-4 w-4 shrink-0 text-forest-600" />}
-            </li>
-          ))}
-        </ul>
-      )}
+      {listbox}
       {!controlled && (
         <input type="hidden" name={name} value={current} aria-required={required} />
       )}

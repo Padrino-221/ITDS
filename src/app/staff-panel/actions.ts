@@ -13,7 +13,7 @@ import {
   requireAdmin,
   requireAuth,
 } from "@/lib/auth";
-import { slugify } from "@/lib/utils";
+import { slugify, learnUrl } from "@/lib/utils";
 import { removeUploadFile } from "@/lib/uploads";
 
 const DEGREES: DegreeLevel[] = ["UNDERGRADUATE", "DIPLOMA", "MSC", "MPHIL", "PHD"];
@@ -92,6 +92,11 @@ export async function login(prev: { error?: string }, formData: FormData) {
     return { error: "Invalid email or password." };
   }
   await createSession(user);
+  // Lecturers don't get content management — they author e-learning lessons
+  // on /learn, so send them straight to the author dashboard.
+  if (user.role === "LECTURER") {
+    redirect(learnUrl("/author"));
+  }
   redirect("/staff-panel");
 }
 
@@ -609,7 +614,27 @@ export async function deleteUser(id: string) {
   if (session.id === id) {
     throw new Error("You cannot delete your own account.");
   }
+  const lessonCount = await prisma.lesson.count({ where: { authorId: id } });
+  if (lessonCount > 0) {
+    throw new Error(
+      `This user has authored ${lessonCount} lesson${lessonCount === 1 ? "" : "s"}. Reassign or delete them first.`
+    );
+  }
   await prisma.user.delete({ where: { id } });
+  revalidatePath("/staff-panel/users");
+}
+
+export async function resetUserPassword(id: string, formData: FormData) {
+  await requireAdmin();
+  const password = str(formData, "password");
+  if (password.length < 8) {
+    throw new Error("Password must be at least 8 characters.");
+  }
+  const { hashPassword } = await import("@/lib/learn-auth");
+  await prisma.user.update({
+    where: { id },
+    data: { passwordHash: await hashPassword(password) },
+  });
   revalidatePath("/staff-panel/users");
 }
 

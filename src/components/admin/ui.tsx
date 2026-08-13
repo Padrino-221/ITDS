@@ -50,7 +50,7 @@ export function Field({
   );
 }
 
-const baseInput =
+export const baseInput =
   "w-full rounded-lg border border-forest-200 bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-soft/60 focus:border-forest-500 focus:outline-none focus:ring-2 focus:ring-forest-500/20";
 
 export function TextInput({

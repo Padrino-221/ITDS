@@ -11,11 +11,11 @@ import {
   XCircle,
 } from "lucide-react";
 import LessonContent from "@/components/learn/LessonContent";
-import CodeBlock from "@/components/learn/CodeBlock";
+import Playground from "@/components/learn/Playground";
 import { getLessonForAuthor, resolvePublishedContent } from "@/lib/learn";
 import { approveLesson, requestChanges } from "@/app/learn/actions";
 import { requireRole } from "@/lib/auth";
-import { formatDateTime, learnUrl } from "@/lib/utils";
+import { absoluteUrl, formatDateTime, learnUrl } from "@/lib/utils";
 
 export default async function ReviewLessonPage({
   params,
@@ -23,7 +23,7 @@ export default async function ReviewLessonPage({
   params: Promise<{ lessonId: string }>;
 }) {
   const { lessonId } = await params;
-  await requireRole(["ADMIN"], learnUrl("/account/signin"));
+  await requireRole(["ADMIN"], absoluteUrl("/staff-panel/login"));
 
   const lesson = await getLessonForAuthor(lessonId);
   if (!lesson) notFound();
@@ -79,7 +79,10 @@ export default async function ReviewLessonPage({
               <MonitorPlay className="h-4 w-4 text-forest-500" />
               Playground ({content.playgroundLang ?? "code"})
             </h3>
-            <CodeBlock code={content.starterCode} language={content.playgroundLang ?? undefined} />
+            <Playground
+              lang={content.playgroundLang ?? "python"}
+              starterCode={content.starterCode}
+            />
           </div>
         )}
 

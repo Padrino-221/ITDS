@@ -2,12 +2,13 @@ import type { ContentBlock } from "@/lib/learn";
 import CodeBlock from "@/components/learn/CodeBlock";
 
 export default function LessonContent({ blocks }: { blocks: ContentBlock[] }) {
-  if (!blocks.length) {
+  const items = Array.isArray(blocks) ? (blocks as ContentBlock[]) : [];
+  if (!items.length) {
     return <p className="text-ink-soft">No content yet.</p>;
   }
   return (
     <div className="min-w-0">
-      {blocks.map((block, i) => {
+      {items.map((block, i) => {
         switch (block.type) {
           case "heading":
             return block.level === 3 ? (

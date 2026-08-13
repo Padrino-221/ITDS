@@ -1,11 +1,11 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
-import { AlertCircle, Loader2 } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, Loader2 } from "lucide-react";
 import { register, signin } from "@/app/learn/actions";
+import { cn, learnUrl } from "@/lib/utils";
 import { inputClass } from "@/lib/styles";
-import { learnUrl } from "@/lib/utils";
 
 function Field({
   label,
@@ -21,6 +21,30 @@ function Field({
       </span>
       {children}
     </label>
+  );
+}
+
+function PasswordField(props: React.InputHTMLAttributes<HTMLInputElement>) {
+  const { className, ...rest } = props;
+  const [visible, setVisible] = useState(false);
+
+  return (
+    <div className="relative">
+      <input
+        {...rest}
+        type={visible ? "text" : "password"}
+        className={cn(inputClass, "pr-11", className)}
+      />
+      <button
+        type="button"
+        aria-label={visible ? "Hide password" : "Show password"}
+        aria-pressed={visible}
+        onClick={() => setVisible((v) => !v)}
+        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-ink-soft transition-colors hover:bg-forest-50 hover:text-forest-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/40"
+      >
+        {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+      </button>
+    </div>
   );
 }
 
@@ -42,7 +66,12 @@ export function SignInForm() {
         <input type="email" name="email" required autoComplete="email" className={inputClass} placeholder="you@uenr.edu.gh" />
       </Field>
       <Field label="Password">
-        <input type="password" name="password" required autoComplete="current-password" className={inputClass} placeholder="••••••••" />
+        <PasswordField
+          name="password"
+          required
+          autoComplete="current-password"
+          placeholder="••••••••"
+        />
       </Field>
       <button
         type="submit"
@@ -83,7 +112,13 @@ export function RegisterForm() {
         <input type="email" name="email" required autoComplete="email" className={inputClass} placeholder="you@uenr.edu.gh" />
       </Field>
       <Field label="Password">
-        <input type="password" name="password" required minLength={8} autoComplete="new-password" className={inputClass} placeholder="At least 8 characters" />
+        <PasswordField
+          name="password"
+          required
+          minLength={8}
+          autoComplete="new-password"
+          placeholder="At least 8 characters"
+        />
       </Field>
       <button
         type="submit"

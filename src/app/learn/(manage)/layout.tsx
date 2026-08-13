@@ -1,7 +1,7 @@
 import { requireRole } from "@/lib/auth";
 import { absoluteUrl } from "@/lib/utils";
 
-export default async function LearnReviewLayout({
+export default async function LearnManageLayout({
   children,
 }: {
   children: React.ReactNode;

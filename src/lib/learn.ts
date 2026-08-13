@@ -41,6 +41,11 @@ type LessonLike = {
   publishedSnapshot: unknown;
 };
 
+/** Coerce a JSON column that may be `{}`, a string, or null into an array. */
+export function asArray<T>(value: unknown): T[] {
+  return Array.isArray(value) ? (value as T[]) : [];
+}
+
 /**
  * The content students should see for a lesson. When a published lesson is
  * being revised (spec §5.5), the working fields hold the draft while
@@ -51,23 +56,25 @@ export function resolvePublishedContent(lesson: LessonLike): LessonContent {
   if (lesson.status === "PUBLISHED") {
     return {
       objective: lesson.objective,
-      contentBody: (lesson.contentBody ?? []) as ContentBlock[],
+      contentBody: asArray<ContentBlock>(lesson.contentBody),
       hasPlayground: lesson.hasPlayground,
       playgroundLang: lesson.playgroundLang,
       starterCode: lesson.starterCode,
       exercisePrompt: lesson.exercisePrompt,
-      quiz: (lesson.quiz ?? null) as QuizQuestion[] | null,
+      quiz: asArray<QuizQuestion>(lesson.quiz).length ? asArray<QuizQuestion>(lesson.quiz) : null,
     };
   }
   const snap = (lesson.publishedSnapshot ?? null) as Partial<LessonContent> | null;
   return {
     objective: snap?.objective ?? lesson.objective,
-    contentBody: (snap?.contentBody ?? []) as ContentBlock[],
+    contentBody: asArray<ContentBlock>(snap?.contentBody ?? lesson.contentBody),
     hasPlayground: snap?.hasPlayground ?? false,
     playgroundLang: snap?.playgroundLang ?? lesson.playgroundLang,
     starterCode: snap?.starterCode ?? lesson.starterCode,
     exercisePrompt: snap?.exercisePrompt ?? lesson.exercisePrompt,
-    quiz: (snap?.quiz ?? lesson.quiz ?? null) as QuizQuestion[] | null,
+    quiz: asArray<QuizQuestion>(snap?.quiz ?? lesson.quiz).length
+      ? asArray<QuizQuestion>(snap?.quiz ?? lesson.quiz)
+      : null,
   };
 }
 
@@ -116,7 +123,7 @@ export function flattenBlocks(blocks: unknown): string {
 export function readingMinutes(content: Pick<LessonContent, "objective" | "contentBody">): number {
   const text = [
     content.objective ?? "",
-    ...(content.contentBody ?? []).map((b) =>
+    ...asArray<ContentBlock>(content.contentBody).map((b) =>
       b.type === "list" ? b.items.join(" ") : b.type === "code" ? b.code : b.text
     ),
   ].join(" ");
@@ -271,6 +278,14 @@ export const getLessonForAuthor = cache(async (id: string) =>
   })
 );
 
+export const getMyLessons = cache(async (authorId: string) =>
+  prisma.lesson.findMany({
+    where: { authorId },
+    orderBy: { updatedAt: "desc" },
+    include: { topic: { include: { subject: true } } },
+  })
+);
+
 export const getReviewQueue = cache(async () =>
   prisma.lesson.findMany({
     where: { status: "IN_REVIEW" },
@@ -289,19 +304,33 @@ export const getSubjectsWithTopics = cache(async () =>
   })
 );
 
+/** Subjects with their topics and lesson counts — for the admin curriculum manager. */
+export const getCurriculum = cache(async () =>
+  prisma.subject.findMany({
+    orderBy: { name: "asc" },
+    include: {
+      _count: { select: { topics: true } },
+      topics: {
+        orderBy: [{ order: "asc" }, { title: "asc" }],
+        include: { _count: { select: { lessons: true } } },
+      },
+    },
+  })
+);
+
 // ---------------------------------------------------------------------------
-// Student progress
+// Learner progress
 // ---------------------------------------------------------------------------
 
-export const getCompletedLessonIds = cache(async (userId: string) =>
+export const getCompletedLessonIds = cache(async (learnerId: string) =>
   prisma.userProgress
-    .findMany({ where: { userId, completed: true }, select: { lessonId: true } })
+    .findMany({ where: { learnerId, completed: true }, select: { lessonId: true } })
     .then((rows) => new Set(rows.map((r) => r.lessonId)))
 );
 
-export const getMyProgress = cache(async (userId: string) =>
+export const getMyProgress = cache(async (learnerId: string) =>
   prisma.userProgress.findMany({
-    where: { userId, completed: true },
+    where: { learnerId, completed: true },
     orderBy: { completedAt: "desc" },
     include: { lesson: { include: { topic: { include: { subject: true } } } } },
   })
@@ -324,7 +353,7 @@ export type ContinueLesson = {
  * "continue where you left off" list for the account dashboard.
  */
 export const getContinueLessons = cache(
-  async (userId: string): Promise<ContinueLesson[]> => {
+  async (learnerId: string): Promise<ContinueLesson[]> => {
     const subjects = await prisma.subject.findMany({
       orderBy: { name: "asc" },
       include: {
@@ -340,7 +369,7 @@ export const getContinueLessons = cache(
         },
       },
     });
-    const completed = await getCompletedLessonIds(userId);
+    const completed = await getCompletedLessonIds(learnerId);
 
     const out: ContinueLesson[] = [];
     for (const s of subjects) {
@@ -370,9 +399,9 @@ export const getContinueLessons = cache(
 );
 
 /** Lessons with a recorded quiz best score, for the account dashboard. */
-export const getQuizScores = cache(async (userId: string) =>
+export const getQuizScores = cache(async (learnerId: string) =>
   prisma.userProgress.findMany({
-    where: { userId, bestScore: { not: null } },
+    where: { learnerId, bestScore: { not: null } },
     orderBy: { lastAttemptAt: "desc" },
     include: { lesson: { include: { topic: { include: { subject: true } } } } },
   })

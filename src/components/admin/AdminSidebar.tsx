@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import {
   BookOpen,
   ChartBar,
+  ChalkboardTeacher,
+  ClipboardText,
   EnvelopeSimple,
   FolderOpen,
   Gear,
@@ -16,16 +18,19 @@ import {
   SignOut,
   SquaresFour,
   Tray,
+  TreeStructure,
   Users,
   X,
 } from "@phosphor-icons/react";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn, learnUrl } from "@/lib/utils";
 import { logout } from "@/app/staff-panel/actions";
 import type { SessionUser } from "@/lib/auth";
 
 const sections: Array<{
   label: string;
+  adminOnly?: boolean;
+  editorOnly?: boolean;
   items: Array<{ href: string; label: string; icon: React.ComponentType<{ className?: string; weight?: "duotone" }>; adminOnly?: boolean }>;
 }> = [
   {
@@ -34,6 +39,7 @@ const sections: Array<{
   },
   {
     label: "Content",
+    editorOnly: true,
     items: [
       { href: "/staff-panel/news", label: "News & Events", icon: Newspaper },
       { href: "/staff-panel/projects", label: "Project Works", icon: FolderOpen },
@@ -45,9 +51,18 @@ const sections: Array<{
   },
   {
     label: "Engagement",
+    editorOnly: true,
     items: [
       { href: "/staff-panel/messages", label: "Messages", icon: Tray },
       { href: "/staff-panel/subscribers", label: "Subscribers", icon: EnvelopeSimple },
+    ],
+  },
+  {
+    label: "E-Learning",
+    items: [
+      { href: learnUrl("/author"), label: "Lesson Authoring", icon: ChalkboardTeacher, adminOnly: true },
+      { href: learnUrl("/manage"), label: "Courses & Topics", icon: TreeStructure, adminOnly: true },
+      { href: learnUrl("/review"), label: "Lesson Reviews", icon: ClipboardText, adminOnly: true },
     ],
   },
   {
@@ -85,34 +100,44 @@ export default function AdminSidebar({ user }: { user: SessionUser }) {
       </div>
 
       <nav className="scrollbar-hide flex-1 space-y-6 overflow-y-auto px-3 py-4">
-        {sections.map((section) => (
-          <div key={section.label}>
-            <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-forest-400">
-              {section.label}
-            </p>
-            <ul className="space-y-1">
-              {section.items
-                .filter((item) => !item.adminOnly || user.role === "ADMIN")
-                .map((item) => (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      onClick={() => setOpen(false)}
-                      className={cn(
-                        "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                        isActive(item.href)
-                          ? "bg-gold-500 text-white"
-                          : "text-forest-200 hover:bg-white/5 hover:text-white"
-                      )}
-                    >
-                      <item.icon weight="duotone" className="h-4 w-4 shrink-0" />
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
-            </ul>
-          </div>
-        ))}
+        {sections
+          .filter((section) => {
+            if (section.adminOnly) return user.role === "ADMIN";
+            if (section.editorOnly) return user.role === "EDITOR";
+            return true;
+          })
+          .map((section) => {
+            const visibleItems = section.items.filter(
+              (item) => !item.adminOnly || user.role === "ADMIN"
+            );
+            if (visibleItems.length === 0) return null;
+            return (
+              <div key={section.label}>
+                <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-forest-400">
+                  {section.label}
+                </p>
+                <ul className="space-y-1">
+                  {visibleItems.map((item) => (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        onClick={() => setOpen(false)}
+                        className={cn(
+                          "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                          isActive(item.href)
+                            ? "bg-gold-500 text-white"
+                            : "text-forest-200 hover:bg-white/5 hover:text-white"
+                        )}
+                      >
+                        <item.icon weight="duotone" className="h-4 w-4 shrink-0" />
+                        {item.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
       </nav>
 
       <div className="border-t border-white/10 p-4">

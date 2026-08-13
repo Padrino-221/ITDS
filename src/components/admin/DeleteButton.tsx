@@ -36,8 +36,8 @@ export default function DeleteButton({
         await action();
         toast("Item deleted successfully.");
         onSuccess?.();
-      } catch {
-        toast("Failed to delete item.", "error");
+      } catch (err) {
+        toast(err instanceof Error && err.message ? err.message : "Failed to delete item.", "error");
       }
     });
   };

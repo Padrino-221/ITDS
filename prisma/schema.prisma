@@ -33,19 +33,32 @@ enum Role {
   ADMIN
   EDITOR
   LECTURER
-  STUDENT
 }
 
 model User {
-  id              String        @id @default(cuid())
+  id              String   @id @default(cuid())
   name            String
-  email           String        @unique
+  email           String   @unique
   passwordHash    String
-  role            Role          @default(STUDENT)
-  createdAt       DateTime      @default(now())
-  authoredLessons Lesson[]      @relation("AuthoredLessons")
-  reviewedLessons Lesson[]      @relation("ReviewedLessons")
-  progress        UserProgress[]
+  role            Role     @default(EDITOR)
+  createdAt       DateTime @default(now())
+  authoredLessons Lesson[] @relation("AuthoredLessons")
+  reviewedLessons Lesson[] @relation("ReviewedLessons")
+}
+
+/**
+ * Learner accounts for the E-Learning Hub (/learn). Deliberately separate
+ * from the staff `User` table — learners self-register and must never be able
+ * to sign in to the Staff Panel, and staff accounts must never count as
+ * learners. Sessions use their own cookie (see src/lib/learn-auth.ts).
+ */
+model Learner {
+  id           String         @id @default(cuid())
+  name         String
+  email        String         @unique
+  passwordHash String
+  createdAt    DateTime       @default(now())
+  progress     UserProgress[]
 }
 
 model NewsPost {
@@ -208,17 +221,17 @@ model Lesson {
 
 model UserProgress {
   id             String    @id @default(cuid())
-  userId         String
-  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  learnerId      String
+  learner        Learner   @relation(fields: [learnerId], references: [id], onDelete: Cascade)
   lessonId       String
   lesson         Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   completed      Boolean   @default(false)
   completedAt    DateTime?
-  // Quiz best score tracking (one row per user+lesson, best score kept).
+  // Quiz best score tracking (one row per learner+lesson, best score kept).
   bestScore      Int?
   bestScoreTotal Int?
   attemptCount   Int       @default(0)
   lastAttemptAt  DateTime?
 
-  @@unique([userId, lessonId])
+  @@unique([learnerId, lessonId])
 }

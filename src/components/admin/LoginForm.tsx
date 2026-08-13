@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { CircleNotch, Envelope, Lock } from "@phosphor-icons/react";
 import { login } from "@/app/staff-panel/actions";
 import { Field, PrimaryButton, TextInput } from "./ui";
+import PasswordInput from "./PasswordInput";
 
 const initialState = { error: "" };
 
@@ -24,10 +25,9 @@ export default function LoginForm() {
         />
       </Field>
       <Field label="Password" htmlFor="login-password">
-        <TextInput
+        <PasswordInput
           id="login-password"
           name="password"
-          type="password"
           required
           autoComplete="current-password"
           placeholder="••••••••"
