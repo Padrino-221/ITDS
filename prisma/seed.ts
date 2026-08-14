@@ -12,6 +12,25 @@ async function main() {
   // never overwrites curated content. The plain `npm run db:seed` keeps the
   // full reset/resync behaviour for local development.
   const bootstrap = process.env.SEED_BOOTSTRAP === "true";
+
+  // Safety guard: the full (overwriting) seed is meant for local development
+  // only. Deployment pipelines must use the bootstrap seed (missing rows
+  // only) via prisma/bootstrap.ts — otherwise a push-triggered deploy could
+  // silently overwrite curated production content (settings, news, projects,
+  // lessons…) with the seed defaults. Refuse to run the overwriting seed
+  // against a production database unless explicitly allowed.
+  if (
+    !bootstrap &&
+    process.env.NODE_ENV === "production" &&
+    process.env.SEED_ALLOW_PRODUCTION !== "true"
+  ) {
+    console.error(
+      "Refusing to run the full seed in production — it would overwrite curated content.\n" +
+        "Use `npm run db:bootstrap` (missing rows only), or set SEED_ALLOW_PRODUCTION=true to override."
+    );
+    process.exit(1);
+  }
+
   console.log(bootstrap ? "Bootstrapping database (missing rows only)…" : "Seeding database…");
 
   // ------------------------------------------------------------------

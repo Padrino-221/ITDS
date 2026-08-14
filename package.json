@@ -5,13 +5,14 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "prebuild": "node --env-file-if-exists=.env scripts/db-migrate.mjs && npm run db:bootstrap",
+    "prebuild": "node --env-file-if-exists=.env scripts/db-migrate.mjs && npm run db:bootstrap:if-empty",
     "start": "next start",
     "lint": "eslint",
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
     "db:bootstrap": "tsx prisma/bootstrap.ts",
+    "db:bootstrap:if-empty": "tsx prisma/bootstrap-if-empty.ts",
     "db:studio": "prisma studio",
     "db:push": "prisma db push",
     "postinstall": "prisma generate"

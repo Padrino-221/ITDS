@@ -110,7 +110,9 @@ npm run dev                 # http://localhost:3000
 | `npm run build` / `npm start` | Production build & serve |
 | `npm run lint` | ESLint |
 | `npm run db:migrate` | Apply Prisma migrations (`prisma migrate dev`) |
-| `npm run db:seed` | Seed the database (`tsx prisma/seed.ts`) |
+| `npm run db:seed` | Seed the database (`tsx prisma/seed.ts`) — local dev only, refused in production |
+| `npm run db:bootstrap` | Add missing baseline rows only (`tsx prisma/bootstrap.ts`) — safe against live data |
+| `npm run db:bootstrap:if-empty` | Same, but only when the database is empty — what deploys run |
 | `npm run db:push` | Push the schema without a migration |
 | `npm run db:studio` | Browse the database with Prisma Studio |
 
@@ -145,19 +147,24 @@ src/
 
 ```bash
 npx prisma migrate deploy
-npm run db:seed   # optional — only for sample content
+npm run db:bootstrap   # baseline content, missing rows only
 ```
 
 - The e-learning content seed (`prisma/seed-learn.ts`) is idempotent — re-running it updates lessons in place.
+- **The full `npm run db:seed` is for local development only.** It resets/overwrites baseline content and refuses to run when `NODE_ENV=production` (override with `SEED_ALLOW_PRODUCTION=true`). Never call it from a deploy pipeline.
 
 ---
 
 ## 🚢 Deployment
 
 1. Set the environment variables above on your host (Vercel, a VPS, etc.).
-2. `npm ci && npx prisma migrate deploy && npm run db:seed && npm run build && npm start`
-3. The public site and e-learning pages are served as static HTML with periodic revalidation; the staff panel, authoring and account areas stay server-rendered.
-4. Uploaded images live under `/uploads` (persisted storage) — make sure your host keeps them across deploys, or use an object store.
+2. The `prebuild` hook runs automatically before `npm run build` and takes care of the database: it applies pending migrations (`prisma migrate deploy`) and then seeds **only if the database is empty** (via `prisma/bootstrap-if-empty.ts`). Pushing updates to GitHub therefore never reseeds an existing database — a fresh one gets its baseline content, and every later deploy is a no-op.
+3. If your host does not run `prebuild` (e.g. a manual VPS script), use:
+   ```bash
+   npm ci && npx prisma migrate deploy && npm run db:bootstrap:if-empty && npm run build && npm start
+   ```
+4. The public site and e-learning pages are served as static HTML with periodic revalidation; the staff panel, authoring and account areas stay server-rendered.
+5. Uploaded images live under `/uploads` (persisted storage) — make sure your host keeps them across deploys, or use an object store.
 
 CI (`GitHub Actions`) runs `tsc`, ESLint and a production build on every push to `master` using a temporary PostgreSQL service.
 
