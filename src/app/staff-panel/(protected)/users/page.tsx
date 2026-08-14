@@ -25,7 +25,14 @@ export default async function AdminUsersPage({
   const session = await requireAdmin();
   const [users, total] = await Promise.all([
     prisma.user.findMany({
-      select: { id: true, name: true, email: true, role: true, createdAt: true },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+        _count: { select: { authoredLessons: true } },
+      },
       orderBy: { createdAt: "asc" },
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
@@ -108,7 +115,13 @@ export default async function AdminUsersPage({
                 {user.id !== session.id && (
                   <DeleteButton
                     action={deleteUser.bind(null, user.id)}
-                    confirmText={`Remove ${user.name}? They will no longer be able to sign in.`}
+                    confirmText={`Remove ${user.name}?${
+                      user._count.authoredLessons > 0
+                        ? ` This will also delete their ${user._count.authoredLessons} authored lesson${
+                            user._count.authoredLessons === 1 ? "" : "s"
+                          } from the E-Learning Hub.`
+                        : ""
+                    } They will no longer be able to sign in.`}
                     label=""
                     className="inline-flex items-center justify-center rounded-lg border border-red-200 bg-white p-1.5 text-red-600 transition-colors hover:bg-red-600 hover:text-white disabled:opacity-50"
                   />

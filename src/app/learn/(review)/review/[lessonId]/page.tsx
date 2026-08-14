@@ -12,8 +12,9 @@ import {
 } from "lucide-react";
 import LessonContent from "@/components/learn/LessonContent";
 import Playground from "@/components/learn/Playground";
+import DeleteButton from "@/components/admin/DeleteButton";
 import { getLessonForAuthor, resolvePublishedContent } from "@/lib/learn";
-import { approveLesson, requestChanges } from "@/app/learn/actions";
+import { approveLesson, deleteLesson, requestChanges } from "@/app/learn/actions";
 import { requireRole } from "@/lib/auth";
 import { absoluteUrl, formatDateTime, learnUrl } from "@/lib/utils";
 
@@ -54,6 +55,11 @@ export default async function ReviewLessonPage({
             submitted {formatDateTime(lesson.updatedAt)}
           </p>
         </div>
+        <DeleteButton
+          action={deleteLesson.bind(null, lesson.id, learnUrl("/review"))}
+          confirmText={`Delete "${lesson.title}"? This removes it from the review queue and cannot be undone.`}
+          label="Delete lesson"
+        />
       </div>
 
       {/* Preview */}

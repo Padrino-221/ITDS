@@ -2,8 +2,10 @@ import Link from "next/link";
 import { CheckCircle2, FilePlus2, PenLine } from "lucide-react";
 import { getMyLessons, LESSON_STATUS_LABEL, LESSON_STATUS_TONE } from "@/lib/learn";
 import { QueryToast } from "@/components/admin/QueryToast";
+import DeleteButton from "@/components/admin/DeleteButton";
 import { requireRole } from "@/lib/auth";
 import { absoluteUrl, cn, formatDate, learnUrl } from "@/lib/utils";
+import { deleteLesson } from "@/app/learn/actions";
 
 export default async function AuthorDashboardPage() {
   const user = await requireRole(["LECTURER", "ADMIN"], absoluteUrl("/staff-panel/login"));
@@ -56,10 +58,13 @@ export default async function AuthorDashboardPage() {
       ) : (
         <ul className="mt-8 space-y-3">
           {lessons.map((lesson) => (
-            <li key={lesson.id}>
+            <li
+              key={lesson.id}
+              className="flex flex-wrap items-center gap-3 rounded-xl border border-forest-100 bg-white p-4 transition-all hover:-translate-y-0.5 hover:border-gold-300 hover:shadow-md"
+            >
               <Link
                 href={learnUrl(`/author/${lesson.id}/edit`)}
-                className="flex flex-wrap items-center gap-4 rounded-xl border border-forest-100 bg-white p-4 transition-all hover:-translate-y-0.5 hover:border-gold-300 hover:shadow-md"
+                className="flex min-w-0 flex-1 items-center gap-4"
               >
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-forest-50">
                   <PenLine className="h-5 w-5 text-forest-700" />
@@ -90,6 +95,13 @@ export default async function AuthorDashboardPage() {
                 </span>
                 <CheckCircle2 className="hidden h-4 w-4 text-forest-300 sm:block" />
               </Link>
+              {(lesson.status !== "PUBLISHED" || user.role === "ADMIN") && (
+                <DeleteButton
+                  action={deleteLesson.bind(null, lesson.id, learnUrl("/author"))}
+                  confirmText={`Delete "${lesson.title}"? This cannot be undone.`}
+                  label="Delete"
+                />
+              )}
             </li>
           ))}
         </ul>

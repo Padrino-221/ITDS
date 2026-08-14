@@ -422,6 +422,30 @@ export async function requestChanges(lessonId: string, formData: FormData) {
   redirect(learnUrl("/review?done=1"));
 }
 
+/**
+ * Delete a lesson. Lecturers can only delete lessons they authored, and only
+ * before they are published (removing live content is an admin decision).
+ * Admins can delete any lesson. Learner progress on the lesson cascades.
+ */
+export async function deleteLesson(lessonId: string, backTo?: string) {
+  const user = await requireRole(["LECTURER", "ADMIN"], absoluteUrl("/staff-panel/login"));
+  const lesson = await prisma.lesson.findUnique({ where: { id: lessonId } });
+  if (!lesson) throw new Error("Lesson not found.");
+
+  if (user.role !== "ADMIN") {
+    if (lesson.authorId !== user.id) {
+      throw new Error("You can only delete lessons you authored.");
+    }
+    if (lesson.status === "PUBLISHED") {
+      throw new Error("Published lessons can only be deleted by an admin.");
+    }
+  }
+
+  await prisma.lesson.delete({ where: { id: lessonId } });
+  revalidateLearn();
+  redirect(learnUrl(backTo ?? "/author"));
+}
+
 // ---------------------------------------------------------------------------
 // Subject & topic management (admin only)
 // ---------------------------------------------------------------------------

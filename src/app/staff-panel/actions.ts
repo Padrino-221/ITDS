@@ -614,14 +614,16 @@ export async function deleteUser(id: string) {
   if (session.id === id) {
     throw new Error("You cannot delete your own account.");
   }
-  const lessonCount = await prisma.lesson.count({ where: { authorId: id } });
-  if (lessonCount > 0) {
-    throw new Error(
-      `This user has authored ${lessonCount} lesson${lessonCount === 1 ? "" : "s"}. Reassign or delete them first.`
-    );
-  }
-  await prisma.user.delete({ where: { id } });
+  // Remove the account together with any lessons they authored, so staff
+  // accounts are never stuck undeletable. Learner progress on those lessons
+  // cascades, and lessons they merely reviewed just lose the reviewer link.
+  await prisma.$transaction([
+    prisma.lesson.deleteMany({ where: { authorId: id } }),
+    prisma.user.delete({ where: { id } }),
+  ]);
   revalidatePath("/staff-panel/users");
+  revalidatePath("/learn", "layout");
+  revalidatePath("/", "layout");
 }
 
 export async function resetUserPassword(id: string, formData: FormData) {
