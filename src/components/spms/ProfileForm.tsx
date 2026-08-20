@@ -133,6 +133,7 @@ function AcademicSection({ profile }: { profile: Profile }) {
       jobRank: form.get("jobRank") as string,
       researchArea1: form.get("researchArea1") as string,
       researchArea2: form.get("researchArea2") as string,
+      about: form.get("about") as string,
     });
     setSaving(false);
     setSaved(true);
@@ -179,6 +180,14 @@ function AcademicSection({ profile }: { profile: Profile }) {
             name="researchArea2"
             rows={3}
             defaultValue={profile?.researchArea2 ?? ""}
+          />
+        </Field>
+        <Field label="About / Bio" hint="Shown on your public lecturer profile">
+          <TextArea
+            name="about"
+            rows={4}
+            defaultValue={profile?.about ?? ""}
+            placeholder="Write a short bio about yourself, your expertise and experience…"
           />
         </Field>
         <div className="flex items-center gap-3 border-t border-forest-100 pt-4">
