@@ -156,9 +156,30 @@ export async function authenticate(
   email: string,
   password: string
 ): Promise<SessionUser | null> {
+  // First check the staff-panel User table (admins, editors)
   const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
-  if (!user) return null;
-  const ok = await verifyPassword(password, user.passwordHash);
-  if (!ok) return null;
-  return { id: user.id, name: user.name, email: user.email, role: user.role };
+  if (user) {
+    const ok = await verifyPassword(password, user.passwordHash);
+    if (ok) return { id: user.id, name: user.name, email: user.email, role: user.role };
+  }
+
+  // If no staff-panel match, check the SPMS Supervisor table.
+  // Supervisors with LECTURER role can log in to the staff panel to author
+  // e-learning lessons. Their SPMS profile is the source of truth.
+  const supervisor = await prisma.supervisor.findUnique({
+    where: { email: email.toLowerCase() },
+  });
+  if (supervisor) {
+    const ok = await verifyPassword(password, supervisor.passwordHash);
+    if (ok) {
+      return {
+        id: supervisor.id,
+        name: supervisor.name,
+        email: supervisor.email,
+        role: "LECTURER",
+      };
+    }
+  }
+
+  return null;
 }
