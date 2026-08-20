@@ -39,8 +39,11 @@ export default function SpmsSidebar({ user }: { user: SpmsSessionUser }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
-  const isActive = (href: string) =>
-    pathname === href || pathname.startsWith(href + "/");
+  const allHrefs = [...lecturerItems, ...adminItems, { href: "/spms/change-password", label: "", icon: KeyRound }].map((i) => i.href);
+  const bestMatch = allHrefs
+    .filter((h) => pathname === h || pathname.startsWith(h + "/"))
+    .sort((a, b) => b.length - a.length)[0];
+  const isActive = (href: string) => href === bestMatch;
 
   const sidebar = (
     <div className="flex h-full flex-col bg-forest-950 text-forest-100">
