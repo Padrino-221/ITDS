@@ -139,7 +139,7 @@ export async function signout() {
  */
 export async function staffSignout() {
   await destroySession();
-  redirect(absoluteUrl("/staff-panel/login"));
+  redirect("/staff-panel/login");
 }
 
 // ---------------------------------------------------------------------------
