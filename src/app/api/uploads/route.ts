@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { getSession } from "@/lib/auth";
 import type { SessionRole } from "@/lib/auth";
+import { getSpmsSession } from "@/lib/spms-auth";
 import { extForMime, MAX_UPLOAD_BYTES, saveUpload } from "@/lib/uploads";
 
-// Only staff accounts may upload files — students self-register on /learn and
-// must never be able to write to the server.
+// Staff accounts and SPMS supervisors may upload files.
 const STAFF_ROLES: SessionRole[] = ["ADMIN", "EDITOR", "LECTURER"];
 
 // Raster formats only — SVG (and other XML-based "images") can carry scripts
@@ -28,11 +28,12 @@ const ALLOWED_IMAGE_TYPES = new Set([
  * URLs inside form submissions.
  */
 export async function POST(request: Request) {
-  const session = await getSession();
-  if (!session) {
+  const staffSession = await getSession();
+  const spmsSession = await getSpmsSession();
+  if (!staffSession && !spmsSession) {
     return NextResponse.json({ error: "Not signed in." }, { status: 401 });
   }
-  if (!STAFF_ROLES.includes(session.role)) {
+  if (staffSession && !STAFF_ROLES.includes(staffSession.role)) {
     return NextResponse.json(
       { error: "Only staff accounts can upload files." },
       { status: 403 }

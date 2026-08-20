@@ -57,27 +57,66 @@ export async function updateSpmsProfile(data: ProfileData) {
   const session = await getSpmsSession();
   if (!session) redirect("/spms/login");
 
-  await prisma.supervisor.update({
+  const supervisorUpdate: Record<string, any> = {};
+  if (data.userTitle !== undefined) supervisorUpdate.userTitle = data.userTitle;
+  if (data.gender !== undefined) supervisorUpdate.gender = data.gender;
+  if (data.name !== undefined) supervisorUpdate.name = data.name;
+  if (data.jobRank !== undefined) supervisorUpdate.jobRank = data.jobRank;
+  if (data.phone !== undefined) supervisorUpdate.phone = data.phone;
+  if (data.linkedin !== undefined) supervisorUpdate.linkedin = data.linkedin;
+  if (data.facebook !== undefined) supervisorUpdate.facebook = data.facebook;
+  if (data.twitter !== undefined) supervisorUpdate.twitter = data.twitter;
+  if (data.publink !== undefined) supervisorUpdate.publink = data.publink;
+  if (data.researchArea1 !== undefined) supervisorUpdate.researchArea1 = data.researchArea1;
+  if (data.researchArea2 !== undefined) supervisorUpdate.researchArea2 = data.researchArea2;
+  if (data.profilePhoto !== undefined) supervisorUpdate.profilePhoto = data.profilePhoto;
+  if (data.about !== undefined) supervisorUpdate.about = data.about;
+
+  const supervisor = await prisma.supervisor.update({
     where: { id: session.id },
-    data: {
-      ...(data.userTitle !== undefined && { userTitle: data.userTitle }),
-      ...(data.gender !== undefined && { gender: data.gender }),
-      ...(data.name !== undefined && { name: data.name }),
-      ...(data.jobRank !== undefined && { jobRank: data.jobRank }),
-      ...(data.phone !== undefined && { phone: data.phone }),
-      ...(data.linkedin !== undefined && { linkedin: data.linkedin }),
-      ...(data.facebook !== undefined && { facebook: data.facebook }),
-      ...(data.twitter !== undefined && { twitter: data.twitter }),
-      ...(data.publink !== undefined && { publink: data.publink }),
-      ...(data.researchArea1 !== undefined && { researchArea1: data.researchArea1 }),
-      ...(data.researchArea2 !== undefined && { researchArea2: data.researchArea2 }),
-      ...(data.profilePhoto !== undefined && { profilePhoto: data.profilePhoto }),
-      ...(data.about !== undefined && { about: data.about }),
-    },
+    data: supervisorUpdate,
+    select: { lecturerId: true },
   });
+
+  // Sync profile changes to the linked public Lecturer record so the
+  // public-facing /lecturers/[slug] page reflects the SPMS profile.
+  if (supervisor.lecturerId) {
+    const lecturerUpdate: Record<string, any> = {};
+    if (data.name !== undefined) lecturerUpdate.name = data.name;
+    if (data.profilePhoto !== undefined) lecturerUpdate.photo = data.profilePhoto;
+    if (data.about !== undefined) lecturerUpdate.bio = data.about;
+    if (data.researchArea1 !== undefined || data.researchArea2 !== undefined) {
+      const supervisorFull = await prisma.supervisor.findUnique({
+        where: { id: session.id },
+        select: { researchArea1: true, researchArea2: true },
+      });
+      const interests = [supervisorFull?.researchArea1, supervisorFull?.researchArea2]
+        .filter(Boolean)
+        .join(", ");
+      lecturerUpdate.researchInterests = interests || null;
+    }
+    if (data.userTitle !== undefined || data.jobRank !== undefined) {
+      const supervisorFull = await prisma.supervisor.findUnique({
+        where: { id: session.id },
+        select: { userTitle: true, jobRank: true },
+      });
+      const title = [supervisorFull?.userTitle, supervisorFull?.jobRank]
+        .filter(Boolean)
+        .join(" ");
+      if (title) lecturerUpdate.title = title;
+    }
+    if (Object.keys(lecturerUpdate).length > 0) {
+      await prisma.lecturer.update({
+        where: { id: supervisor.lecturerId },
+        data: lecturerUpdate,
+      });
+    }
+  }
 
   revalidatePath("/spms/profile");
   revalidatePath("/spms/dashboard");
+  revalidatePath("/lecturers");
+  if (supervisor.lecturerId) revalidatePath("/lecturers/[slug]");
 }
 
 // ---------------------------------------------------------------------------

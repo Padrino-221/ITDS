@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { updateSpmsProfile } from "@/app/spms/(protected)/actions";
 import { AdminCard, Field, TextArea, SaveButton } from "@/components/admin/ui";
 import { Select } from "@/components/admin/Dropdown";
+import { ImageUpload } from "@/components/admin/ImageUpload";
 import { User, Briefcase, Phone } from "lucide-react";
 
 type Profile = {
@@ -46,6 +48,7 @@ function PersonalSection({ profile }: { profile: Profile }) {
       userTitle: form.get("userTitle") as string,
       gender: form.get("gender") as string,
       name: `${form.get("firstName")} ${form.get("lastName")}`,
+      profilePhoto: form.get("profilePhoto") as string,
     });
     setSaving(false);
     setSaved(true);
@@ -59,6 +62,12 @@ function PersonalSection({ profile }: { profile: Profile }) {
   return (
     <AdminCard title={<>Personal Details</>}>
       <form onSubmit={handleSubmit} className="space-y-4">
+        <ImageUpload
+          name="profilePhoto"
+          label="Profile Photo"
+          hint="Upload a professional photo for your public profile"
+          defaultValue={profile?.profilePhoto ?? ""}
+        />
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Title">
             <Select
