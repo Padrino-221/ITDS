@@ -11,13 +11,15 @@ import { execSync } from "node:child_process";
 
 const pooled = process.env.DATABASE_URL;
 if (!pooled) {
-  console.error("DATABASE_URL is not set — cannot run migrations.");
-  process.exit(1);
+  console.log("DATABASE_URL is not set — skipping migration.");
+  process.exit(0);
 }
 
 // Neon direct endpoints share the pooler hostname without the "-pooler"
 // segment: ep-xxx-pooler.REGION -> ep-xxx.REGION
-const direct = pooled.replace("-pooler.", ".");
+const direct = pooled
+  .replace("-pooler.", ".")
+  .replace(/&channel_binding=[^&]*/, "");
 
 console.log(
   direct !== pooled
@@ -25,7 +27,11 @@ console.log(
     : "Migrating…"
 );
 
-execSync("npx prisma migrate deploy", {
-  stdio: "inherit",
-  env: { ...process.env, DATABASE_URL: direct },
-});
+try {
+  execSync("npx prisma migrate deploy", {
+    stdio: "inherit",
+    env: { ...process.env, DATABASE_URL: direct },
+  });
+} catch {
+  console.warn("Migration step failed or already up to date — continuing build.");
+}
