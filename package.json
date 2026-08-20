@@ -15,6 +15,7 @@
     "db:bootstrap:if-empty": "tsx prisma/bootstrap-if-empty.ts",
     "db:studio": "prisma studio",
     "db:push": "prisma db push",
+    "db:seed-spms": "node --env-file=.env scripts/seed-spms-admin.mjs",
     "postinstall": "prisma generate"
   },
   "prisma": {

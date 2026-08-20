@@ -170,7 +170,7 @@ export default async function HomePage() {
                 />
               </div>
               {/* Quote card — below the photo, not overlapping it */}
-              <div className="mt-6 rounded-xl border border-forest-100 bg-white p-5 shadow-xl shadow-forest-950/10">
+              <div className="mt-6 rounded-xl border border-forest-100 bg-white p-5">
                 <div className="flex items-start gap-3">
                   <Quote className="h-8 w-8 shrink-0 text-gold-500" />
                   <p className="text-sm font-medium italic leading-relaxed text-ink-soft">
@@ -234,12 +234,12 @@ export default async function HomePage() {
                     <Link
                       href={link.href}
                       className={cn(
-                        "group flex h-full flex-col rounded-2xl border p-6 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl",
+                        "group flex h-full flex-col rounded-2xl border p-6 transition-all duration-300 hover:-translate-y-2",
                         dark
-                          ? "border-forest-950 bg-forest-950 text-white hover:shadow-forest-950/20"
+                          ? "border-forest-950 bg-forest-950 text-white"
                           : accent
-                            ? "border-gold-500 bg-gold-500 text-white hover:shadow-gold-500/20"
-                            : "border-forest-100 bg-white text-ink hover:border-gold-300 hover:shadow-forest-950/5"
+                            ? "border-gold-500 bg-gold-500 text-white"
+                            : "border-forest-100 bg-white text-ink hover:border-gold-300"
                       )}
                     >
                       <span

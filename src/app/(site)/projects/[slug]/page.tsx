@@ -5,8 +5,12 @@ import { notFound } from "next/navigation";
 import {
   ArrowLeft,
   Calendar,
+  Download,
   FileText,
+  GitBranch,
   GraduationCap,
+  Users,
+  Target,
   User,
 } from "lucide-react";
 import { Badge } from "@/components/ui";
@@ -139,16 +143,49 @@ export default async function ProjectDetailPage({
       <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-3">
           {/* Abstract */}
-          <article className="lg:col-span-2">
-            <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-forest-900">
-              <FileText className="h-5 w-5 text-gold-600" />
-              Project Abstract
-            </h2>
-            <div className="prose-content mt-4">
-              {paragraphs(project.abstract ?? project.title).map((p, i) => (
-                <p key={i}>{p}</p>
-              ))}
+          <article className="lg:col-span-2 space-y-8">
+            {/* Abstract */}
+            <div>
+              <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-forest-900">
+                <FileText className="h-5 w-5 text-gold-600" />
+                Project Abstract
+              </h2>
+              <div className="prose-content mt-4">
+                {paragraphs(project.abstract ?? project.title).map((p, i) => (
+                  <p key={i}>{p}</p>
+                ))}
+              </div>
             </div>
+
+            {/* Objective */}
+            {'objective' in project && project.objective && (
+              <div>
+                <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-forest-900">
+                  <Target className="h-5 w-5 text-gold-600" />
+                  Main Objective
+                </h2>
+                <div className="prose-content mt-4">
+                  {paragraphs(project.objective).map((p, i) => (
+                    <p key={i}>{p}</p>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Group Members */}
+            {'groupMembers' in project && project.groupMembers && (
+              <div>
+                <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-forest-900">
+                  <Users className="h-5 w-5 text-gold-600" />
+                  Group Members
+                </h2>
+                <div className="prose-content mt-4">
+                  {paragraphs(project.groupMembers).map((p, i) => (
+                    <p key={i}>{p}</p>
+                  ))}
+                </div>
+              </div>
+            )}
           </article>
 
           {/* Sidebar */}
@@ -190,6 +227,50 @@ export default async function ProjectDetailPage({
                 </div>
               </dl>
             </div>
+
+            {/* Document Download */}
+            {'documentUrl' in project && project.documentUrl && (
+              <a
+                href={project.documentUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 rounded-xl border border-forest-100 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-gold-300 hover:shadow-md"
+              >
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gold-500 text-white">
+                  <Download className="h-5 w-5" />
+                </span>
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-ink-soft">
+                    Project Document
+                  </p>
+                  <p className="font-display font-bold text-forest-900">
+                    {'documentName' in project ? (project.documentName ?? 'Download PDF') : 'Download PDF'}
+                  </p>
+                </div>
+              </a>
+            )}
+
+            {/* GitHub Link */}
+            {'githubLink' in project && project.githubLink && (
+              <a
+                href={project.githubLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 rounded-xl border border-forest-100 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-gold-300 hover:shadow-md"
+              >
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-forest-800 text-white">
+                  <GitBranch className="h-5 w-5" />
+                </span>
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-ink-soft">
+                    Source Code
+                  </p>
+                  <p className="font-display font-bold text-forest-900">
+                    View on GitHub
+                  </p>
+                </div>
+              </a>
+            )}
 
             {project.supervisor && (
               <Link

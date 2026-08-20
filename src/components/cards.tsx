@@ -6,6 +6,7 @@ import {
   Brain,
   CalendarDays,
   ChartPie,
+  Download,
   FolderOpen,
   Globe,
   Shield,
@@ -39,10 +40,10 @@ export function NewsCard({
     <Link
       href={`/news/${post.slug}`}
       className={cn(
-        "group flex flex-col overflow-hidden rounded-2xl border transition-all duration-300 hover:-translate-y-2 hover:shadow-xl",
+        "group flex flex-col overflow-hidden rounded-2xl border transition-all duration-300 hover:-translate-y-2",
         isDark
-          ? "border-white/10 bg-white hover:shadow-forest-950/20"
-          : "border-forest-100 bg-white hover:border-gold-300 hover:shadow-forest-950/5"
+          ? "border-white/10 bg-white"
+          : "border-forest-100 bg-white hover:border-gold-300"
       )}
     >
       <div className="relative h-48 overflow-hidden">
@@ -93,7 +94,7 @@ export function ProjectCard({
   return (
     <Link
       href={`/projects/${project.slug}`}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-forest-100 bg-white transition-all duration-300 hover:-translate-y-2 hover:border-gold-300 hover:shadow-xl hover:shadow-forest-950/5"
+      className="group flex flex-col overflow-hidden rounded-2xl border border-forest-100 bg-white transition-all duration-300 hover:-translate-y-2 hover:border-gold-300"
     >
       <div className="relative h-44 overflow-hidden">
         {project.image ? (
@@ -135,10 +136,18 @@ export function ProjectCard({
             </p>
           )}
         </div>
-        <span className="mt-auto flex items-center gap-1.5 pt-4 text-sm font-bold text-gold-600 transition-colors">
-          View Project
-          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-        </span>
+        <div className="mt-auto flex items-center justify-between pt-4">
+          <span className="flex items-center gap-1.5 text-sm font-bold text-gold-600 transition-colors">
+            View Project
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </span>
+          {'documentUrl' in project && project.documentUrl && (
+            <span className="flex items-center gap-1 rounded-full bg-forest-50 px-2.5 py-1 text-xs font-semibold text-forest-700">
+              <Download className="h-3 w-3" />
+              PDF
+            </span>
+          )}
+        </div>
       </div>
     </Link>
   );
@@ -223,7 +232,7 @@ export function ResearchAreaCard({ area }: { area: ResearchArea }) {
   return (
     <Link
       href={`/research#${area.slug}`}
-      className="group flex flex-col rounded-2xl border border-forest-100 bg-white p-6 transition-all duration-300 hover:-translate-y-2 hover:border-gold-300 hover:shadow-xl hover:shadow-forest-950/5"
+      className="group flex flex-col rounded-2xl border border-forest-100 bg-white p-6 transition-all duration-300 hover:-translate-y-2 hover:border-gold-300"
     >
       <span className="flex h-14 w-14 items-center justify-center rounded-xl bg-forest-50 text-forest-700 transition-colors group-hover:bg-gold-500 group-hover:text-white">
         <Icon className="h-7 w-7" />

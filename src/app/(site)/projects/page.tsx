@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 import type { DegreeLevel } from "@prisma/client";
-import { PageHeader, EmptyState } from "@/components/ui";
-import { ProjectCard } from "@/components/cards";
+import { PageHeader } from "@/components/ui";
 import ProjectsFilter from "@/components/ProjectsFilter";
+import ProjectsTable from "@/components/ProjectsTable";
 import { DEGREE_LABELS, getProjects } from "@/lib/data";
 
 export const metadata = {
@@ -46,31 +46,9 @@ export default async function ProjectsPage({
           <ProjectsFilter />
         </Suspense>
 
-        <div className="mt-8 flex items-center justify-between">
-          <p className="text-sm text-ink-soft">
-            Showing{" "}
-            <span className="font-semibold text-forest-800">
-              {validLevel === "ALL" ? "all" : DEGREE_LABELS[validLevel]}
-            </span>{" "}
-            projects
-          </p>
-          <p className="text-sm font-semibold text-forest-800">{projects.length} result(s)</p>
+        <div className="mt-6">
+          <ProjectsTable projects={projects} initialLevel={validLevel} />
         </div>
-
-        {projects.length === 0 ? (
-          <div className="mt-8">
-            <EmptyState
-              title="No projects found"
-              description="Projects in this category will appear here once published."
-            />
-          </div>
-        ) : (
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {projects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
-            ))}
-          </div>
-        )}
       </section>
     </>
   );

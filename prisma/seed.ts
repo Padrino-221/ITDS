@@ -85,6 +85,32 @@ async function main() {
   });
 
   // ------------------------------------------------------------------
+  // SPMS Supervisor accounts (Student Project Management System)
+  // ------------------------------------------------------------------
+  const spmsAdminPassword = await hash("spms-admin123", 12);
+  await prisma.supervisor.upsert({
+    where: { email: "spms-admin@itds.uenr.edu.gh" },
+    update: {},
+    create: {
+      name: "SPMS Administrator",
+      email: "spms-admin@itds.uenr.edu.gh",
+      passwordHash: spmsAdminPassword,
+      role: "ADMIN",
+    },
+  });
+  const spmsLecturerPassword = await hash("spms-lecturer123", 12);
+  await prisma.supervisor.upsert({
+    where: { email: "spms-lecturer@itds.uenr.edu.gh" },
+    update: {},
+    create: {
+      name: "Dr. Yaw Anokye-Acheampong",
+      email: "spms-lecturer@itds.uenr.edu.gh",
+      passwordHash: spmsLecturerPassword,
+      role: "LECTURER",
+    },
+  });
+
+  // ------------------------------------------------------------------
   // Settings
   // ------------------------------------------------------------------
   const settings: Array<[string, string]> = [
@@ -818,6 +844,8 @@ Thesis writing, Internal review, External examination, Thesis defense & viva voc
   console.log("Editor login:  editor@itds.uenr.edu.gh / editor123");
   console.log("Lecturer login: lecturer@itds.uenr.edu.gh / lecturer123");
   console.log("Student login:  student@itds.uenr.edu.gh / student123");
+  console.log("SPMS Admin:    spms-admin@itds.uenr.edu.gh / spms-admin123");
+  console.log("SPMS Lecturer: spms-lecturer@itds.uenr.edu.gh / spms-lecturer123");
 }
 
 main()

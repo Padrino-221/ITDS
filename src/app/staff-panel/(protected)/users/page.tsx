@@ -11,7 +11,6 @@ import {
 import { Select } from "@/components/admin/Dropdown";
 import { SavedToast } from "@/components/admin/SavedToast";
 import DeleteButton from "@/components/admin/DeleteButton";
-import AddUserModal from "@/components/admin/AddUserModal";
 import ResetPasswordModal from "@/components/admin/ResetPasswordModal";
 import { deleteUser, updateUserRole } from "@/app/staff-panel/actions";
 
@@ -47,7 +46,7 @@ export default async function AdminUsersPage({
       <AdminPageHeader
         title="Users"
         description="Manage staff accounts that can edit website content. Only administrators can access this page."
-        action={<AddUserModal />}
+
       />
       <SavedToast saved={saved} />
 
@@ -88,7 +87,6 @@ export default async function AdminUsersPage({
                   className="w-28"
                   options={[
                     { value: "EDITOR", label: "Editor" },
-                    { value: "LECTURER", label: "Lecturer" },
                     { value: "ADMIN", label: "Admin" },
                   ]}
                 />
