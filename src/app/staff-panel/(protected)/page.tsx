@@ -1,6 +1,5 @@
 import Link from "next/link";
 import {
-  FolderOpen,
   Newspaper,
   Plus,
   Target,
@@ -13,13 +12,11 @@ import { AdminCard, AdminPageHeader, PrimaryLink, SecondaryLink } from "@/compon
 export default async function AdminDashboard() {
   const [
     newsCount,
-    projectCount,
     researchCount,
     unreadMessages,
     recentMessages,
   ] = await Promise.all([
     prisma.newsPost.count(),
-    prisma.project.count(),
     prisma.researchArea.count(),
     prisma.contactMessage.count({ where: { read: false } }),
     prisma.contactMessage.findMany({ orderBy: { createdAt: "desc" }, take: 5 }),
@@ -27,7 +24,6 @@ export default async function AdminDashboard() {
 
   const cards = [
     { label: "News & Events", value: newsCount, icon: Newspaper, href: "/staff-panel/news" },
-    { label: "Project Works", value: projectCount, icon: FolderOpen, href: "/staff-panel/projects" },
     { label: "Research Areas", value: researchCount, icon: Target, href: "/staff-panel/research" },
   ];
 
@@ -108,9 +104,6 @@ export default async function AdminDashboard() {
         <div className="mt-4 flex flex-wrap gap-3">
           <PrimaryLink href="/staff-panel/news/new">
             <Plus className="h-4 w-4" /> New post
-          </PrimaryLink>
-          <PrimaryLink href="/staff-panel/projects/new">
-            <Plus className="h-4 w-4" /> New project
           </PrimaryLink>
           <SecondaryLink href="/staff-panel/settings">Edit site settings</SecondaryLink>
         </div>

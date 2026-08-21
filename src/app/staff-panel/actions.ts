@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import type { DegreeLevel, Role } from "@prisma/client";
+import type { Role } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
   authenticate,
@@ -16,7 +16,7 @@ import {
 import { slugify, learnUrl } from "@/lib/utils";
 import { removeUploadFile } from "@/lib/uploads";
 
-const DEGREES: DegreeLevel[] = ["UNDERGRADUATE", "DIPLOMA", "MSC", "MPHIL", "PHD"];
+type SlugModel = "newsPost" | "researchArea";
 
 function str(formData: FormData, key: string): string {
   // Values can be non-strings (e.g. a File from an upload input);
@@ -33,8 +33,6 @@ function opt(formData: FormData, key: string): string | null {
 function bool(formData: FormData, key: string): boolean {
   return formData.get(key) === "on";
 }
-
-type SlugModel = "newsPost" | "project" | "researchArea";
 
 type SlugWhere = { slug: string; id?: { not: string } };
 
@@ -55,9 +53,6 @@ async function uniqueSlug(
     switch (model) {
       case "newsPost":
         existing = await prisma.newsPost.findFirst({ where, select: { id: true } });
-        break;
-      case "project":
-        existing = await prisma.project.findFirst({ where, select: { id: true } });
         break;
       case "researchArea":
         existing = await prisma.researchArea.findFirst({ where, select: { id: true } });
@@ -168,86 +163,6 @@ export async function deleteNews(id: string) {
   await requireAuth();
   const existing = await prisma.newsPost.findUnique({ where: { id } });
   await prisma.newsPost.delete({ where: { id } });
-  if (existing?.image) await removeUploadFile(existing.image);
-  revalidateAll();
-}
-
-// ------------------------------------------------------------------
-// Projects
-// ------------------------------------------------------------------
-
-const projectSchema = z.object({
-  title: z.string().min(3, "Title must be at least 3 characters."),
-  studentName: z.string().optional(),
-  program: z.string().optional(),
-  academicYear: z.string().optional(),
-  image: z.string().optional(),
-  abstract: z.string().optional(),
-  degreeLevel: z.enum(DEGREES as [DegreeLevel, ...DegreeLevel[]]),
-  supervisorId: z.string().optional(),
-});
-
-export async function createProject(formData: FormData) {
-  await requireAuth();
-  const degreeLevel = str(formData, "degreeLevel") as DegreeLevel;
-  const parsed = projectSchema.safeParse({
-    title: str(formData, "title"),
-    studentName: opt(formData, "studentName") ?? undefined,
-    program: opt(formData, "program") ?? undefined,
-    academicYear: opt(formData, "academicYear") ?? undefined,
-    image: opt(formData, "image") ?? undefined,
-    abstract: opt(formData, "abstract") ?? undefined,
-    degreeLevel,
-    supervisorId: opt(formData, "supervisorId") ?? undefined,
-  });
-  if (!parsed.success) {
-    throw new Error(parsed.error.issues[0]?.message ?? "Invalid input.");
-  }
-  const slug = await uniqueSlug(parsed.data.title, "project");
-  await prisma.project.create({
-    data: {
-      ...parsed.data,
-      slug,
-      published: bool(formData, "published"),
-    },
-  });
-  revalidateAll();
-  redirect("/staff-panel/projects?saved=1");
-}
-
-export async function updateProject(id: string, formData: FormData) {
-  await requireAuth();
-  const existing = await prisma.project.findUnique({ where: { id } });
-  const degreeLevel = str(formData, "degreeLevel") as DegreeLevel;
-  const parsed = projectSchema.safeParse({
-    title: str(formData, "title"),
-    studentName: opt(formData, "studentName") ?? undefined,
-    program: opt(formData, "program") ?? undefined,
-    academicYear: opt(formData, "academicYear") ?? undefined,
-    image: opt(formData, "image") ?? undefined,
-    abstract: opt(formData, "abstract") ?? undefined,
-    degreeLevel,
-    supervisorId: opt(formData, "supervisorId") ?? undefined,
-  });
-  if (!parsed.success) {
-    throw new Error(parsed.error.issues[0]?.message ?? "Invalid input.");
-  }
-  const slug = await uniqueSlug(parsed.data.title, "project", id);
-  await prisma.project.update({
-    where: { id },
-    data: { ...parsed.data, slug, published: bool(formData, "published") },
-  });
-  if (existing?.image && parsed.data.image && existing.image !== parsed.data.image) {
-    await removeUploadFile(existing.image);
-  }
-  revalidateAll();
-  redirect("/staff-panel/projects?saved=1");
-}
-
-export async function deleteProject(id: string) {
-  await requireAuth();
-  const existing = await prisma.project.findUnique({ where: { id } });
-  await prisma.project.delete({ where: { id } });
   if (existing?.image) await removeUploadFile(existing.image);
   revalidateAll();
 }

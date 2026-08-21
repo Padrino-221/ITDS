@@ -1,16 +1,13 @@
-import type { NewsPost, Project, ResearchArea, Program, GalleryImage } from "@prisma/client";
+import type { NewsPost, ResearchArea, Program, GalleryImage } from "@prisma/client";
 import {
   createNews,
-  createProject,
   createResearchArea,
   createGalleryImage,
   updateNews,
-  updateProject,
   updateResearchArea,
   updateGalleryImage,
   updateProgram,
 } from "@/app/staff-panel/actions";
-import { DEGREE_LABELS } from "@/lib/data";
 import { AdminCard, Checkbox, Field, SaveButton, SecondaryLink, TextArea, TextInput } from "./ui";
 import { Select } from "./Dropdown";
 import { ImageUpload } from "./ImageUpload";
@@ -56,83 +53,6 @@ export function NewsForm({ post }: { post?: NewsPost }) {
         </div>
         <div className="mt-6">
           <FormActions cancelHref="/staff-panel/news" />
-        </div>
-      </AdminCard>
-    </form>
-  );
-}
-
-// ------------------------------------------------------------------
-// Projects
-// ------------------------------------------------------------------
-
-export function ProjectForm({
-  project,
-  supervisors,
-}: {
-  project?: Project;
-  supervisors: { id: string; name: string }[];
-}) {
-  return (
-    <form action={project ? updateProject.bind(null, project.id) : createProject}>
-      <AdminCard>
-        <div className="grid gap-5">
-          <Field label="Project title" required>
-            <TextInput name="title" required minLength={3} defaultValue={project?.title} />
-          </Field>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <Field label="Student name">
-              <TextInput name="studentName" defaultValue={project?.studentName ?? ""} />
-            </Field>
-            <Field label="Programme">
-              <TextInput
-                name="program"
-                placeholder="e.g. BSc. Information Technology"
-                defaultValue={project?.program ?? ""}
-              />
-            </Field>
-          </div>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <Field label="Degree level" required>
-              <Select
-                name="degreeLevel"
-                required
-                defaultValue={project?.degreeLevel ?? "UNDERGRADUATE"}
-                options={Object.entries(DEGREE_LABELS).map(([value, label]) => ({ value, label }))}
-              />
-            </Field>
-            <Field label="Academic year">
-              <TextInput
-                name="academicYear"
-                placeholder="e.g. 2025/2026"
-                defaultValue={project?.academicYear ?? ""}
-              />
-            </Field>
-          </div>
-          <Field label="Supervisor">
-            <Select
-              name="supervisorId"
-              defaultValue={project?.supervisorId ?? ""}
-              placeholder="— No supervisor —"
-              options={[
-                { value: "", label: "— No supervisor —" },
-                ...supervisors.map((s) => ({ value: s.id, label: s.name })),
-              ]}
-            />
-          </Field>
-          <ImageUpload
-            name="image"
-            label="Project Image"
-            hint="Optional cover image for the project card."
-            defaultValue={project?.image ?? ""}
-          />
-          <Field label="Abstract" hint="Project summary / abstract (optional).">
-            <TextArea name="abstract" rows={8} defaultValue={project?.abstract ?? ""} />
-          </Field>
-          <Checkbox label="Published (visible on the public site)" name="published" defaultChecked={project?.published ?? true} />
-        </div>
-        <div className="mt-6">
-          <FormActions cancelHref="/staff-panel/projects" />
         </div>
       </AdminCard>
     </form>

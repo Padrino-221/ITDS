@@ -9,7 +9,6 @@ import {
   ChalkboardTeacher,
   ClipboardText,
   EnvelopeSimple,
-  FolderOpen,
   Gear,
   ImageSquare,
   List,
@@ -41,7 +40,6 @@ const sections: Array<{
     editorOnly: true,
     items: [
       { href: "/staff-panel/news", label: "News & Events", icon: Newspaper },
-      { href: "/staff-panel/projects", label: "Project Works", icon: FolderOpen },
       { href: "/staff-panel/research", label: "Research Areas", icon: ChartBar },
       { href: "/staff-panel/programs", label: "Programmes", icon: BookOpen },
       { href: "/staff-panel/gallery", label: "Gallery", icon: ImageSquare },
