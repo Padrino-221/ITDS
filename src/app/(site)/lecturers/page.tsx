@@ -16,6 +16,10 @@ export const metadata = {
   },
 };
 
+// Always reflect the current SPMS profile state so lecturers only appear once
+// their profile is complete and disappear as soon as it is not.
+export const dynamic = "force-dynamic";
+
 export default async function LecturersPage() {
   const lecturers = await getLecturers();
 

@@ -14,13 +14,17 @@ import {
   User,
 } from "lucide-react";
 import { Badge } from "@/components/ui";
-import { getProjectBySlug, getProjects, DEGREE_LABELS } from "@/lib/data";
+import {
+  getProjectBySlug,
+  formatSupervisorName,
+  isPublicLecturerProfile,
+  DEGREE_LABELS,
+} from "@/lib/data";
 import { absoluteUrl, paragraphs } from "@/lib/utils";
 
-export async function generateStaticParams() {
-  const projects = await getProjects("ALL");
-  return projects.map((project) => ({ slug: project.slug }));
-}
+// Always reflect the current SPMS state: projects added, edited or removed in
+// SPMS must show up here immediately, never serve a stale render.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -70,7 +74,7 @@ export default async function ProjectDetailPage({
           ? { "@type": "Person", name: project.studentName }
           : undefined,
         author: project.supervisor
-          ? { "@type": "Person", name: project.supervisor.name }
+          ? { "@type": "Person", name: formatSupervisorName(project.supervisor) }
           : undefined,
         isPartOf: {
           "@type": "CollegeOrUniversity",
@@ -272,24 +276,39 @@ export default async function ProjectDetailPage({
               </a>
             )}
 
-            {project.supervisor && (
-              <Link
-                href={`/lecturers/${project.supervisor.slug}`}
-                className="group flex items-center gap-4 rounded-xl border border-forest-100 bg-white p-5 transition-all hover:-translate-y-0.5"
-              >
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-forest-800 text-gold-300">
-                  <GraduationCap className="h-5 w-5" />
-                </span>
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-ink-soft">
-                    Supervisor
-                  </p>
-                  <p className="font-display font-bold text-forest-900 group-hover:text-forest-700">
-                    {project.supervisor.name}
-                  </p>
+            {project.supervisor &&
+              (isPublicLecturerProfile(project.supervisor) ? (
+                <Link
+                  href={`/lecturers/${project.supervisor.slug}`}
+                  className="group flex items-center gap-4 rounded-xl border border-forest-100 bg-white p-5 transition-all hover:-translate-y-0.5"
+                >
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-forest-800 text-gold-300">
+                    <GraduationCap className="h-5 w-5" />
+                  </span>
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wide text-ink-soft">
+                      Supervisor
+                    </p>
+                    <p className="font-display font-bold text-forest-900 group-hover:text-forest-700">
+                      {formatSupervisorName(project.supervisor)}
+                    </p>
+                  </div>
+                </Link>
+              ) : (
+                <div className="flex items-center gap-4 rounded-xl border border-forest-100 bg-white p-5">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-forest-800 text-gold-300">
+                    <GraduationCap className="h-5 w-5" />
+                  </span>
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wide text-ink-soft">
+                      Supervisor
+                    </p>
+                    <p className="font-display font-bold text-forest-900">
+                      {formatSupervisorName(project.supervisor)}
+                    </p>
+                  </div>
                 </div>
-              </Link>
-            )}
+              ))}
           </aside>
         </div>
       </section>

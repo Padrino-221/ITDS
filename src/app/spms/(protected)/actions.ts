@@ -57,66 +57,47 @@ export async function updateSpmsProfile(data: ProfileData) {
   const session = await getSpmsSession();
   if (!session) redirect("/spms/login");
 
-  const supervisorUpdate: Record<string, any> = {};
-  if (data.userTitle !== undefined) supervisorUpdate.userTitle = data.userTitle;
-  if (data.gender !== undefined) supervisorUpdate.gender = data.gender;
-  if (data.name !== undefined) supervisorUpdate.name = data.name;
-  if (data.jobRank !== undefined) supervisorUpdate.jobRank = data.jobRank;
-  if (data.phone !== undefined) supervisorUpdate.phone = data.phone;
-  if (data.linkedin !== undefined) supervisorUpdate.linkedin = data.linkedin;
-  if (data.facebook !== undefined) supervisorUpdate.facebook = data.facebook;
-  if (data.twitter !== undefined) supervisorUpdate.twitter = data.twitter;
-  if (data.publink !== undefined) supervisorUpdate.publink = data.publink;
-  if (data.researchArea1 !== undefined) supervisorUpdate.researchArea1 = data.researchArea1;
-  if (data.researchArea2 !== undefined) supervisorUpdate.researchArea2 = data.researchArea2;
-  if (data.profilePhoto !== undefined) supervisorUpdate.profilePhoto = data.profilePhoto;
-  if (data.about !== undefined) supervisorUpdate.about = data.about;
+  // Convert empty strings to null so we don't overwrite existing data
+  const emptyToNull = (v: string | undefined) => (v ? v : null);
 
-  const supervisor = await prisma.supervisor.update({
+  const supervisorUpdate: Record<string, any> = {};
+  if (data.userTitle !== undefined) supervisorUpdate.userTitle = emptyToNull(data.userTitle);
+  if (data.gender !== undefined) supervisorUpdate.gender = emptyToNull(data.gender);
+  if (data.name !== undefined) supervisorUpdate.name = data.name || null;
+  if (data.jobRank !== undefined) supervisorUpdate.jobRank = emptyToNull(data.jobRank);
+  if (data.phone !== undefined) supervisorUpdate.phone = emptyToNull(data.phone);
+  if (data.linkedin !== undefined) supervisorUpdate.linkedin = emptyToNull(data.linkedin);
+  if (data.facebook !== undefined) supervisorUpdate.facebook = emptyToNull(data.facebook);
+  if (data.twitter !== undefined) supervisorUpdate.twitter = emptyToNull(data.twitter);
+  if (data.publink !== undefined) supervisorUpdate.publink = emptyToNull(data.publink);
+  if (data.researchArea1 !== undefined) supervisorUpdate.researchArea1 = emptyToNull(data.researchArea1);
+  if (data.researchArea2 !== undefined) supervisorUpdate.researchArea2 = emptyToNull(data.researchArea2);
+  if (data.profilePhoto !== undefined) supervisorUpdate.profilePhoto = emptyToNull(data.profilePhoto);
+  if (data.about !== undefined) supervisorUpdate.about = emptyToNull(data.about);
+
+  const existing = await prisma.supervisor.findUnique({
     where: { id: session.id },
-    data: supervisorUpdate,
-    select: { lecturerId: true },
+    select: { name: true, slug: true },
   });
 
-  // Sync profile changes to the linked public Lecturer record so the
-  // public-facing /lecturers/[slug] page reflects the SPMS profile.
-  if (supervisor.lecturerId) {
-    const lecturerUpdate: Record<string, any> = {};
-    if (data.name !== undefined) lecturerUpdate.name = data.name;
-    if (data.profilePhoto !== undefined) lecturerUpdate.photo = data.profilePhoto;
-    if (data.about !== undefined) lecturerUpdate.bio = data.about;
-    if (data.researchArea1 !== undefined || data.researchArea2 !== undefined) {
-      const supervisorFull = await prisma.supervisor.findUnique({
-        where: { id: session.id },
-        select: { researchArea1: true, researchArea2: true },
-      });
-      const interests = [supervisorFull?.researchArea1, supervisorFull?.researchArea2]
-        .filter(Boolean)
-        .join(", ");
-      lecturerUpdate.researchInterests = interests || null;
-    }
-    if (data.userTitle !== undefined || data.jobRank !== undefined) {
-      const supervisorFull = await prisma.supervisor.findUnique({
-        where: { id: session.id },
-        select: { userTitle: true, jobRank: true },
-      });
-      const title = [supervisorFull?.userTitle, supervisorFull?.jobRank]
-        .filter(Boolean)
-        .join(" ");
-      if (title) lecturerUpdate.title = title;
-    }
-    if (Object.keys(lecturerUpdate).length > 0) {
-      await prisma.lecturer.update({
-        where: { id: supervisor.lecturerId },
-        data: lecturerUpdate,
-      });
+  // Regenerate the public slug from the supervisor's name when it changes,
+  // so /lecturers/[slug] URLs stay derived from the name.
+  if (data.name && data.name !== existing?.name) {
+    const base = slugify(data.name);
+    const current = existing?.slug;
+    if (base !== current || !current) {
+      supervisorUpdate.slug = await uniqueSupervisorSlug(base, session.id);
     }
   }
 
+  await prisma.supervisor.update({
+    where: { id: session.id },
+    data: supervisorUpdate,
+  });
+
   revalidatePath("/spms/profile");
   revalidatePath("/spms/dashboard");
-  revalidatePath("/lecturers");
-  if (supervisor.lecturerId) revalidatePath("/lecturers/[slug]");
+  revalidatePath("/lecturers", "layout");
 }
 
 // ---------------------------------------------------------------------------
@@ -129,6 +110,19 @@ function slugify(text: string): string {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "")
     .slice(0, 200);
+}
+
+/** Slug from a supervisor name, deduplicated against other supervisors. */
+async function uniqueSupervisorSlug(base: string, excludeId?: string): Promise<string> {
+  const baseSlug = slugify(base) || `lecturer-${Date.now()}`;
+  let candidate = baseSlug;
+  let n = 2;
+  while (true) {
+    const where = excludeId ? { slug: candidate, id: { not: excludeId } } : { slug: candidate };
+    const existing = await prisma.supervisor.findFirst({ where, select: { id: true } });
+    if (!existing) return candidate;
+    candidate = `${baseSlug}-${n++}`;
+  }
 }
 
 export async function createSpmsProject(formData: FormData) {
@@ -149,12 +143,6 @@ export async function createSpmsProject(formData: FormData) {
 
   const slug = slugify(title) || `project-${Date.now()}`;
 
-  // Link project to the supervisor's Lecturer profile if they have one
-  const supervisor = await prisma.supervisor.findUnique({
-    where: { id: session.id },
-    select: { lecturerId: true },
-  });
-
   await prisma.project.create({
     data: {
       title,
@@ -164,7 +152,7 @@ export async function createSpmsProject(formData: FormData) {
       program: program || null,
       degreeLevel: (degreeLevel as any) || "UNDERGRADUATE",
       academicYear: academicYear || null,
-      supervisorId: supervisor?.lecturerId || null,
+      supervisorId: session.id,
       objective: objective || null,
       groupMembers: groupMembers || null,
       githubLink: githubLink || null,
@@ -220,8 +208,7 @@ export async function deleteSpmsProject(id: string) {
   // Admins can delete any project; lecturers can only delete their own
   if (session.role !== "ADMIN") {
     const project = await prisma.project.findUnique({ where: { id }, select: { supervisorId: true } });
-    const supervisor = await prisma.supervisor.findUnique({ where: { id: session.id }, select: { lecturerId: true } });
-    if (!project || project.supervisorId !== supervisor?.lecturerId) {
+    if (!project || project.supervisorId !== session.id) {
       return { error: "You can only delete your own projects." };
     }
   }
@@ -258,7 +245,7 @@ export async function createSpmsUser(formData: FormData) {
   }
 
   await prisma.supervisor.create({
-    data: { name, email, passwordHash, role },
+    data: { name, email, passwordHash, role, slug: await uniqueSupervisorSlug(name) },
   });
 
   // Send welcome email via Resend with credentials
@@ -317,7 +304,7 @@ export async function updateSpmsUser(id: string, formData: FormData) {
 
   await prisma.supervisor.update({
     where: { id },
-    data: { name, email, role },
+    data: { name, email, role, slug: await uniqueSupervisorSlug(name, id) },
   });
 
   redirect("/spms/users?updated=1");
@@ -358,6 +345,74 @@ export async function deleteAcademicYear(key: string) {
   await requireSpmsAdmin();
   await prisma.setting.delete({ where: { key } });
   revalidatePath("/spms/settings");
+}
+
+// ---------------------------------------------------------------------------
+// Settings (Admin) — Research Areas
+// ---------------------------------------------------------------------------
+
+export async function createSpmsResearchAreaAction(formData: FormData) {
+  await requireSpmsAdmin();
+
+  const title = ((formData.get("title") as string) ?? "").trim();
+  if (!title) return;
+  const description = ((formData.get("description") as string) ?? "").trim();
+
+  const base = slugify(title) || `area-${Date.now()}`;
+  let slug = base;
+  let n = 2;
+  while (await prisma.researchArea.findUnique({ where: { slug }, select: { id: true } })) {
+    slug = `${base}-${n++}`;
+  }
+
+  const max = await prisma.researchArea.aggregate({ _max: { order: true } });
+  await prisma.researchArea.create({
+    data: { title, slug, description, order: (max._max.order ?? 0) + 1 },
+  });
+
+  revalidatePath("/spms/settings");
+  revalidatePath("/research");
+}
+
+export async function updateSpmsResearchArea(id: string, formData: FormData) {
+  await requireSpmsAdmin();
+
+  const title = ((formData.get("title") as string) ?? "").trim();
+  if (!title) return;
+  const description = ((formData.get("description") as string) ?? "").trim();
+
+  const existing = await prisma.researchArea.findUnique({
+    where: { id },
+    select: { title: true },
+  });
+  if (!existing) return;
+
+  // Regenerate the public slug when the title changes.
+  const data: { title: string; description: string; slug?: string } = { title, description };
+  if (title !== existing.title) {
+    const base = slugify(title) || `area-${Date.now()}`;
+    let slug = base;
+    let n = 2;
+    while (await prisma.researchArea.findFirst({
+      where: { slug, id: { not: id } },
+      select: { id: true },
+    })) {
+      slug = `${base}-${n++}`;
+    }
+    data.slug = slug;
+  }
+
+  await prisma.researchArea.update({ where: { id }, data });
+
+  revalidatePath("/spms/settings");
+  revalidatePath("/research");
+}
+
+export async function deleteSpmsResearchArea(id: string) {
+  await requireSpmsAdmin();
+  await prisma.researchArea.delete({ where: { id } });
+  revalidatePath("/spms/settings");
+  revalidatePath("/research");
 }
 
 // ---------------------------------------------------------------------------

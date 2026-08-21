@@ -1,7 +1,6 @@
 import Link from "next/link";
 import {
   FolderOpen,
-  GraduationCap,
   Newspaper,
   Plus,
   Target,
@@ -15,14 +14,12 @@ export default async function AdminDashboard() {
   const [
     newsCount,
     projectCount,
-    lecturerCount,
     researchCount,
     unreadMessages,
     recentMessages,
   ] = await Promise.all([
     prisma.newsPost.count(),
     prisma.project.count(),
-    prisma.lecturer.count(),
     prisma.researchArea.count(),
     prisma.contactMessage.count({ where: { read: false } }),
     prisma.contactMessage.findMany({ orderBy: { createdAt: "desc" }, take: 5 }),
@@ -31,7 +28,6 @@ export default async function AdminDashboard() {
   const cards = [
     { label: "News & Events", value: newsCount, icon: Newspaper, href: "/staff-panel/news" },
     { label: "Project Works", value: projectCount, icon: FolderOpen, href: "/staff-panel/projects" },
-    { label: "Lecturers", value: lecturerCount, icon: GraduationCap, href: "/staff-panel/lecturers" },
     { label: "Research Areas", value: researchCount, icon: Target, href: "/staff-panel/research" },
   ];
 
@@ -43,7 +39,7 @@ export default async function AdminDashboard() {
       />
 
       {/* Stat cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map((card) => (
           <Link
             key={card.label}
@@ -115,9 +111,6 @@ export default async function AdminDashboard() {
           </PrimaryLink>
           <PrimaryLink href="/staff-panel/projects/new">
             <Plus className="h-4 w-4" /> New project
-          </PrimaryLink>
-          <PrimaryLink href="/staff-panel/lecturers/new">
-            <Plus className="h-4 w-4" /> New lecturer
           </PrimaryLink>
           <SecondaryLink href="/staff-panel/settings">Edit site settings</SecondaryLink>
         </div>

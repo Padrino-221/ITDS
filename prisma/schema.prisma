@@ -16,17 +16,17 @@ enum DegreeLevel {
 }
 
 model Program {
-  id                  String   @id @default(cuid())
-  slug                String   @unique
+  id                  String      @id @default(cuid())
+  slug                String      @unique
   title               String
   degreeLevel         DegreeLevel @unique
-  overview            String   @default("")
-  learningObjectives  String   @default("")
-  curriculumStructure String   @default("")
-  programmeContact    String   @default("")
-  published          Boolean  @default(true)
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  overview            String      @default("")
+  learningObjectives  String      @default("")
+  curriculumStructure String      @default("")
+  programmeContact    String      @default("")
+  published           Boolean     @default(true)
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
 }
 
 enum Role {
@@ -36,14 +36,14 @@ enum Role {
 }
 
 model User {
-  id              String   @id @default(cuid())
+  id              String          @id @default(cuid())
   name            String
-  email           String   @unique
+  email           String          @unique
   passwordHash    String
-  role            Role     @default(EDITOR)
-  createdAt       DateTime @default(now())
-  authoredLessons Lesson[] @relation("AuthoredLessons")
-  reviewedLessons Lesson[] @relation("ReviewedLessons")
+  role            Role            @default(EDITOR)
+  createdAt       DateTime        @default(now())
+  authoredLessons Lesson[]        @relation("AuthoredLessons")
+  reviewedLessons Lesson[]        @relation("ReviewedLessons")
   passwordResets  PasswordReset[]
 }
 
@@ -76,21 +76,6 @@ model NewsPost {
   updatedAt   DateTime @updatedAt
 }
 
-model Lecturer {
-  id                String      @id @default(cuid())
-  slug              String      @unique
-  name              String
-  title             String
-  photo             String?
-  bio               String?
-  email             String?
-  researchInterests String?
-  order             Int         @default(0)
-  createdAt         DateTime    @default(now())
-  projects          Project[]
-  supervisor        Supervisor?
-}
-
 model Project {
   id           String      @id @default(cuid())
   slug         String      @unique
@@ -102,14 +87,14 @@ model Project {
   academicYear String?
   image        String?
   supervisorId String?
-  supervisor   Lecturer?   @relation(fields: [supervisorId], references: [id], onDelete: SetNull)
+  supervisor   Supervisor? @relation(fields: [supervisorId], references: [id], onDelete: SetNull)
   published    Boolean     @default(true)
   // SPMS fields
-  documentUrl  String?     // Path to uploaded PDF (/uploads/...)
-  documentName String?     // Original filename for display
-  objective    String?     // Project main objective
-  groupMembers String?     // Group member names
-  githubLink   String?     // GitHub repository URL
+  documentUrl  String? // Path to uploaded PDF (/uploads/...)
+  documentName String? // Original filename for display
+  objective    String? // Project main objective
+  groupMembers String? // Group member names
+  githubLink   String? // GitHub repository URL
   createdAt    DateTime    @default(now())
 }
 
@@ -171,33 +156,31 @@ model PasswordReset {
 // ---------------------------------------------------------------------------
 
 model Supervisor {
-  id            String   @id @default(cuid())
-  email         String   @unique
-  passwordHash  String
-  name          String
-  role          String   @default("LECTURER") // LECTURER or ADMIN
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String   @id @default(cuid())
+  slug         String   @unique @default("")
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("LECTURER") // LECTURER or ADMIN
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   // Profile fields
-  userTitle     String?  // Mr., Mrs., Ms., Dr., Prof.
-  gender        String?  // Male, Female
-  jobRank       String?  // Research Assistant, Lecturer, etc.
+  userTitle     String? // Mr., Mrs., Ms., Dr., Prof.
+  gender        String? // Male, Female
+  jobRank       String? // Research Assistant, Lecturer, etc.
   phone         String?
   linkedin      String?
   facebook      String?
-  twitter       String?  // Publication link 1
-  publink       String?  // Publication link 2
-  profilePhoto  String?  // Upload URL
+  twitter       String? // Publication link 1
+  publink       String? // Publication link 2
+  profilePhoto  String? // Upload URL
   researchArea1 String?
   researchArea2 String?
-  about         String?  // Bio / about text
-
-  // Link to public Lecturer profile
-  lecturerId    String?   @unique
-  lecturer      Lecturer? @relation(fields: [lecturerId], references: [id], onDelete: SetNull)
+  about         String? // Bio / about text
 
   // Relations
+  projects       Project[]
   passwordResets SupervisorPasswordReset[]
 }
 
@@ -257,31 +240,31 @@ model Topic {
 }
 
 model Lesson {
-  id              String       @id @default(cuid())
-  topicId         String
-  topic           Topic        @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  title           String
-  slug            String
-  objective       String       @default("")
-  contentBody     Json         @default("{}") // rich text / structured content
-  hasPlayground   Boolean      @default(false)
-  playgroundLang  String?
-  starterCode     String?
-  exercisePrompt  String?
-  quiz            Json?        // optional check-for-understanding
-  status          LessonStatus @default(DRAFT)
-  authorId        String
-  author          User         @relation("AuthoredLessons", fields: [authorId], references: [id])
-  reviewerId      String?
-  reviewer        User?        @relation("ReviewedLessons", fields: [reviewerId], references: [id])
-  reviewNote      String?
+  id                String         @id @default(cuid())
+  topicId           String
+  topic             Topic          @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  title             String
+  slug              String
+  objective         String         @default("")
+  contentBody       Json           @default("{}") // rich text / structured content
+  hasPlayground     Boolean        @default(false)
+  playgroundLang    String?
+  starterCode       String?
+  exercisePrompt    String?
+  quiz              Json? // optional check-for-understanding
+  status            LessonStatus   @default(DRAFT)
+  authorId          String
+  author            User           @relation("AuthoredLessons", fields: [authorId], references: [id])
+  reviewerId        String?
+  reviewer          User?          @relation("ReviewedLessons", fields: [reviewerId], references: [id])
+  reviewNote        String?
   // Snapshot of the last PUBLISHED version, so authors can revise a live
   // lesson without mutating it (spec §5.5).
   publishedSnapshot Json?
-  progress        UserProgress[]
-  order           Int          @default(0)
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+  progress          UserProgress[]
+  order             Int            @default(0)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
 
   @@unique([topicId, slug])
 }

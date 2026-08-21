@@ -169,17 +169,19 @@ function AcademicSection({ profile }: { profile: Profile }) {
           </Field>
         </div>
         <Field label="Research Area 1" hint="e.g. Machine Learning, Web Development">
-          <TextArea
+          <input
             name="researchArea1"
-            rows={3}
             defaultValue={profile?.researchArea1 ?? ""}
+            placeholder="e.g. Machine Learning"
+            className="w-full rounded-lg border border-forest-200 bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-soft/60 focus:border-forest-500 focus:outline-none focus:ring-2 focus:ring-forest-500/20"
           />
         </Field>
         <Field label="Research Area 2" hint="Optional second research area">
-          <TextArea
+          <input
             name="researchArea2"
-            rows={3}
             defaultValue={profile?.researchArea2 ?? ""}
+            placeholder="e.g. Web Development"
+            className="w-full rounded-lg border border-forest-200 bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-soft/60 focus:border-forest-500 focus:outline-none focus:ring-2 focus:ring-forest-500/20"
           />
         </Field>
         <Field label="About / Bio" hint="Shown on your public lecturer profile">

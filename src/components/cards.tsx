@@ -13,11 +13,12 @@ import {
   Smartphone,
   User,
 } from "lucide-react";
-import type { NewsPost, Project, Lecturer, ResearchArea } from "@prisma/client";
+import type { NewsPost, Project, ResearchArea } from "@prisma/client";
 import { Badge } from "./ui";
 import { DEGREE_LABELS } from "@/lib/data";
 import { formatDate, initials } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import type { PublicLecturer } from "@/lib/data";
 
 const researchIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   brain: Brain,
@@ -156,7 +157,7 @@ export function ProjectCard({
 export function LecturerCard({
   lecturer,
 }: {
-  lecturer: Lecturer & { _count?: { projects: number } };
+  lecturer: PublicLecturer;
 }) {
   return (
     <Link

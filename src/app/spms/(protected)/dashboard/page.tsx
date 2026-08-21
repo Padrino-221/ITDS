@@ -43,12 +43,8 @@ export default async function SpmsDashboardPage() {
   const filledFields = profileFields.filter(Boolean).length;
   const profilePercent = Math.round((filledFields / profileFields.length) * 100);
 
-  // Stats — for lecturers, find projects linked to their Lecturer profile
-  const supervisorRecord = await prisma.supervisor.findUnique({
-    where: { id: user.id },
-    select: { lecturerId: true },
-  });
-  const whereClause = isAdmin ? {} : { supervisorId: supervisorRecord?.lecturerId ?? "__none__" };
+  // Stats — for lecturers, find projects linked to their supervisor record
+  const whereClause = isAdmin ? {} : { supervisorId: user.id };
 
   const [totalProjects, projectsThisYear, recentProjects, totalUsers] =
     await Promise.all([

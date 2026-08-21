@@ -12,7 +12,7 @@ import {
   User,
 } from "lucide-react";
 import { Select } from "@/components/admin/Dropdown";
-import { DEGREE_LABELS } from "@/lib/data";
+import { DEGREE_LABELS, formatSupervisorName } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
 type ProjectRow = {
@@ -29,7 +29,7 @@ type ProjectRow = {
   githubLink: string | null;
   documentUrl: string | null;
   documentName: string | null;
-  supervisor: { name: string } | null;
+  supervisor: { name: string; userTitle: string | null } | null;
 };
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
@@ -56,7 +56,7 @@ export default function ProjectsTable({
       (p) =>
         p.title.toLowerCase().includes(q) ||
         p.studentName?.toLowerCase().includes(q) ||
-        p.supervisor?.name.toLowerCase().includes(q) ||
+        (p.supervisor && formatSupervisorName(p.supervisor).toLowerCase().includes(q)) ||
         p.program?.toLowerCase().includes(q) ||
         p.academicYear?.toLowerCase().includes(q)
     );
@@ -215,7 +215,9 @@ export default function ProjectsTable({
                           </span>
                         </td>
                         <td className="px-4 py-3 text-stone-600">
-                          {project.supervisor?.name ?? "—"}
+                          {project.supervisor
+                            ? formatSupervisorName(project.supervisor)
+                            : "—"}
                         </td>
                         <td className="px-4 py-3 text-stone-600">
                           {project.program ?? "—"}

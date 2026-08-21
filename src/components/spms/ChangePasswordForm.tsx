@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { changeSpmsPassword } from "@/app/spms/(protected)/actions";
 import { AdminCard, SaveButton } from "@/components/admin/ui";
+import PasswordInput from "@/components/admin/PasswordInput";
 
 export default function ChangePasswordForm() {
   const [error, setError] = useState("");
@@ -67,13 +68,12 @@ export default function ChangePasswordForm() {
           <label htmlFor="currentPassword" className="block text-sm font-medium text-forest-900">
             Current Password
           </label>
-          <input
+          <PasswordInput
             id="currentPassword"
             name="currentPassword"
-            type="password"
             required
             autoComplete="current-password"
-            className="mt-1 block w-full rounded-lg border border-forest-200 bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-soft/60 focus:border-forest-500 focus:outline-none focus:ring-2 focus:ring-forest-500/20"
+            className="mt-1"
           />
         </div>
 
@@ -81,15 +81,14 @@ export default function ChangePasswordForm() {
           <label htmlFor="newPassword" className="block text-sm font-medium text-forest-900">
             New Password
           </label>
-          <input
+          <PasswordInput
             id="newPassword"
             name="newPassword"
-            type="password"
             required
             minLength={8}
             autoComplete="new-password"
             placeholder="At least 8 characters"
-            className="mt-1 block w-full rounded-lg border border-forest-200 bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-soft/60 focus:border-forest-500 focus:outline-none focus:ring-2 focus:ring-forest-500/20"
+            className="mt-1"
           />
         </div>
 
@@ -97,15 +96,14 @@ export default function ChangePasswordForm() {
           <label htmlFor="confirmPassword" className="block text-sm font-medium text-forest-900">
             Confirm New Password
           </label>
-          <input
+          <PasswordInput
             id="confirmPassword"
             name="confirmPassword"
-            type="password"
             required
             minLength={8}
             autoComplete="new-password"
             placeholder="Re-enter your new password"
-            className="mt-1 block w-full rounded-lg border border-forest-200 bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-soft/60 focus:border-forest-500 focus:outline-none focus:ring-2 focus:ring-forest-500/20"
+            className="mt-1"
           />
         </div>
 

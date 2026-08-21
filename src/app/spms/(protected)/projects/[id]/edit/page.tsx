@@ -16,10 +16,9 @@ export default async function EditSpmsProjectPage({
   const project = await prisma.project.findUnique({ where: { id } });
   if (!project) notFound();
 
-  const [lecturers, researchAreas, programs, academicYears] = await Promise.all([
-    prisma.lecturer.findMany({ orderBy: { name: "asc" } }),
+  const [supervisors, researchAreas, academicYears] = await Promise.all([
+    prisma.supervisor.findMany({ orderBy: { name: "asc" } }),
     prisma.researchArea.findMany({ orderBy: { order: "asc" } }),
-    prisma.program.findMany({ orderBy: { title: "asc" } }),
     prisma.setting.findMany({
       where: { key: { startsWith: "spms_year_" } },
       orderBy: { value: "desc" },
@@ -34,9 +33,8 @@ export default async function EditSpmsProjectPage({
       </div>
       <SpmsProjectForm
         project={project}
-        lecturers={lecturers}
+        supervisors={supervisors}
         researchAreas={researchAreas}
-        programs={programs}
         academicYears={academicYears.map((y) => y.value)}
         userRole={user.role}
         userEmail={user.email}

@@ -7,12 +7,12 @@ export default async function EditProjectPage({ params }: { params: Promise<{ id
   const { id } = await params;
   const project = await prisma.project.findUnique({ where: { id } });
   if (!project) notFound();
-  const lecturers = await prisma.lecturer.findMany({ orderBy: { name: "asc" } });
+  const supervisors = await prisma.supervisor.findMany({ orderBy: { name: "asc" } });
 
   return (
     <div className="space-y-6">
       <AdminPageHeader title="Edit Project" description={project.title} />
-      <ProjectForm project={project} lecturers={lecturers} />
+      <ProjectForm project={project} supervisors={supervisors} />
     </div>
   );
 }

@@ -9,8 +9,13 @@ import { baseInput } from "./ui";
 export default function PasswordInput({
   icon,
   className,
+  inputClassName,
   ...rest
-}: React.InputHTMLAttributes<HTMLInputElement> & { icon?: React.ReactNode }) {
+}: React.InputHTMLAttributes<HTMLInputElement> & {
+  icon?: React.ReactNode;
+  /** Replaces the default input styling entirely (e.g. for non-admin forms). */
+  inputClassName?: string;
+}) {
   const [visible, setVisible] = useState(false);
 
   return (
@@ -23,7 +28,12 @@ export default function PasswordInput({
       <input
         {...rest}
         type={visible ? "text" : "password"}
-        className={cn(baseInput, icon ? "pl-10" : undefined, "pr-11", className)}
+        className={cn(
+          inputClassName ?? baseInput,
+          icon ? "pl-10" : undefined,
+          "pr-11",
+          className
+        )}
       />
       <button
         type="button"

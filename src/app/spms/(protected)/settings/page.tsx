@@ -1,6 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { requireSpmsAdmin } from "@/lib/spms-auth";
-import { createAcademicYearAction, deleteAcademicYear } from "../actions";
+import {
+  createAcademicYearAction,
+  deleteAcademicYear,
+  createSpmsResearchAreaAction,
+  updateSpmsResearchArea,
+  deleteSpmsResearchArea,
+} from "../actions";
 import {
   AdminPageHeader,
   AdminCard,
@@ -8,6 +14,7 @@ import {
   Field,
 } from "@/components/admin/ui";
 import { Trash2 } from "lucide-react";
+import DeleteButton from "@/components/admin/DeleteButton";
 
 export const metadata = { title: "Settings" };
 
@@ -79,28 +86,65 @@ export default async function SpmsSettingsPage() {
       </AdminCard>
 
       {/* Research Areas */}
-      <AdminCard
-        title="Research Areas"
-        action={
-          <a
-            href="/staff-panel/research"
-            className="text-sm font-medium text-forest-600 hover:text-forest-800"
-          >
-            Manage here →
-          </a>
-        }
-      >
+      <AdminCard title="Research Areas">
+        <form
+          action={createSpmsResearchAreaAction}
+          className="mb-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto]"
+        >
+          <Field label="Title">
+            <input
+              name="title"
+              required
+              placeholder="e.g. Machine Learning"
+              className="w-full rounded-lg border border-forest-200 bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-soft/60 focus:border-forest-500 focus:outline-none focus:ring-2 focus:ring-forest-500/20"
+            />
+          </Field>
+          <Field label="Description (optional)">
+            <input
+              name="description"
+              placeholder="Short description…"
+              className="w-full rounded-lg border border-forest-200 bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-soft/60 focus:border-forest-500 focus:outline-none focus:ring-2 focus:ring-forest-500/20"
+            />
+          </Field>
+          <div className="flex items-end">
+            <PrimaryButton type="submit">Add Area</PrimaryButton>
+          </div>
+        </form>
+
         {researchAreas.length === 0 ? (
           <p className="text-sm text-ink-soft">No research areas configured yet.</p>
         ) : (
           <div className="space-y-2">
             {researchAreas.map((area) => (
-              <div
+              <form
                 key={area.id}
-                className="flex items-center justify-between rounded-lg border border-forest-100 px-4 py-3"
+                action={updateSpmsResearchArea.bind(null, area.id)}
+                className="grid items-center gap-3 rounded-lg border border-forest-100 px-4 py-3 sm:grid-cols-[1fr_1.5fr_auto]"
               >
-                <span className="font-medium text-forest-900">{area.title}</span>
-              </div>
+                <input
+                  name="title"
+                  required
+                  defaultValue={area.title}
+                  aria-label={`Title for ${area.title}`}
+                  className="w-full rounded-lg border border-transparent bg-stone-50 px-3 py-2 text-sm font-medium text-forest-900 transition-colors hover:border-forest-200 focus:border-forest-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-forest-500/20"
+                />
+                <input
+                  name="description"
+                  defaultValue={area.description}
+                  placeholder="Short description…"
+                  aria-label={`Description for ${area.title}`}
+                  className="w-full rounded-lg border border-transparent bg-stone-50 px-3 py-2 text-sm text-ink-soft transition-colors hover:border-forest-200 focus:border-forest-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-forest-500/20"
+                />
+                <div className="flex items-center justify-end gap-2">
+                  <button
+                    type="submit"
+                    className="rounded-lg border border-forest-200 bg-white px-3 py-1.5 text-xs font-semibold text-forest-700 transition-colors hover:border-forest-400 hover:bg-forest-50"
+                  >
+                    Save
+                  </button>
+                  <DeleteButton action={deleteSpmsResearchArea.bind(null, area.id)} />
+                </div>
+              </form>
             ))}
           </div>
         )}

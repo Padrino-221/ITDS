@@ -1,13 +1,11 @@
-import type { NewsPost, Project, Lecturer, ResearchArea, Program, GalleryImage } from "@prisma/client";
+import type { NewsPost, Project, ResearchArea, Program, GalleryImage } from "@prisma/client";
 import {
   createNews,
   createProject,
-  createLecturer,
   createResearchArea,
   createGalleryImage,
   updateNews,
   updateProject,
-  updateLecturer,
   updateResearchArea,
   updateGalleryImage,
   updateProgram,
@@ -70,10 +68,10 @@ export function NewsForm({ post }: { post?: NewsPost }) {
 
 export function ProjectForm({
   project,
-  lecturers,
+  supervisors,
 }: {
   project?: Project;
-  lecturers: Lecturer[];
+  supervisors: { id: string; name: string }[];
 }) {
   return (
     <form action={project ? updateProject.bind(null, project.id) : createProject}>
@@ -118,7 +116,7 @@ export function ProjectForm({
               placeholder="— No supervisor —"
               options={[
                 { value: "", label: "— No supervisor —" },
-                ...lecturers.map((lecturer) => ({ value: lecturer.id, label: lecturer.name })),
+                ...supervisors.map((s) => ({ value: s.id, label: s.name })),
               ]}
             />
           </Field>
@@ -135,52 +133,6 @@ export function ProjectForm({
         </div>
         <div className="mt-6">
           <FormActions cancelHref="/staff-panel/projects" />
-        </div>
-      </AdminCard>
-    </form>
-  );
-}
-
-// ------------------------------------------------------------------
-// Lecturers
-// ------------------------------------------------------------------
-
-export function LecturerForm({ lecturer }: { lecturer?: Lecturer }) {
-  return (
-    <form action={lecturer ? updateLecturer.bind(null, lecturer.id) : createLecturer}>
-      <AdminCard>
-        <div className="grid gap-5">
-          <div className="grid gap-5 sm:grid-cols-2">
-            <Field label="Full name" required>
-              <TextInput name="name" required minLength={2} defaultValue={lecturer?.name} />
-            </Field>
-            <Field label="Title / position" required hint="e.g. Associate Professor, Lecturer">
-              <TextInput name="title" required defaultValue={lecturer?.title} />
-            </Field>
-          </div>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <Field label="Email">
-              <TextInput name="email" type="email" defaultValue={lecturer?.email ?? ""} />
-            </Field>
-            <Field label="Display order" hint="Lower numbers appear first.">
-              <TextInput name="order" type="number" min={0} defaultValue={lecturer?.order ?? 0} />
-            </Field>
-          </div>
-          <ImageUpload
-            name="photo"
-            label="Photo"
-            hint="Upload a photo for this lecturer."
-            defaultValue={lecturer?.photo ?? ""}
-          />
-          <Field label="Research interests" hint="Comma separated, e.g. Machine Learning, Data Science">
-            <TextArea name="researchInterests" rows={2} defaultValue={lecturer?.researchInterests ?? ""} />
-          </Field>
-          <Field label="Biography">
-            <TextArea name="bio" rows={6} defaultValue={lecturer?.bio ?? ""} />
-          </Field>
-        </div>
-        <div className="mt-6">
-          <FormActions cancelHref="/staff-panel/lecturers" />
         </div>
       </AdminCard>
     </form>

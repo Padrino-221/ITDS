@@ -7,10 +7,9 @@ export const metadata = { title: "Upload New Project" };
 export default async function NewSpmsProjectPage() {
   const user = await requireSpmsAuth();
 
-  const [lecturers, researchAreas, programs, academicYears] = await Promise.all([
-    prisma.lecturer.findMany({ orderBy: { name: "asc" } }),
+  const [supervisors, researchAreas, academicYears] = await Promise.all([
+    prisma.supervisor.findMany({ orderBy: { name: "asc" } }),
     prisma.researchArea.findMany({ orderBy: { order: "asc" } }),
-    prisma.program.findMany({ orderBy: { title: "asc" } }),
     prisma.setting.findMany({
       where: { key: { startsWith: "spms_year_" } },
       orderBy: { value: "desc" },
@@ -28,9 +27,8 @@ export default async function NewSpmsProjectPage() {
         </p>
       </div>
       <SpmsProjectForm
-        lecturers={lecturers}
+        supervisors={supervisors}
         researchAreas={researchAreas}
-        programs={programs}
         academicYears={academicYears.map((y) => y.value)}
         userRole={user.role}
         userEmail={user.email}

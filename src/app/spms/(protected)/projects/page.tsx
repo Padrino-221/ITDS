@@ -34,16 +34,10 @@ export default async function SpmsProjectsPage({
   const params = await searchParams;
   const page = Math.max(1, parseInt(params.page ?? "1", 10) || 1);
 
-  // Build where clause — lecturers see only their linked projects
+  // Build where clause — lecturers see only their own projects
   const where: any = {};
-  let lecturerId: string | null = null;
   if (!isAdmin) {
-    const supervisor = await prisma.supervisor.findUnique({
-      where: { id: user.id },
-      select: { lecturerId: true },
-    });
-    lecturerId = supervisor?.lecturerId ?? null;
-    where.supervisorId = lecturerId ?? "__none__";
+    where.supervisorId = user.id;
   }
   if (params.search) {
     where.OR = [
@@ -81,7 +75,7 @@ export default async function SpmsProjectsPage({
   const academicYears = await prisma.project.findMany({
     select: { academicYear: true },
     distinct: ["academicYear"],
-    where: isAdmin ? {} : { supervisorId: lecturerId ?? "__none__" },
+    where: isAdmin ? {} : { supervisorId: user.id },
     orderBy: { academicYear: "desc" },
   });
 

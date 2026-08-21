@@ -28,7 +28,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ].map((path) => ({ url: `${BASE}${path}`, changeFrequency: "weekly", priority: 0.7 }));
 
   const [lecturers, news, programs, projects, research, learnSubjects] = await Promise.all([
-    prisma.lecturer.findMany({ where: { name: { not: "" } }, select: { slug: true } }),
+    prisma.supervisor.findMany({
+      where: { profilePhoto: { not: null }, about: { not: null } },
+      select: { slug: true },
+    }),
     prisma.newsPost.findMany({ where: { published: true }, select: { slug: true } }),
     prisma.program.findMany({ where: { published: true }, select: { slug: true } }),
     prisma.project.findMany({ where: { published: true }, select: { slug: true } }),

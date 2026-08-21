@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { resetSpmsPassword } from "@/app/spms/(protected)/actions";
+import PasswordInput from "@/components/admin/PasswordInput";
 
 export default function ResetPasswordForm({ token }: { token: string }) {
   const router = useRouter();
@@ -65,15 +66,14 @@ export default function ResetPasswordForm({ token }: { token: string }) {
         <label htmlFor="password" className="block text-sm font-medium text-forest-900">
           New Password
         </label>
-        <input
+        <PasswordInput
           id="password"
           name="password"
-          type="password"
           required
           minLength={8}
           autoComplete="new-password"
           placeholder="At least 8 characters"
-          className="mt-1 block w-full rounded-lg border border-stone-300 px-3 py-2.5 text-sm text-forest-950 placeholder:text-stone-400 focus:border-forest-500 focus:outline-none focus:ring-1 focus:ring-forest-500"
+          inputClassName="mt-1 block w-full rounded-lg border border-stone-300 px-3 py-2.5 text-sm text-forest-950 placeholder:text-stone-400 focus:border-forest-500 focus:outline-none focus:ring-1 focus:ring-forest-500"
         />
       </div>
 
@@ -81,15 +81,14 @@ export default function ResetPasswordForm({ token }: { token: string }) {
         <label htmlFor="confirmPassword" className="block text-sm font-medium text-forest-900">
           Confirm Password
         </label>
-        <input
+        <PasswordInput
           id="confirmPassword"
           name="confirmPassword"
-          type="password"
           required
           minLength={8}
           autoComplete="new-password"
           placeholder="Re-enter your password"
-          className="mt-1 block w-full rounded-lg border border-stone-300 px-3 py-2.5 text-sm text-forest-950 placeholder:text-stone-400 focus:border-forest-500 focus:outline-none focus:ring-1 focus:ring-forest-500"
+          inputClassName="mt-1 block w-full rounded-lg border border-stone-300 px-3 py-2.5 text-sm text-forest-950 placeholder:text-stone-400 focus:border-forest-500 focus:outline-none focus:ring-1 focus:ring-forest-500"
         />
       </div>
 

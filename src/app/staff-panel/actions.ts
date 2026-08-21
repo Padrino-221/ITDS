@@ -34,7 +34,7 @@ function bool(formData: FormData, key: string): boolean {
   return formData.get(key) === "on";
 }
 
-type SlugModel = "newsPost" | "project" | "lecturer" | "researchArea";
+type SlugModel = "newsPost" | "project" | "researchArea";
 
 type SlugWhere = { slug: string; id?: { not: string } };
 
@@ -58,9 +58,6 @@ async function uniqueSlug(
         break;
       case "project":
         existing = await prisma.project.findFirst({ where, select: { id: true } });
-        break;
-      case "lecturer":
-        existing = await prisma.lecturer.findFirst({ where, select: { id: true } });
         break;
       case "researchArea":
         existing = await prisma.researchArea.findFirst({ where, select: { id: true } });
@@ -252,75 +249,6 @@ export async function deleteProject(id: string) {
   const existing = await prisma.project.findUnique({ where: { id } });
   await prisma.project.delete({ where: { id } });
   if (existing?.image) await removeUploadFile(existing.image);
-  revalidateAll();
-}
-
-// ------------------------------------------------------------------
-// Lecturers
-// ------------------------------------------------------------------
-
-const lecturerSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters."),
-  title: z.string().min(1, "Title is required."),
-  photo: z.string().optional(),
-  email: z.string().optional(),
-  bio: z.string().optional(),
-  researchInterests: z.string().optional(),
-  order: z.coerce.number().int().min(0).default(0),
-});
-
-export async function createLecturer(formData: FormData) {
-  await requireAuth();
-  const parsed = lecturerSchema.safeParse({
-    name: str(formData, "name"),
-    title: str(formData, "title"),
-    photo: opt(formData, "photo") ?? undefined,
-    email: opt(formData, "email") ?? undefined,
-    bio: opt(formData, "bio") ?? undefined,
-    researchInterests: opt(formData, "researchInterests") ?? undefined,
-    order: Number(formData.get("order") ?? 0),
-  });
-  if (!parsed.success) {
-    throw new Error(parsed.error.issues[0]?.message ?? "Invalid input.");
-  }
-  const slug = await uniqueSlug(parsed.data.name, "lecturer");
-  await prisma.lecturer.create({ data: { ...parsed.data, slug } });
-  revalidateAll();
-  redirect("/staff-panel/lecturers?saved=1");
-}
-
-export async function updateLecturer(id: string, formData: FormData) {
-  await requireAuth();
-  const existing = await prisma.lecturer.findUnique({ where: { id } });
-  const parsed = lecturerSchema.safeParse({
-    name: str(formData, "name"),
-    title: str(formData, "title"),
-    photo: opt(formData, "photo") ?? undefined,
-    email: opt(formData, "email") ?? undefined,
-    bio: opt(formData, "bio") ?? undefined,
-    researchInterests: opt(formData, "researchInterests") ?? undefined,
-    order: Number(formData.get("order") ?? 0),
-  });
-  if (!parsed.success) {
-    throw new Error(parsed.error.issues[0]?.message ?? "Invalid input.");
-  }
-  const slug = await uniqueSlug(parsed.data.name, "lecturer", id);
-  await prisma.lecturer.update({
-    where: { id },
-    data: { ...parsed.data, slug },
-  });
-  if (existing?.photo && parsed.data.photo && existing.photo !== parsed.data.photo) {
-    await removeUploadFile(existing.photo);
-  }
-  revalidateAll();
-  redirect("/staff-panel/lecturers?saved=1");
-}
-
-export async function deleteLecturer(id: string) {
-  await requireAuth();
-  const existing = await prisma.lecturer.findUnique({ where: { id } });
-  await prisma.lecturer.delete({ where: { id } });
-  if (existing?.photo) await removeUploadFile(existing.photo);
   revalidateAll();
 }
 

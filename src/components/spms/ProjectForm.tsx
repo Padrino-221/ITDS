@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Upload, FileText, X, ExternalLink } from "lucide-react";
-import { DEGREE_LABELS } from "@/lib/data";
+import { DEGREE_LABELS, SPMS_PROGRAMS } from "@/lib/data";
 import {
   AdminCard,
   Field,
@@ -14,29 +14,30 @@ import {
 import { Select } from "@/components/admin/Dropdown";
 import { createSpmsProject, updateSpmsProject } from "@/app/spms/(protected)/actions";
 
-type Lecturer = { id: string; name: string };
+type SupervisorOption = { id: string; name: string };
 type ResearchArea = { id: string; title: string };
-type Program = { id: string; title: string; degreeLevel: string };
 
 export default function SpmsProjectForm({
   project,
-  lecturers,
+  supervisors,
   researchAreas,
-  programs,
   academicYears,
   userRole,
   userEmail,
 }: {
   project?: any;
-  lecturers: Lecturer[];
+  supervisors: SupervisorOption[];
   researchAreas: ResearchArea[];
-  programs: Program[];
   academicYears: string[];
   userRole: string;
   userEmail: string;
 }) {
   const router = useRouter();
   const [uploading, setUploading] = useState(false);
+  const [program, setProgram] = useState<string>(project?.program ?? "");
+  const [degreeLevel, setDegreeLevel] = useState<string>(
+    project?.degreeLevel ?? "UNDERGRADUATE"
+  );
   const [uploadedFile, setUploadedFile] = useState<{
     url: string;
     name: string;
@@ -88,6 +89,13 @@ export default function SpmsProjectForm({
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
+  // The programme a student is enrolled in implies their degree level.
+  function handleProgramChange(value: string) {
+    setProgram(value);
+    const match = SPMS_PROGRAMS.find((p) => p.title === value);
+    if (match) setDegreeLevel(match.degreeLevel);
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setSubmitting(true);
@@ -107,10 +115,10 @@ export default function SpmsProjectForm({
     }
   }
 
-  // Auto-assign supervisor if lecturer (not admin)
+  // Auto-assign the supervisor to the current user for lecturer (not admin)
   const defaultSupervisor =
     userRole === "LECTURER"
-      ? lecturers.find((l) => l.name.toLowerCase().includes(userEmail.split("@")[0]))?.id ?? ""
+      ? supervisors.find((s) => s.name.toLowerCase().includes(userEmail.split("@")[0]))?.id ?? ""
       : project?.supervisorId ?? "";
 
   return (
@@ -145,15 +153,16 @@ export default function SpmsProjectForm({
 
             <Field label="Programme" required>
               <Select
-                name="program"
                 required
-                defaultValue={project?.program ?? ""}
                 placeholder="Select programme…"
-                options={programs.map((prog) => ({
+                value={program}
+                onChange={handleProgramChange}
+                options={SPMS_PROGRAMS.map((prog) => ({
                   value: prog.title,
                   label: prog.title,
                 }))}
               />
+              <input type="hidden" name="program" value={program} />
             </Field>
           </div>
 
@@ -171,16 +180,16 @@ export default function SpmsProjectForm({
               />
             </Field>
 
-            <Field label="Degree Level" required>
+            <Field label="Degree Level" required hint="Set automatically from the programme.">
               <Select
-                name="degreeLevel"
-                required
-                defaultValue={project?.degreeLevel ?? "UNDERGRADUATE"}
+                value={degreeLevel}
+                onChange={setDegreeLevel}
                 options={Object.entries(DEGREE_LABELS).map(([value, label]) => ({
                   value,
                   label,
                 }))}
               />
+              <input type="hidden" name="degreeLevel" value={degreeLevel} />
             </Field>
           </div>
 
@@ -191,9 +200,9 @@ export default function SpmsProjectForm({
                 required
                 defaultValue={defaultSupervisor}
                 placeholder="Select supervisor…"
-                options={lecturers.map((l) => ({
-                  value: l.id,
-                  label: l.name,
+                options={supervisors.map((s) => ({
+                  value: s.id,
+                  label: s.name,
                 }))}
               />
             </Field>

@@ -96,8 +96,10 @@ async function main() {
       email: "spms-admin@itds.uenr.edu.gh",
       passwordHash: spmsAdminPassword,
       role: "ADMIN",
+      slug: "spms-administrator",
     },
   });
+
   const spmsLecturerPassword = await hash("spms-lecturer123", 12);
   await prisma.supervisor.upsert({
     where: { email: "spms-lecturer@itds.uenr.edu.gh" },
@@ -107,6 +109,14 @@ async function main() {
       email: "spms-lecturer@itds.uenr.edu.gh",
       passwordHash: spmsLecturerPassword,
       role: "LECTURER",
+      slug: "yaw-anokye-acheampong",
+      userTitle: "Dr.",
+      jobRank: "Lecturer",
+      profilePhoto: img("lecturers/yaw-anokye-acheampong.jpg"),
+      researchArea1: "Web Engineering",
+      researchArea2: "Software Architecture",
+      about:
+        "Dr. Yaw Anokye-Acheampong is a Lecturer specialising in web engineering and software architecture. He supervises a wide range of web application projects and is passionate about practical, industry-ready software development.",
     },
   });
 
@@ -267,85 +277,85 @@ image: img("hero/slide3.jpg"),
   }
 
   // ------------------------------------------------------------------
-  // Lecturers
+  // Supervisors (public lecturer profiles via SPMS)
   // ------------------------------------------------------------------
-  const lecturers = [
+  const supervisors = [
     {
       slug: "peter-appiahene",
-      name: "Prof. Peter Appiahene",
-      title: "Associate Professor & Head of Department",
-      photo: img("lecturers/peter-appiahene.jpg"),
+      name: "Peter Appiahene",
+      userTitle: "Prof.",
+      jobRank: "Associate Professor",
+      profilePhoto: img("lecturers/peter-appiahene.jpg"),
       email: "peter.appiahene@uenr.edu.gh",
-      researchInterests: "Machine Learning, Artificial Intelligence, Educational Data Mining",
-      bio: "Prof. Peter Appiahene is an Associate Professor and the Head of the Department of Information Technology and Decision Sciences. He holds a PhD in Computer Science and has published extensively on the application of machine learning to education and agriculture. He leads the department's vision of technology-driven academic excellence.",
-      order: 1,
+      researchArea1: "Machine Learning",
+      researchArea2: "Artificial Intelligence",
+      about:
+        "Prof. Peter Appiahene is an Associate Professor and the Head of the Department of Information Technology and Decision Sciences. He holds a PhD in Computer Science and has published extensively on the application of machine learning to education and agriculture. He leads the department's vision of technology-driven academic excellence.",
     },
     {
       slug: "felicia-akoto-danso",
-      name: "Dr. Felicia Akoto-Danso",
-      title: "Senior Lecturer",
-      photo: img("lecturers/emmanuel-boateng.jpg"),
+      name: "Felicia Akoto-Danso",
+      userTitle: "Dr.",
+      jobRank: "Senior Lecturer",
+      profilePhoto: img("lecturers/emmanuel-boateng.jpg"),
       email: "felicia.akoto-danso@uenr.edu.gh",
-      researchInterests: "Data Science, Business Intelligence, Decision Support Systems",
-      bio: "Dr. Felicia Akoto-Danso is a Senior Lecturer whose research focuses on data-driven decision making, business intelligence and decision support systems for organisations in developing economies.",
-      order: 2,
+      researchArea1: "Data Science",
+      researchArea2: "Business Intelligence",
+      about:
+        "Dr. Felicia Akoto-Danso is a Senior Lecturer whose research focuses on data-driven decision making, business intelligence and decision support systems for organisations in developing economies.",
     },
     {
       slug: "michael-opoku",
-      name: "Mr. Michael Opoku",
-      title: "Lecturer",
-      photo: img("lecturers/michael-opoku.jpg"),
+      name: "Michael Opoku",
+      userTitle: "Mr.",
+      jobRank: "Lecturer",
+      profilePhoto: img("lecturers/michael-opoku.jpg"),
       email: "michael.opoku@uenr.edu.gh",
-      researchInterests: "Computer Networking, Network Security, IoT",
-      bio: "Mr. Michael Opoku is a Lecturer with expertise in computer networking, network security and the Internet of Things. He coordinates the department's networking laboratory and mentors final-year networking projects.",
-      order: 3,
-    },
-    {
-      slug: "yaw-anokye-acheampong",
-      name: "Dr. Yaw Anokye-Acheampong",
-      title: "Lecturer",
-      photo: img("lecturers/yaw-anokye-acheampong.jpg"),
-      email: "yaw.anokye@uenr.edu.gh",
-      researchInterests: "Web Engineering, Software Architecture, Cloud Computing",
-      bio: "Dr. Yaw Anokye-Acheampong is a Lecturer specialising in web engineering and software architecture. He supervises a wide range of web application projects and is passionate about practical, industry-ready software development.",
-      order: 4,
+      researchArea1: "Computer Networking",
+      researchArea2: "Network Security",
+      about:
+        "Mr. Michael Opoku is a Lecturer with expertise in computer networking, network security and the Internet of Things. He coordinates the department's networking laboratory and mentors final-year networking projects.",
     },
     {
       slug: "ama-owusu-ansah",
-      name: "Mrs. Ama Owusu-Ansah",
-      title: "Lecturer",
-      photo: img("lecturers/felicia-akoto-danso.jpg"),
+      name: "Ama Owusu-Ansah",
+      userTitle: "Mrs.",
+      jobRank: "Lecturer",
+      profilePhoto: img("lecturers/felicia-akoto-danso.jpg"),
       email: "ama.owusu-ansah@uenr.edu.gh",
-      researchInterests: "Mobile Application Development, Human-Computer Interaction",
-      bio: "Mrs. Ama Owusu-Ansah is a Lecturer focused on mobile application development and human-computer interaction. She leads the mobile development track and coordinates student innovation competitions.",
-      order: 5,
+      researchArea1: "Mobile Application Development",
+      researchArea2: "Human-Computer Interaction",
+      about:
+        "Mrs. Ama Owusu-Ansah is a Lecturer focused on mobile application development and human-computer interaction. She leads the mobile development track and coordinates student innovation competitions.",
     },
     {
       slug: "emmanuel-boateng",
-      name: "Dr. Emmanuel Boateng",
-      title: "Senior Lecturer",
-      photo: img("lecturers/abena-mensah.jpg"),
+      name: "Emmanuel Boateng",
+      userTitle: "Dr.",
+      jobRank: "Senior Lecturer",
+      profilePhoto: img("lecturers/abena-mensah.jpg"),
       email: "emmanuel.boateng@uenr.edu.gh",
-      researchInterests: "Deep Learning, Computer Vision, Health Informatics",
-      bio: "Dr. Emmanuel Boateng is a Senior Lecturer whose research applies deep learning and computer vision to healthcare diagnostics and agriculture. He supervises MSc, MPhil and PhD candidates in these areas.",
-      order: 6,
+      researchArea1: "Deep Learning",
+      researchArea2: "Computer Vision",
+      about:
+        "Dr. Emmanuel Boateng is a Senior Lecturer whose research applies deep learning and computer vision to healthcare diagnostics and agriculture. He supervises MSc, MPhil and PhD candidates in these areas.",
     },
   ];
 
-  for (const l of lecturers) {
+  for (const s of supervisors) {
     if (bootstrap) {
-      const existing = await prisma.lecturer.findUnique({ where: { slug: l.slug } });
+      const existing = await prisma.supervisor.findUnique({ where: { slug: s.slug } });
       if (existing) continue;
     }
-    await prisma.lecturer.upsert({
-      where: { slug: l.slug },
-      update: { ...l },
-      create: { ...l },
+    await prisma.supervisor.upsert({
+      where: { slug: s.slug },
+      update: { ...s },
+      create: { ...s, passwordHash: spmsLecturerPassword, role: "LECTURER" },
     });
   }
 
   const bySlug = Object.fromEntries(
-    (await prisma.lecturer.findMany()).map((l) => [l.slug, l.id])
+    (await prisma.supervisor.findMany()).map((s) => [s.slug, s.id])
   );
 
   // ------------------------------------------------------------------

@@ -4,13 +4,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Mail, FolderOpen, Sparkles } from "lucide-react";
 import { ProjectCard } from "@/components/cards";
-import { getLecturerBySlug, getLecturers } from "@/lib/data";
+import { getLecturerBySlug } from "@/lib/data";
 import { absoluteUrl, initials } from "@/lib/utils";
 
-export async function generateStaticParams() {
-  const lecturers = await getLecturers();
-  return lecturers.map((lecturer) => ({ slug: lecturer.slug }));
-}
+// Always reflect the current SPMS profile state: a profile that is incomplete
+// (or no longer complete) must 404 immediately, never serve a stale render.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
