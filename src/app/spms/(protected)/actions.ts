@@ -7,13 +7,17 @@ import {
   createSpmsSession,
   destroySpmsSession,
   hashPassword,
+  verifyPassword,
   requireSpmsAdmin,
   getSpmsSession,
   type SpmsSessionUser,
 } from "@/lib/spms-auth";
+import { removeUploadFile } from "@/lib/uploads";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { randomBytes } from "crypto";
+import { slugify } from "@/lib/utils";
+import { str, opt } from "@/lib/form-utils";
 
 // ---------------------------------------------------------------------------
 // Auth
@@ -104,14 +108,6 @@ export async function updateSpmsProfile(data: ProfileData) {
 // Projects
 // ---------------------------------------------------------------------------
 
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "")
-    .slice(0, 200);
-}
-
 /** Slug from a supervisor name, deduplicated against other supervisors. */
 async function uniqueSupervisorSlug(base: string, excludeId?: string): Promise<string> {
   const baseSlug = slugify(base) || `lecturer-${Date.now()}`;
@@ -125,39 +121,49 @@ async function uniqueSupervisorSlug(base: string, excludeId?: string): Promise<s
   }
 }
 
+async function uniqueProjectSlug(base: string): Promise<string> {
+  const baseSlug = slugify(base) || `project-${Date.now()}`;
+  let candidate = baseSlug;
+  let n = 2;
+  while (await prisma.project.findUnique({ where: { slug: candidate }, select: { id: true } })) {
+    candidate = `${baseSlug}-${n++}`;
+  }
+  return candidate;
+}
+
 export async function createSpmsProject(formData: FormData) {
   const session = await getSpmsSession();
   if (!session) redirect("/spms/login");
 
-  const title = formData.get("title") as string;
-  const abstract = formData.get("abstract") as string;
-  const studentName = formData.get("studentName") as string;
-  const program = formData.get("program") as string;
-  const degreeLevel = formData.get("degreeLevel") as string;
-  const academicYear = formData.get("academicYear") as string;
-  const objective = formData.get("objective") as string;
-  const groupMembers = formData.get("groupMembers") as string;
-  const githubLink = formData.get("githubLink") as string;
-  const documentUrl = formData.get("documentUrl") as string;
-  const documentName = formData.get("documentName") as string;
+  const title = str(formData, "title");
+  const abstract = opt(formData, "abstract");
+  const studentName = opt(formData, "studentName");
+  const program = opt(formData, "program");
+  const degreeLevel = opt(formData, "degreeLevel");
+  const academicYear = opt(formData, "academicYear");
+  const objective = opt(formData, "objective");
+  const groupMembers = opt(formData, "groupMembers");
+  const githubLink = opt(formData, "githubLink");
+  const documentUrl = opt(formData, "documentUrl");
+  const documentName = opt(formData, "documentName");
 
-  const slug = slugify(title) || `project-${Date.now()}`;
+  const slug = await uniqueProjectSlug(title);
 
   await prisma.project.create({
     data: {
       title,
       slug,
-      abstract: abstract || null,
-      studentName: studentName || null,
-      program: program || null,
+      abstract,
+      studentName,
+      program,
       degreeLevel: (degreeLevel as any) || "UNDERGRADUATE",
-      academicYear: academicYear || null,
+      academicYear,
       supervisorId: session.id,
-      objective: objective || null,
-      groupMembers: groupMembers || null,
-      githubLink: githubLink || null,
-      documentUrl: documentUrl || null,
-      documentName: documentName || null,
+      objective,
+      groupMembers,
+      githubLink,
+      documentUrl,
+      documentName,
       published: true,
     },
   });
@@ -169,30 +175,44 @@ export async function updateSpmsProject(id: string, formData: FormData) {
   const session = await getSpmsSession();
   if (!session) redirect("/spms/login");
 
-  const title = formData.get("title") as string;
-  const abstract = formData.get("abstract") as string;
-  const studentName = formData.get("studentName") as string;
-  const program = formData.get("program") as string;
-  const degreeLevel = formData.get("degreeLevel") as string;
-  const academicYear = formData.get("academicYear") as string;
-  const objective = formData.get("objective") as string;
-  const groupMembers = formData.get("groupMembers") as string;
-  const githubLink = formData.get("githubLink") as string;
-  const documentUrl = formData.get("documentUrl") as string;
-  const documentName = formData.get("documentName") as string;
+  // Admins can edit any project; lecturers can only edit their own
+  if (session.role !== "ADMIN") {
+    const existing = await prisma.project.findUnique({ where: { id }, select: { supervisorId: true } });
+    if (!existing || existing.supervisorId !== session.id) {
+      return { error: "You can only edit your own projects." };
+    }
+  }
+
+  const title = str(formData, "title");
+  const abstract = opt(formData, "abstract");
+  const studentName = opt(formData, "studentName");
+  const program = opt(formData, "program");
+  const degreeLevel = opt(formData, "degreeLevel");
+  const academicYear = opt(formData, "academicYear");
+  const objective = opt(formData, "objective");
+  const groupMembers = opt(formData, "groupMembers");
+  const githubLink = opt(formData, "githubLink");
+  const documentUrl = opt(formData, "documentUrl");
+  const documentName = opt(formData, "documentName");
+
+  // Clean up old document file when replaced
+  const current = await prisma.project.findUnique({ where: { id }, select: { documentUrl: true } });
+  if (current?.documentUrl && documentUrl && current.documentUrl !== documentUrl) {
+    await removeUploadFile(current.documentUrl);
+  }
 
   await prisma.project.update({
     where: { id },
     data: {
       title,
-      abstract: abstract || null,
-      studentName: studentName || null,
-      program: program || null,
+      abstract,
+      studentName,
+      program,
       degreeLevel: (degreeLevel as any) || "UNDERGRADUATE",
-      academicYear: academicYear || null,
-      objective: objective || null,
-      groupMembers: groupMembers || null,
-      githubLink: githubLink || null,
+      academicYear,
+      objective,
+      groupMembers,
+      githubLink,
       ...(documentUrl && { documentUrl }),
       ...(documentName && { documentName }),
     },
@@ -211,6 +231,12 @@ export async function deleteSpmsProject(id: string) {
     if (!project || project.supervisorId !== session.id) {
       return { error: "You can only delete your own projects." };
     }
+  }
+
+  // Clean up the associated document file before deleting the record
+  const project = await prisma.project.findUnique({ where: { id }, select: { documentUrl: true } });
+  if (project?.documentUrl) {
+    await removeUploadFile(project.documentUrl);
   }
 
   await prisma.project.delete({ where: { id } });
@@ -535,14 +561,12 @@ export async function changeSpmsPassword(
   });
   if (!supervisor) redirect("/spms/login");
 
-  const { verifyPassword } = await import("@/lib/spms-auth");
   const ok = await verifyPassword(currentPassword, supervisor.passwordHash);
   if (!ok) {
     return { error: "Current password is incorrect." };
   }
 
-  const { hashPassword: hp } = await import("@/lib/spms-auth");
-  const newHash = await hp(newPassword);
+  const newHash = await hashPassword(newPassword);
 
   await prisma.supervisor.update({
     where: { id: session.id },

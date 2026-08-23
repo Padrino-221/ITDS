@@ -15,24 +15,9 @@ import {
 } from "@/lib/auth";
 import { slugify, learnUrl } from "@/lib/utils";
 import { removeUploadFile } from "@/lib/uploads";
+import { str, opt, bool } from "@/lib/form-utils";
 
 type SlugModel = "newsPost" | "researchArea";
-
-function str(formData: FormData, key: string): string {
-  // Values can be non-strings (e.g. a File from an upload input);
-  // only stringify-then-trim actual strings.
-  const value = formData.get(key);
-  return typeof value === "string" ? value.trim() : "";
-}
-
-function opt(formData: FormData, key: string): string | null {
-  const value = str(formData, key);
-  return value ? value : null;
-}
-
-function bool(formData: FormData, key: string): boolean {
-  return formData.get(key) === "on";
-}
 
 type SlugWhere = { slug: string; id?: { not: string } };
 

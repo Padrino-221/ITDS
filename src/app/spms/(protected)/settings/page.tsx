@@ -13,7 +13,6 @@ import {
   PrimaryButton,
   Field,
 } from "@/components/admin/ui";
-import { Trash2 } from "lucide-react";
 import DeleteButton from "@/components/admin/DeleteButton";
 
 export const metadata = { title: "Settings" };
@@ -71,14 +70,12 @@ export default async function SpmsSettingsPage() {
                     {yearCounts.get(year.value) ?? 0} projects
                   </span>
                 </div>
-                <form action={deleteAcademicYear.bind(null, year.key)}>
-                  <button
-                    type="submit"
-                    className="rounded-lg p-1.5 text-red-500 hover:bg-red-50"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </form>
+                <DeleteButton
+                  action={deleteAcademicYear.bind(null, year.key)}
+                  confirmText={`Delete academic year "${year.value}"? ${yearCounts.get(year.value) ? `This year has ${yearCounts.get(year.value)} associated project${yearCounts.get(year.value) === 1 ? "" : "s"}.` : ""}`}
+                  label=""
+                  className="inline-flex items-center justify-center rounded-lg p-1.5 text-red-500 transition-colors hover:bg-red-50"
+                />
               </div>
             ))}
           </div>
