@@ -11,7 +11,8 @@ export type ContentBlock =
   | { type: "heading"; text: string; level?: 2 | 3 }
   | { type: "paragraph"; text: string }
   | { type: "code"; code: string; language?: string }
-  | { type: "list"; items: string[] };
+  | { type: "list"; items: string[] }
+  | { type: "video"; url: string };
 
 export type QuizQuestion = {
   question: string;
@@ -111,6 +112,11 @@ export function flattenBlocks(blocks: unknown): string {
           return b.code;
         case "list":
           return b.items.join(" ");
+        case "video": {
+          // Extract video ID as searchable text so video lessons are discoverable.
+          const ytMatch = b.url.match(/(?:youtu\.be\/|watch\?v=|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
+          return ytMatch ? `youtube ${ytMatch[1]}` : b.url;
+        }
         default:
           return "";
       }
@@ -123,9 +129,12 @@ export function flattenBlocks(blocks: unknown): string {
 export function readingMinutes(content: Pick<LessonContent, "objective" | "contentBody">): number {
   const text = [
     content.objective ?? "",
-    ...asArray<ContentBlock>(content.contentBody).map((b) =>
-      b.type === "list" ? b.items.join(" ") : b.type === "code" ? b.code : b.text
-    ),
+    ...asArray<ContentBlock>(content.contentBody).map((b) => {
+      if (b.type === "list") return b.items.join(" ");
+      if (b.type === "code") return b.code;
+      if (b.type === "video") return "";
+      return b.text;
+    }),
   ].join(" ");
   const words = text.trim().split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.ceil(words / 200));
@@ -153,6 +162,9 @@ export const getSubjectWithTopics = cache(async (slug: string) =>
             where: PUBLIC_LESSON_WHERE,
             orderBy: { order: "asc" },
             select: { id: true, slug: true, title: true, order: true, status: true },
+          },
+          exam: {
+            select: { id: true, title: true, published: true },
           },
         },
       },
@@ -406,3 +418,201 @@ export const getQuizScores = cache(async (learnerId: string) =>
     include: { lesson: { include: { topic: { include: { subject: true } } } } },
   })
 );
+
+// ---------------------------------------------------------------------------
+// Exams
+// ---------------------------------------------------------------------------
+
+export type ExamQuestionType = "MC" | "TF" | "CODE";
+
+export type ExamQuestionInput = {
+  type: ExamQuestionType;
+  question: string;
+  options?: string[]; // MC only
+  correctAnswer: string; // MC: index as string, TF: "True"/"False", CODE: expected stdout
+  codeLanguage?: string; // CODE only
+  codeTemplate?: string; // CODE only
+};
+
+/** Get an exam by topic ID (with questions, for authoring). */
+export const getExamByTopic = cache(async (topicId: string) =>
+  prisma.exam.findUnique({
+    where: { topicId },
+    include: {
+      questions: { orderBy: { order: "asc" } },
+      topic: { include: { subject: true } },
+    },
+  })
+);
+
+/** Get a published exam for taking (without correct answers). */
+export const getPublishedExam = cache(async (topicId: string) =>
+  prisma.exam.findUnique({
+    where: { topicId, published: true },
+    include: {
+      questions: {
+        orderBy: { order: "asc" },
+        select: {
+          id: true,
+          type: true,
+          question: true,
+          options: true,
+          codeLanguage: true,
+          codeTemplate: true,
+          order: true,
+          // intentionally omit correctAnswer
+        },
+      },
+      topic: { include: { subject: true } },
+    },
+  })
+);
+
+/** Get all exam attempts for a learner on a topic. */
+export const getExamAttempts = cache(async (examId: string, learnerId: string) =>
+  prisma.examAttempt.findMany({
+    where: { examId, learnerId },
+    orderBy: { startedAt: "desc" },
+  })
+);
+
+/** Check if a topic has a published exam. */
+export const topicHasExam = cache(async (topicId: string) =>
+  prisma.exam.findUnique({
+    where: { topicId, published: true },
+    select: { id: true },
+  })
+);
+
+// ---------------------------------------------------------------------------
+// Certificates — eligibility check (shared between API routes and actions)
+// ---------------------------------------------------------------------------
+
+export type CertificateEligibility = {
+  eligible: boolean;
+  hasCertificate: boolean;
+  certificate?: { id: string } | null;
+  reason?: string;
+  completed?: number;
+  total?: number;
+  examsPassed?: number;
+  examsTotal?: number;
+};
+
+/**
+ * Check if a learner is eligible for a certificate for a given subject.
+ * Returns whether they already have one, are eligible, or need to complete
+ * more lessons. This is a pure data function — no auth, no redirects.
+ */
+export async function checkCertificateEligibilityFor(
+  learnerId: string,
+  subjectId: string
+): Promise<CertificateEligibility> {
+  // Check if already has certificate
+  const existing = await prisma.certificate.findUnique({
+    where: { learnerId_subjectId: { learnerId, subjectId } },
+  });
+  if (existing) return { eligible: true, hasCertificate: true, certificate: existing };
+
+  // Get all published lessons in the subject
+  const lessons = await prisma.lesson.findMany({
+    where: {
+      topic: { subjectId },
+      OR: [{ status: "PUBLISHED" }, { publishedSnapshot: { not: Prisma.DbNull } }],
+    },
+    select: { id: true },
+  });
+
+  if (lessons.length === 0) {
+    return { eligible: false, hasCertificate: false, reason: "No lessons available yet." };
+  }
+
+  // Check completion
+  const completed = await prisma.userProgress.findMany({
+    where: {
+      learnerId,
+      completed: true,
+      lessonId: { in: lessons.map((l) => l.id) },
+    },
+    select: { lessonId: true },
+  });
+
+  const completedCount = completed.length;
+  const totalCount = lessons.length;
+
+  if (completedCount < totalCount) {
+    return {
+      eligible: false,
+      hasCertificate: false,
+      reason: `You've completed ${completedCount} of ${totalCount} lessons. Complete all lessons to earn a certificate.`,
+      completed: completedCount,
+      total: totalCount,
+    };
+  }
+
+  // All published exams in the subject must have been passed at least once.
+  // A subject with no published exams is certifiable on lessons alone.
+  const exams = await prisma.exam.findMany({
+    where: { topic: { subjectId }, published: true },
+    select: { id: true, title: true },
+  });
+
+  if (exams.length > 0) {
+    const passedAttempts = await prisma.examAttempt.findMany({
+      where: {
+        learnerId,
+        passed: true,
+        examId: { in: exams.map((e) => e.id) },
+      },
+      select: { examId: true },
+      distinct: ["examId"],
+    });
+
+    if (passedAttempts.length < exams.length) {
+      return {
+        eligible: false,
+        hasCertificate: false,
+        reason: `You've passed ${passedAttempts.length} of ${exams.length} exams. Pass every course exam to earn a certificate.`,
+        completed: completedCount,
+        total: totalCount,
+        examsPassed: passedAttempts.length,
+        examsTotal: exams.length,
+      };
+    }
+  }
+
+  return { eligible: true, hasCertificate: false };
+}
+
+export type CertificateVerification = {
+  certificateNo: string;
+  learnerName: string;
+  subjectName: string;
+  issuedAt: Date;
+};
+
+/**
+ * Public certificate lookup for the /learn/verify page. Deliberately returns
+ * only what a third-party verifier may see — no payment amount, no ids, no
+ * email. Auth-free by design so employers can verify without an account.
+ */
+export async function getCertificateForVerification(
+  certificateNo: string
+): Promise<CertificateVerification | null> {
+  const certificate = await prisma.certificate.findUnique({
+    where: { certificateNo },
+    select: {
+      certificateNo: true,
+      issuedAt: true,
+      learner: { select: { name: true } },
+      subject: { select: { name: true } },
+    },
+  });
+  if (!certificate) return null;
+  return {
+    certificateNo: certificate.certificateNo,
+    learnerName: certificate.learner.name,
+    subjectName: certificate.subject.name,
+    issuedAt: certificate.issuedAt,
+  };
+}

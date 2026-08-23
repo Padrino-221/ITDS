@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { BookOpenCheck, CheckCircle2, PlayCircle } from "lucide-react";
+import { BookOpenCheck, CheckCircle2, ClipboardList, PlayCircle } from "lucide-react";
 import { learnUrl } from "@/lib/utils";
 
 type Lesson = { id: string; slug: string; title: string };
-type Topic = { id: string; title: string; slug: string; lessons: Lesson[] };
+type Exam = { id: string; title: string; published: boolean } | null;
+type Topic = { id: string; title: string; slug: string; lessons: Lesson[]; exam: Exam };
 
 export default function SubjectLessonList({
   subjectSlug,
@@ -115,6 +116,24 @@ export default function SubjectLessonList({
                 <li className="px-6 py-6 text-sm text-ink-soft">
                   <BookOpenCheck className="mr-2 inline h-4 w-4" />
                   Lessons in this topic are being prepared.
+                </li>
+              )}
+              {topic.exam?.published && (
+                <li>
+                  <Link
+                    href={learnUrl(`/${subjectSlug}/${topic.slug}/exam`)}
+                    className="group flex items-center gap-3 border-t border-gold-200 bg-gold-50/60 px-4 py-3 transition-colors hover:bg-gold-100/60 sm:px-6 sm:py-4"
+                  >
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gold-100 sm:h-9 sm:w-9">
+                      <ClipboardList className="h-5 w-5 text-gold-600" />
+                    </span>
+                    <span className="flex-1 min-w-0 font-semibold text-sm sm:text-base text-gold-800 group-hover:text-gold-900">
+                      {topic.exam.title}
+                    </span>
+                    <span className="rounded-lg bg-gold-200 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-gold-700">
+                      Exam
+                    </span>
+                  </Link>
                 </li>
               )}
             </ul>

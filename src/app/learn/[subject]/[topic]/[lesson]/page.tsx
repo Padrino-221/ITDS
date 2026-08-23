@@ -108,7 +108,7 @@ export default async function LessonPage({
         <span className="text-forest-800">{lessonRow.topic.title}</span>
       </nav>
 
-      <div className="mt-6 grid gap-10 lg:grid-cols-[1fr_300px]">
+      <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_300px]">
         {/* Main content */}
         <article className="min-w-0">
           <h1 className="display-heading text-balance text-2xl font-extrabold uppercase tracking-tight text-forest-950 sm:text-3xl lg:text-4xl">

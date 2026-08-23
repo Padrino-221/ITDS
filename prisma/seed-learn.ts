@@ -18,18 +18,40 @@ export async function seedLearn(
     title: string;
     objective: string;
     body: Array<{
-      type: "heading" | "paragraph" | "code" | "list";
+      type: "heading" | "paragraph" | "code" | "list" | "video";
       [key: string]: unknown;
     }>;
     exercise?: string;
     quiz?: { question: string; options: string[]; answer: number }[];
     playground?: { lang: string; starter: string };
   };
-  type SeedTopic = { title: string; slug: string; order: number; lessons: SeedLesson[] };
+  type SeedExamQuestion = {
+    type: "MC" | "TF" | "CODE";
+    question: string;
+    options?: string[]; // MC only
+    correctAnswer: string; // MC: option index ("0","1"...), TF: "True"/"False", CODE: expected stdout
+    codeLanguage?: string;
+    codeTemplate?: string;
+  };
+  type SeedExam = {
+    title: string;
+    description?: string;
+    timeLimit?: number; // minutes
+    passScore?: number; // percentage
+    questions: SeedExamQuestion[];
+  };
+  type SeedTopic = {
+    title: string;
+    slug: string;
+    order: number;
+    lessons: SeedLesson[];
+    exam?: SeedExam;
+  };
   type SeedSubject = {
     name: string;
     slug: string;
     description: string;
+    certificatePrice?: number; // GHS pesewas (3000 = GHS 30.00); omit = certificates disabled
     topics: SeedTopic[];
   };
 
@@ -1694,6 +1716,373 @@ export async function seedLearn(
         },
       ],
     },
+    {
+      name: "Artificial Intelligence Basics",
+      slug: "artificial-intelligence-basics",
+      description:
+        "Discover how machines learn — from the core ideas of AI to training and evaluating simple models responsibly.",
+      certificatePrice: 3000, // GHS 30.00
+      topics: [
+        {
+          title: "Foundations of AI",
+          slug: "foundations-of-ai",
+          order: 1,
+          lessons: [
+            {
+              slug: "what-is-artificial-intelligence",
+              title: "What is Artificial Intelligence?",
+              objective:
+                "By the end of this lesson you will be able to define artificial intelligence and identify everyday examples of AI systems.",
+              body: [
+                {
+                  type: "paragraph",
+                  text: "Artificial Intelligence (AI) is the field of computer science devoted to building systems that perform tasks which normally require human intelligence — recognising speech, spotting patterns, translating languages or making recommendations.",
+                },
+                { type: "heading", text: "AI is already around you", level: 2 },
+                {
+                  type: "list",
+                  items: [
+                    "Recommendation engines suggest videos, songs and products",
+                    "Voice assistants answer spoken questions",
+                    "Spam filters decide which emails reach your inbox",
+                    "Maps apps predict travel time using live traffic data",
+                  ],
+                },
+                { type: "heading", text: "A short tour", level: 2 },
+                {
+                  type: "video",
+                  url: "https://www.youtube.com/watch?v=ad79nYk2keg",
+                },
+                {
+                  type: "paragraph",
+                  text: "AI is not one single technique. It is an umbrella term covering rule-based systems, machine learning, computer vision, natural language processing and more.",
+                },
+                { type: "heading", text: "Rule-based vs learning systems", level: 2 },
+                {
+                  type: "code",
+                  language: "python",
+                  code: `# A rule-based system follows hand-written rules\nif temperature > 30:\n    print("It is hot today")\n\n# A learning system discovers rules from data\n# model.fit(historical_weather, umbrella_sales)`,
+                },
+                {
+                  type: "list",
+                  items: [
+                    "Rule-based — behaviour written explicitly by programmers",
+                    "Machine learning — behaviour learned from examples",
+                    "Most modern AI applications combine both approaches",
+                  ],
+                },
+              ],
+              quiz: [
+                {
+                  question: "What does AI stand for?",
+                  options: [
+                    "Automated Integration",
+                    "Artificial Intelligence",
+                    "Applied Informatics",
+                    "Advanced Iteration",
+                  ],
+                  answer: 1,
+                },
+                {
+                  question: "A spam filter that improves from examples is best described as…",
+                  options: [
+                    "A rule-based system",
+                    "A machine learning system",
+                    "A spreadsheet",
+                    "An operating system",
+                  ],
+                  answer: 1,
+                },
+              ],
+              exercise:
+                "List three apps on your phone that use AI and what each one does for you.",
+            },
+            {
+              slug: "machine-learning-essentials",
+              title: "Machine Learning Essentials",
+              objective:
+                "By the end of this lesson you will be able to distinguish supervised, unsupervised and reinforcement learning.",
+              body: [
+                {
+                  type: "paragraph",
+                  text: "Machine learning (ML) is the branch of AI where systems improve at a task by learning from data instead of following explicit instructions.",
+                },
+                { type: "heading", text: "The three main flavours", level: 2 },
+                {
+                  type: "list",
+                  items: [
+                    "Supervised learning — learn from labelled examples (photos tagged 'cat' or 'dog')",
+                    "Unsupervised learning — find structure in unlabelled data (grouping customers by behaviour)",
+                    "Reinforcement learning — learn by trial and error using rewards (game-playing agents)",
+                  ],
+                },
+                { type: "heading", text: "The supervised workflow", level: 2 },
+                {
+                  type: "code",
+                  language: "python",
+                  code: `# Pseudocode for a supervised classifier\nX = [[5.1, 3.5], [6.7, 3.0], [5.9, 3.2]]   # features\ny = ["setosa", "virginica", "versicolor"]   # labels\n\nmodel = Classifier()\nmodel.fit(X, y)            # 1. train on examples\nprediction = model.predict([[6.0, 3.1]])  # 2. predict`,
+                },
+                {
+                  type: "paragraph",
+                  text: "Training means adjusting internal parameters so the model's predictions match the labels as closely as possible.",
+                },
+                { type: "heading", text: "Key vocabulary", level: 2 },
+                {
+                  type: "list",
+                  items: [
+                    "Feature — an input measurement (height, pixel value)",
+                    "Label — the answer we want predicted",
+                    "Model — the function that maps features to predictions",
+                    "Training data / test data — examples used to fit vs evaluate",
+                  ],
+                },
+                {
+                  type: "paragraph",
+                  text: "Always split your data: train on one portion and evaluate on another. Testing a model on the same data it trained on hides how badly it might fail in the real world.",
+                },
+              ],
+              quiz: [
+                {
+                  question: "Which learning style uses labelled examples?",
+                  options: [
+                    "Supervised learning",
+                    "Unsupervised learning",
+                    "Reinforcement learning",
+                    "Manual programming",
+                  ],
+                  answer: 0,
+                },
+                {
+                  question: "Why split data into training and test sets?",
+                  options: [
+                    "To make training faster",
+                    "To measure performance on unseen data",
+                    "To reduce file size",
+                    "To satisfy the compiler",
+                  ],
+                  answer: 1,
+                },
+              ],
+              exercise:
+                "Classify each scenario as supervised, unsupervised or reinforcement learning: spam detection, customer grouping, game-playing agent.",
+            },
+          ],
+          exam: {
+            title: "Foundations of AI — Exam",
+            description:
+              "Covers the definition of AI and the essentials of machine learning. Score at least 70% to pass.",
+            timeLimit: 15,
+            passScore: 70,
+            questions: [
+              {
+                type: "MC",
+                question: "What does 'AI' stand for?",
+                options: [
+                  "Automated Integration",
+                  "Artificial Intelligence",
+                  "Applied Informatics",
+                  "Advanced Iteration",
+                ],
+                correctAnswer: "1",
+              },
+              {
+                type: "TF",
+                question: "Machine learning is a subset of artificial intelligence.",
+                correctAnswer: "True",
+              },
+              {
+                type: "MC",
+                question: "Which of these is a common everyday use of AI?",
+                options: [
+                  "Recommendation systems on streaming platforms",
+                  "Printing documents",
+                  "Typing on a keyboard",
+                  "Displaying pixels on a monitor",
+                ],
+                correctAnswer: "0",
+              },
+              {
+                type: "TF",
+                question: "AI systems can never make mistakes.",
+                correctAnswer: "False",
+              },
+            ],
+          },
+        },
+        {
+          title: "Building Simple AI Models",
+          slug: "building-simple-ai-models",
+          order: 2,
+          lessons: [
+            {
+              slug: "training-your-first-model",
+              title: "Training Your First Model",
+              objective:
+                "By the end of this lesson you will be able to describe the steps of training and evaluating a simple model.",
+              body: [
+                {
+                  type: "paragraph",
+                  text: "Training a model follows a repeatable recipe: collect data, prepare it, train, evaluate and improve. Understanding the recipe matters more than memorising any particular library call.",
+                },
+                { type: "heading", text: "The five steps", level: 2 },
+                {
+                  type: "list",
+                  items: [
+                    "Collect — gather examples with reliable labels",
+                    "Prepare — clean errors, encode categories, scale numbers",
+                    "Train — fit the model on the training split",
+                    "Evaluate — measure accuracy on the test split",
+                    "Improve — add data or features and repeat",
+                  ],
+                },
+                { type: "heading", text: "Measuring success", level: 2 },
+                {
+                  type: "code",
+                  language: "python",
+                  code: `correct = 0\ntotal = len(test_labels)\nfor prediction, label in zip(predictions, test_labels):\n    if prediction == label:\n        correct += 1\naccuracy = correct / total\nprint(f"Accuracy: {accuracy:.0%}")`,
+                },
+                {
+                  type: "paragraph",
+                  text: "Accuracy is the simplest metric, but it can mislead when classes are imbalanced — a model that always predicts 'not fraud' scores 99% if fraud is 1% of transactions.",
+                },
+                { type: "heading", text: "Overfitting and underfitting", level: 2 },
+                {
+                  type: "list",
+                  items: [
+                    "Overfitting — great on training data, poor on new data; the model memorised noise",
+                    "Underfitting — poor everywhere; the model is too simple",
+                    "The fix is usually more data, simpler models or better features",
+                  ],
+                },
+              ],
+              quiz: [
+                {
+                  question: "A model scores 99% on training data and 60% on test data. This is…",
+                  options: ["Underfitting", "Overfitting", "Perfect fitting", "Data leakage"],
+                  answer: 1,
+                },
+                {
+                  question: "Accuracy alone can be misleading when…",
+                  options: [
+                    "The dataset is large",
+                    "Classes are imbalanced",
+                    "Features are numeric",
+                    "Python version differs",
+                  ],
+                  answer: 1,
+                },
+              ],
+              exercise:
+                "Write the five training steps from memory, then swap your list with a classmate and compare.",
+            },
+            {
+              slug: "ai-ethics-responsible-use",
+              title: "AI Ethics & Responsible Use",
+              objective:
+                "By the end of this lesson you will be able to explain bias, privacy and transparency concerns in AI systems.",
+              body: [
+                {
+                  type: "paragraph",
+                  text: "AI systems affect people — who gets a loan, whose CV is shortlisted, which news is shown. Building them responsibly is part of the job, not an afterthought.",
+                },
+                { type: "heading", text: "Bias in, bias out", level: 2 },
+                {
+                  type: "paragraph",
+                  text: "Models learn whatever patterns are in their training data — including unfair ones. If historical hiring data favoured one group, a model trained on it will reproduce that favouritism.",
+                },
+                { type: "heading", text: "Privacy", level: 2 },
+                {
+                  type: "list",
+                  items: [
+                    "Collect only the data the system genuinely needs",
+                    "Anonymise or aggregate personal data where possible",
+                    "Follow Ghana's Data Protection Act and campus policies",
+                  ],
+                },
+                { type: "heading", text: "Transparency", level: 2 },
+                {
+                  type: "code",
+                  language: "python",
+                  code: `# Simple interpretable scoring keeps humans in the loop\nrisk_score = (\n    0.4 * payment_history +\n    0.3 * debt_ratio +\n    0.3 * account_age\n)\n# A human reviews every automated decision above threshold`,
+                },
+                {
+                  type: "list",
+                  items: [
+                    "Prefer interpretable models when decisions affect people",
+                    "Document data sources and known limitations",
+                    "Keep a human review path for high-stakes decisions",
+                  ],
+                },
+              ],
+              quiz: [
+                {
+                  question: "A hiring model trained on biased past decisions will most likely…",
+                  options: [
+                    "Correct the bias automatically",
+                    "Reproduce the bias",
+                    "Ignore employment history",
+                    "Become unsupervised",
+                  ],
+                  answer: 1,
+                },
+                {
+                  question: "Which practice protects user privacy?",
+                  options: [
+                    "Collecting every possible field",
+                    "Storing passwords in plain text",
+                    "Collecting only necessary data",
+                    "Sharing raw data publicly",
+                  ],
+                  answer: 2,
+                },
+              ],
+              exercise:
+                "Pick one AI product you use. Write two sentences on a possible bias risk and one mitigation.",
+            },
+          ],
+          exam: {
+            title: "Building Simple AI Models — Exam",
+            description:
+              "Covers the model-training workflow, evaluation and responsible AI. Score at least 70% to pass.",
+            timeLimit: 20,
+            passScore: 70,
+            questions: [
+              {
+                type: "MC",
+                question: "In supervised learning, what does a model learn from?",
+                options: [
+                  "Labelled examples",
+                  "Random noise",
+                  "No data at all",
+                  "Only images",
+                ],
+                correctAnswer: "0",
+              },
+              {
+                type: "TF",
+                question:
+                  "Overfitting happens when a model memorises training data and performs poorly on new data.",
+                correctAnswer: "True",
+              },
+              {
+                type: "TF",
+                question:
+                  "Collecting every possible piece of user data is the best way to build responsible AI.",
+                correctAnswer: "False",
+              },
+              {
+                type: "CODE",
+                question:
+                  "Using the starter code pattern, write a Python print statement whose output is exactly: AI is fun",
+                codeLanguage: "python",
+                codeTemplate: "# Print the required text below\n",
+                correctAnswer: "AI is fun",
+              },
+            ],
+          },
+        },
+      ],
+    },
   ];
 
   for (const s of learnSubjects) {
@@ -1755,6 +2144,59 @@ export async function seedLearn(
           await prisma.lesson.create({ data: { ...data, topicId: topic.id, slug: l.slug } });
         }
       }
+    }
+  }
+
+  // Certificate pricing + topic exams. Exams replace their questions on every
+  // non-bootstrap run so seed edits propagate (same contract as lessons).
+  for (const s of learnSubjects) {
+    const subject = await prisma.subject.findUniqueOrThrow({ where: { slug: s.slug } });
+
+    if (typeof s.certificatePrice === "number") {
+      await prisma.subject.update({
+        where: { id: subject.id },
+        data: { certificatePrice: s.certificatePrice },
+      });
+    }
+
+    for (const t of s.topics) {
+      if (!t.exam) continue;
+      const topic = await prisma.topic.findUniqueOrThrow({
+        where: { subjectId_slug: { subjectId: subject.id, slug: t.slug } },
+      });
+
+      const existingExam = bootstrap
+        ? await prisma.exam.findUnique({ where: { topicId: topic.id } })
+        : null;
+      if (existingExam) continue;
+
+      const examData = {
+        title: t.exam.title,
+        description: t.exam.description ?? null,
+        timeLimit: t.exam.timeLimit ?? null,
+        passScore: t.exam.passScore ?? 70,
+        published: true,
+      };
+      const exam = await prisma.exam.upsert({
+        where: { topicId: topic.id },
+        update: examData,
+        create: { ...examData, topicId: topic.id },
+      });
+
+      await prisma.examQuestion.deleteMany({ where: { examId: exam.id } });
+      await prisma.examQuestion.createMany({
+        data: t.exam.questions.map((q, i) => ({
+          examId: exam.id,
+          type: q.type,
+          question: q.question,
+          options:
+            q.type === "MC" ? (q.options ?? []) : q.type === "TF" ? ["True", "False"] : undefined,
+          correctAnswer: q.correctAnswer,
+          codeLanguage: q.codeLanguage || undefined,
+          codeTemplate: q.codeTemplate || undefined,
+          order: i,
+        })),
+      });
     }
   }
 }

@@ -12,6 +12,8 @@
 
 # testing
 /coverage
+e2e/__screenshots__/
+e2e/*-snapshots/
 
 # next.js
 /.next/
@@ -39,6 +41,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+dev.log
 
 # env files (can opt-in for committing if needed)
 .env*
@@ -55,3 +58,5 @@ next-env.d.ts
 ITDS-SPMS-Documentation*.pdf
 SPMS-Implementation-Plan.md
 SPMS-Plan.html
+test-results/
+playwright-report/

@@ -1,5 +1,6 @@
 import type { ContentBlock } from "@/lib/learn";
 import CodeBlock from "@/components/learn/CodeBlock";
+import YouTubeEmbed from "@/components/learn/YouTubeEmbed";
 
 export default function LessonContent({ blocks }: { blocks: ContentBlock[] }) {
   const items = Array.isArray(blocks) ? (blocks as ContentBlock[]) : [];
@@ -44,6 +45,8 @@ export default function LessonContent({ blocks }: { blocks: ContentBlock[] }) {
                 ))}
               </ul>
             );
+          case "video":
+            return <YouTubeEmbed key={i} url={block.url} />;
           default:
             return null;
         }

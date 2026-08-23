@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { ChevronRight } from "lucide-react";
 import { PageHeader, EmptyState } from "@/components/ui";
 import SubjectLessonList from "@/components/learn/SubjectLessonList";
+import CertificateButton from "@/components/learn/CertificateButton";
 import { getSubjectWithTopics, getSubjects } from "@/lib/learn";
 import { learnUrl } from "@/lib/utils";
 
@@ -82,6 +83,7 @@ export default async function SubjectPage({
               slug: l.slug,
               title: l.title,
             })),
+            exam: t.exam ?? null,
           }))}
         />
 
@@ -91,6 +93,15 @@ export default async function SubjectPage({
             description="Topics for this course are being structured by the department."
           />
         )}
+
+        {/* Certificate section */}
+        <div className="mt-10">
+          <CertificateButton
+            subjectId={subject.id}
+            subjectName={subject.name}
+            certificatePrice={subject.certificatePrice}
+          />
+        </div>
 
         <Link
           href={learnUrl("/")}

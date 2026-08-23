@@ -60,6 +60,8 @@ model Learner {
   passwordHash String
   createdAt    DateTime       @default(now())
   progress     UserProgress[]
+  examAttempts ExamAttempt[]
+  certificates Certificate[]
 }
 
 model NewsPost {
@@ -219,12 +221,14 @@ enum LessonStatus {
 }
 
 model Subject {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String   @unique
-  description String?
-  topics      Topic[]
-  createdAt   DateTime @default(now())
+  id               String   @id @default(cuid())
+  name             String
+  slug             String   @unique
+  description      String?
+  certificatePrice Int?     // Price in GHS cents (e.g. 5000 = GHS 50.00), null = no certificate available
+  topics           Topic[]
+  certificates     Certificate[]
+  createdAt        DateTime @default(now())
 }
 
 model Topic {
@@ -235,6 +239,7 @@ model Topic {
   slug      String
   order     Int      @default(0)
   lessons   Lesson[]
+  exam      Exam?
 
   @@unique([subjectId, slug])
 }
@@ -284,4 +289,79 @@ model UserProgress {
   lastAttemptAt  DateTime?
 
   @@unique([learnerId, lessonId])
+}
+
+// ---------------------------------------------------------------------------
+// E-Learning Exams (topic-level assessments)
+// ---------------------------------------------------------------------------
+
+enum ExamQuestionType {
+  MC    // Multiple Choice
+  TF    // True / False
+  CODE  // Code exercise (auto-graded via Piston)
+}
+
+model Exam {
+  id          String   @id @default(cuid())
+  topicId     String
+  topic       Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  timeLimit   Int?     // minutes, null = no time limit
+  passScore   Int      @default(70) // percentage to pass (0-100)
+  published   Boolean  @default(false)
+  questions   ExamQuestion[]
+  attempts    ExamAttempt[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([topicId])
+}
+
+model ExamQuestion {
+  id            String          @id @default(cuid())
+  examId        String
+  exam          Exam            @relation(fields: [examId], references: [id], onDelete: Cascade)
+  type          ExamQuestionType
+  question      String
+  options       Json?           // MC: string[], TF: null (auto ["True","False"]), CODE: null
+  correctAnswer String          // MC: option index as string ("0","1"...), TF: "True"/"False", CODE: expected stdout
+  codeLanguage  String?         // CODE: language for Piston
+  codeTemplate  String?         // CODE: starter code
+  order         Int             @default(0)
+  createdAt     DateTime        @default(now())
+}
+
+model ExamAttempt {
+  id          String   @id @default(cuid())
+  examId      String
+  exam        Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  learnerId   String
+  learner     Learner  @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  answers     Json     // Array of { questionId, answer, correct? } (filled on submit)
+  score       Int?     // percentage (0-100), null until graded
+  passed      Boolean? // null until graded
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  timeSpent   Int?     // seconds elapsed
+
+  @@unique([examId, learnerId, startedAt])
+}
+
+// ---------------------------------------------------------------------------
+// Certificates
+// ---------------------------------------------------------------------------
+
+model Certificate {
+  id           String   @id @default(cuid())
+  learnerId    String
+  learner      Learner  @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  subjectId    String
+  subject      Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  paystackRef  String?  @unique // Paystack transaction reference
+  amountPaid   Int      // Amount paid in GHS cents
+  issuedAt     DateTime @default(now())
+  certificateNo String  @unique // e.g. ITDS-2026-WEB-001
+
+  @@unique([learnerId, subjectId])
 }

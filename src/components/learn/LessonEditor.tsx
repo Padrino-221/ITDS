@@ -9,6 +9,7 @@ import {
   Heading2,
   List,
   MonitorPlay,
+  Play,
   Plus,
   Quote,
   Send,
@@ -73,6 +74,8 @@ function makeBlock(type: ContentBlock["type"]): ContentBlock {
       return { type, code: "", language: "" };
     case "list":
       return { type, items: [""] };
+    case "video":
+      return { type, url: "" };
   }
 }
 
@@ -81,6 +84,7 @@ const blockIcons: Record<ContentBlock["type"], React.ReactNode> = {
   paragraph: <Quote className="h-4 w-4" />,
   code: <Code2 className="h-4 w-4" />,
   list: <List className="h-4 w-4" />,
+  video: <Play className="h-4 w-4" />,
 };
 
 const blockLabels: Record<ContentBlock["type"], string> = {
@@ -88,6 +92,7 @@ const blockLabels: Record<ContentBlock["type"], string> = {
   paragraph: "Paragraph",
   code: "Code block",
   list: "Bullet list",
+  video: "YouTube video",
 };
 
 function SectionCard({
@@ -406,13 +411,26 @@ export default function LessonEditor({ lesson }: { lesson: EditorLesson }) {
                       </button>
                     </div>
                   )}
+                  {block.type === "video" && (
+                    <div>
+                      <input
+                        value={(block as { url: string }).url}
+                        onChange={(e) => updateBlock(i, { url: e.target.value })}
+                        placeholder="YouTube URL or video ID (e.g. https://youtube.com/watch?v=dQw4w9WgXcQ)"
+                        className={inputClass}
+                      />
+                      <p className="mt-1.5 text-xs text-ink-soft">
+                        Paste a YouTube URL or video ID. Supports youtube.com/watch, youtu.be, /embed, and /shorts links.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
 
             {/* Add block */}
             <div className="flex flex-wrap gap-2 pt-1">
-              {(["paragraph", "heading", "code", "list"] as ContentBlock["type"][]).map((type) => (
+              {(["paragraph", "heading", "code", "list", "video"] as ContentBlock["type"][]).map((type) => (
                 <button
                   key={type}
                   type="button"

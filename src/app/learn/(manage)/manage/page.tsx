@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   ClipboardList,
+  FileCheck,
   FolderOpen,
   FolderPlus,
   PenLine,
@@ -62,11 +63,11 @@ export default async function ManageCurriculumPage() {
       />
       <QueryToast
         param="updated"
-        messages={{ subject: "Course updated.", topic: "Topic updated." }}
+        messages={{ subject: "Course updated.", topic: "Topic updated.", exam: "Exam saved." }}
       />
       <QueryToast
         param="deleted"
-        messages={{ subject: "Course deleted.", topic: "Topic deleted." }}
+        messages={{ subject: "Course deleted.", topic: "Topic deleted.", exam: "Exam deleted." }}
       />
 
       {subjects.length === 0 ? (
@@ -123,6 +124,23 @@ export default async function ManageCurriculumPage() {
                         placeholder="Short description (optional)"
                         className={cn(inputClass, "resize-y")}
                       />
+                      <div>
+                        <label className="mb-1 block text-xs font-bold uppercase tracking-wider text-ink-soft">
+                          Certificate Price (GHS)
+                        </label>
+                        <input
+                          name="certificatePrice"
+                          type="number"
+                          min={0}
+                          step={0.01}
+                          defaultValue={subject.certificatePrice ? (subject.certificatePrice / 100).toFixed(2) : ""}
+                          placeholder="Leave empty if no certificate"
+                          className={cn(inputClass, "max-w-[200px]")}
+                        />
+                        <p className="mt-1 text-xs text-ink-soft">
+                          Price in GHS. Leave empty to disable certificates.
+                        </p>
+                      </div>
                       <button type="submit" className={saveButtonClass}>
                         Save course
                       </button>
@@ -198,6 +216,13 @@ export default async function ManageCurriculumPage() {
                           </button>
                         </form>
                       </details>
+                      <Link
+                        href={learnUrl(`/manage/exam/${topic.id}`)}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-forest-200 bg-white px-3 py-1.5 text-xs font-semibold text-ink-soft transition-colors hover:border-gold-400 hover:text-gold-700"
+                      >
+                        <FileCheck className="h-3.5 w-3.5" />
+                        Exam
+                      </Link>
                       <DeleteButton
                         action={deleteTopic.bind(null, topic.id)}
                         confirmText={`Delete "${topic.title}"? It must have no lessons.`}
@@ -259,6 +284,22 @@ export default async function ManageCurriculumPage() {
               placeholder="Short description (optional)"
               className={cn(inputClass, "resize-y")}
             />
+            <div>
+              <label className="mb-1 block text-xs font-bold uppercase tracking-wider text-ink-soft">
+                Certificate Price (GHS)
+              </label>
+              <input
+                name="certificatePrice"
+                type="number"
+                min={0}
+                step={0.01}
+                placeholder="Leave empty if no certificate"
+                className={cn(inputClass, "max-w-[200px]")}
+              />
+              <p className="mt-1 text-xs text-ink-soft">
+                Price in GHS. Leave empty to disable certificates.
+              </p>
+            </div>
             <button type="submit" className={saveButtonClass}>
               Create course
             </button>

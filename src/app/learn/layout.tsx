@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ShieldCheck } from "lucide-react";
 import { getSubjects } from "@/lib/learn";
 import { SITE_URL, learnUrl } from "@/lib/utils";
 import AccountMenu from "@/components/learn/AccountMenu";
@@ -70,13 +70,22 @@ export default async function LearnLayout({ children }: { children: React.ReactN
               Decision Sciences, UENR
             </span>
           </p>
-          <Link
-            href={SITE_URL}
-            className="inline-flex items-center gap-1.5 font-bold text-gold-600 transition-colors hover:text-gold-700"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Back to main website
-          </Link>
+          <div className="flex items-center gap-5">
+            <Link
+              href={learnUrl("/verify")}
+              className="inline-flex items-center gap-1.5 font-bold text-gold-600 transition-colors hover:text-gold-700"
+            >
+              <ShieldCheck className="h-3.5 w-3.5" />
+              Verify a certificate
+            </Link>
+            <Link
+              href={SITE_URL}
+              className="inline-flex items-center gap-1.5 font-bold text-gold-600 transition-colors hover:text-gold-700"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Back to main website
+            </Link>
+          </div>
         </div>
       </footer>
 
