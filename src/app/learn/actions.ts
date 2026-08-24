@@ -642,32 +642,62 @@ export async function deleteExam(examId: string) {
 // Exam taking (learner)
 // ---------------------------------------------------------------------------
 
-const PISTON_URL = process.env.PISTON_URL || "https://emkc.org/api/v2/piston/execute";
+const WANDBOX_URL = process.env.WANDBOX_URL || "https://wandbox.org/api/compile.json";
+
+// Authoring stores simple language names; Wandbox wants a specific compiler.
+const COMPILER_ALIASES: Record<string, string> = {
+  python: "cpython-3.13.8",
+  py: "cpython-3.13.8",
+  javascript: "nodejs-20.17.0",
+  js: "nodejs-20.17.0",
+  node: "nodejs-20.17.0",
+  nodejs: "nodejs-20.17.0",
+  c: "gcc-13.2.0-c",
+  "c++": "gcc-13.2.0",
+  cpp: "gcc-13.2.0",
+  java: "openjdk-jdk-21+35",
+  "c#": "dotnetcore-8.0.402",
+  csharp: "dotnetcore-8.0.402",
+  cs: "dotnetcore-8.0.402",
+  php: "php-8.3.12",
+  ruby: "ruby-3.4.9",
+  go: "go-1.23.2",
+  rust: "rust-1.82.0",
+};
+
+function resolveCompiler(language: string | null): string {
+  const key = (language || "").toLowerCase().trim();
+  return COMPILER_ALIASES[key] ?? key ?? "cpython-3.13.8";
+}
 
 /**
- * Execute student code via the Piston sandbox (emkc.org). Never throws —
- * returns ok:false on any failure so CODE questions can be excluded from the
- * score instead of unfairly failing the learner.
+ * Execute student code via Wandbox. Compile/runtime errors still count as an
+ * executed attempt (stdout simply won't match); only transport failures —
+ * network, timeout, non-200 — return ok:false so CODE questions can be
+ * excluded from the score instead of unfairly failing the learner.
  */
 async function runCode(
   language: string | null,
   code: string
 ): Promise<{ ok: true; stdout: string } | { ok: false }> {
   try {
-    const res = await fetch(PISTON_URL, {
+    const res = await fetch(WANDBOX_URL, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        language: language || "python",
-        version: "*",
-        files: [{ name: "solution", content: code }],
+        code,
+        compiler: resolveCompiler(language),
+        save: false,
       }),
-      signal: AbortSignal.timeout(20_000),
+      signal: AbortSignal.timeout(30_000),
     });
     if (!res.ok) return { ok: false };
-    const data = (await res.json()) as { run?: { stdout?: unknown } };
-    if (!data || typeof data.run?.stdout !== "string") return { ok: false };
-    return { ok: true, stdout: data.run.stdout };
+    // compile.json responds with a flat result object; program_output holds
+    // the combined stdout (compile/runtime errors leave it empty, which then
+    // simply fails the output comparison).
+    const data = (await res.json()) as { program_output?: unknown };
+    if (!data || typeof data.program_output !== "string") return { ok: false };
+    return { ok: true, stdout: data.program_output };
   } catch {
     return { ok: false };
   }
@@ -753,11 +783,9 @@ export async function submitExamAttempt(attemptId: string, formData: FormData) {
         isCorrect =
           normalizeOutput(run.stdout) === normalizeOutput(q.correctAnswer);
       } else {
-        // No executor configured/reachable (EMKC's public API went
-        // whitelist-only 2026-02): exclude the question from the score
-        // instead of marking genuinely correct solutions wrong. Point
-        // PISTON_URL at a self-hosted instance to enable full grading.
-        console.warn(`Piston unavailable for CODE question ${q.id}; excluded from score`);
+        // Executor unreachable: exclude the question from the score instead
+        // of marking genuinely correct solutions wrong.
+        console.warn(`Wandbox unavailable for CODE question ${q.id}; excluded from score`);
       }
     } else if (q.type === "MC" || q.type === "TF") {
       isCorrect = answer === q.correctAnswer;
