@@ -23,14 +23,13 @@ export default async function CertificateDetailPage({
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 py-8">
+    <div className="min-h-screen bg-paper py-8 print:bg-white print:p-0">
       <CertificateView
         certificate={{
           certificateNo: certificate.certificateNo,
           issuedAt: certificate.issuedAt.toISOString(),
           learnerName: learner.name,
           subjectName: certificate.subject.name,
-          amountPaid: certificate.amountPaid,
         }}
       />
     </div>
