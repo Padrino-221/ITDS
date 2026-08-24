@@ -642,6 +642,39 @@ export async function deleteExam(examId: string) {
 // Exam taking (learner)
 // ---------------------------------------------------------------------------
 
+const PISTON_URL = process.env.PISTON_URL || "https://emkc.org/api/v2/piston/execute";
+
+/**
+ * Execute student code via the Piston sandbox (emkc.org). Never throws —
+ * returns ok:false on any failure so CODE questions can be excluded from the
+ * score instead of unfairly failing the learner.
+ */
+async function runCode(
+  language: string | null,
+  code: string
+): Promise<{ ok: true; stdout: string } | { ok: false }> {
+  try {
+    const res = await fetch(PISTON_URL, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        language: language || "python",
+        version: "*",
+        files: [{ name: "solution", content: code }],
+      }),
+      signal: AbortSignal.timeout(20_000),
+    });
+    if (!res.ok) return { ok: false };
+    const data = (await res.json()) as { run?: { stdout?: unknown } };
+    if (!data || typeof data.run?.stdout !== "string") return { ok: false };
+    return { ok: true, stdout: data.run.stdout };
+  } catch {
+    return { ok: false };
+  }
+}
+
+const normalizeOutput = (s: string) => s.replace(/\r\n/g, "\n").trim();
+
 /** Start a new exam attempt. */
 export async function startExamAttempt(examId: string) {
   const learner = await requireLearner();
@@ -701,30 +734,46 @@ export async function submitExamAttempt(attemptId: string, formData: FormData) {
     // leave empty
   }
 
-  // Auto-grade
+  // Auto-grade. CODE questions are executed via Piston — blank submissions
+  // run too, so skipping still costs marks. If execution is unavailable the
+  // question is excluded from the score rather than unfairly failed.
   const questions = attempt.exam.questions;
-  const gradedAnswers = answers.map((a) => {
-    const q = questions.find((qq) => qq.id === a.questionId);
-    if (!q) return { ...a, correct: false };
+  const codeExecuted = new Set<string>();
+  const gradedAnswers = [];
+  const answerFor = new Map(answers.map((a) => [a.questionId, a.answer]));
+  for (const q of questions) {
+    const answer = answerFor.get(q.id) ?? "";
 
     let isCorrect = false;
-    if (q.type === "MC") {
-      // correctAnswer is the index as string
-      isCorrect = a.answer === q.correctAnswer;
-    } else if (q.type === "TF") {
-      isCorrect = a.answer === q.correctAnswer;
+    if (q.type === "CODE") {
+      const run = await runCode(q.codeLanguage, answer);
+      if (run.ok) {
+        // Real execution: compare the program's stdout with the expected one.
+        codeExecuted.add(q.id);
+        isCorrect =
+          normalizeOutput(run.stdout) === normalizeOutput(q.correctAnswer);
+      } else {
+        // No executor configured/reachable (EMKC's public API went
+        // whitelist-only 2026-02): exclude the question from the score
+        // instead of marking genuinely correct solutions wrong. Point
+        // PISTON_URL at a self-hosted instance to enable full grading.
+        console.warn(`Piston unavailable for CODE question ${q.id}; excluded from score`);
+      }
+    } else if (q.type === "MC" || q.type === "TF") {
+      isCorrect = answer === q.correctAnswer;
     }
-    // CODE answers are graded separately (via Piston) — mark as ungraded for now
 
-    return { ...a, correct: isCorrect };
-  });
+    gradedAnswers.push({ questionId: q.id, answer, correct: isCorrect });
+  }
 
-  // Calculate score (only MC + TF count toward score for now)
-  const scorableQuestions = questions.filter((q) => q.type === "MC" || q.type === "TF");
-  const scorableAnswers = gradedAnswers.filter((a) => {
-    const q = questions.find((qq) => qq.id === a.questionId);
-    return q && (q.type === "MC" || q.type === "TF");
-  });
+  // Score: MC/TF always count; CODE counts only when it was actually executed.
+  const scorableIds = new Set(
+    questions
+      .filter((q) => q.type !== "CODE" || codeExecuted.has(q.id))
+      .map((q) => q.id)
+  );
+  const scorableQuestions = questions.filter((q) => scorableIds.has(q.id));
+  const scorableAnswers = gradedAnswers.filter((a) => scorableIds.has(a.questionId));
   const score = scorableQuestions.length > 0
     ? Math.round((scorableAnswers.filter((a) => a.correct).length / scorableQuestions.length) * 100)
     : 0;

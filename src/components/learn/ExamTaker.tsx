@@ -152,6 +152,21 @@ export default function ExamTaker({
     }
   }
 
+  // Retake must fully reset local state — router.refresh() alone re-renders
+  // server components but leaves this client component stuck on the result.
+  function handleRetake() {
+    setResult(null);
+    setStarted(false);
+    setAttemptId(null);
+    setAnswers({});
+    setCurrentQ(0);
+    setTimeLeft(null);
+    setSubmitting(false);
+    setSubmitError(null);
+    setStartError(null);
+    router.refresh();
+  }
+
   function formatTime(seconds: number) {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
@@ -192,7 +207,7 @@ export default function ExamTaker({
 
         <div className="mt-8 flex justify-center gap-3">
           <button
-            onClick={() => router.refresh()}
+            onClick={handleRetake}
             className="rounded-xl border border-forest-200 bg-white px-6 py-3 text-sm font-bold text-forest-900 transition-all hover:-translate-y-0.5 hover:shadow-lg"
           >
             Retake Exam
@@ -274,11 +289,11 @@ export default function ExamTaker({
   const q = exam.questions[currentQ];
   const mcOptions = Array.isArray(q?.options) ? (q.options as string[]) : [];
   const total = exam.questions.length;
-  const scorableIds = new Set(
-    exam.questions.filter((qq) => qq.type === "MC" || qq.type === "TF").map((qq) => qq.id)
-  );
-  const answeredCount = Object.keys(answers).filter((id) => scorableIds.has(id)).length;
-  const scorableTotal = scorableIds.size;
+  // All questions are scorable now (CODE runs server-side); the counter is
+  // cosmetic and simply reflects answered questions.
+  const answeredCount = Object.keys(answers).filter((id) =>
+    exam.questions.some((qq) => qq.id === id)
+  ).length;
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 sm:py-10">
@@ -303,7 +318,7 @@ export default function ExamTaker({
           </div>
         )}
         <div className="text-xs text-ink-soft">
-          {answeredCount}/{scorableTotal} answered
+          {answeredCount}/{total} answered
         </div>
       </div>
 
@@ -378,32 +393,21 @@ export default function ExamTaker({
             </div>
           )}
 
-          {/* CODE option */}
+          {/* CODE — student writes code; the server executes it and grades
+              the program's output */}
           {q.type === "CODE" && (
-            <div className="mt-4 space-y-3">
-              {q.codeTemplate && (
-                <div className="rounded-xl border border-forest-800 bg-forest-950 p-4">
-                  <p className="mb-2 text-xs font-bold uppercase tracking-wider text-emerald-300">
-                    Starter code ({q.codeLanguage})
-                  </p>
-                  <pre className="font-mono text-[13px] text-emerald-100 whitespace-pre-wrap">
-                    {q.codeTemplate}
-                  </pre>
-                </div>
-              )}
-              <div>
-                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-ink-soft">
-                  Your answer (paste the output)
-                </label>
-                <textarea
-                  value={answers[q.id] ?? ""}
-                  onChange={(e) => setAnswers((a) => ({ ...a, [q.id]: e.target.value }))}
-                  rows={4}
-                  placeholder="Paste the expected output here…"
-                  spellCheck={false}
-                  className="w-full rounded-lg border border-forest-800 bg-forest-950 p-3.5 font-mono text-[13px] text-emerald-100 placeholder:text-emerald-100/40 outline-none focus:ring-2 focus:ring-gold-500/40"
-                />
-              </div>
+            <div className="mt-4">
+              <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-ink-soft">
+                Your solution ({q.codeLanguage ?? "code"}) — write code whose
+                output matches what is asked
+              </label>
+              <textarea
+                value={answers[q.id] ?? q.codeTemplate ?? ""}
+                onChange={(e) => setAnswers((a) => ({ ...a, [q.id]: e.target.value }))}
+                rows={10}
+                spellCheck={false}
+                className="w-full rounded-lg border border-forest-800 bg-forest-950 p-3.5 font-mono text-[13px] leading-relaxed text-emerald-100 outline-none focus:ring-2 focus:ring-gold-500/40"
+              />
             </div>
           )}
         </div>
