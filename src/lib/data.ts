@@ -193,3 +193,46 @@ export const getResearchAreas = cache(async () =>
 export const getGallery = cache(async () =>
   prisma.galleryImage.findMany({ orderBy: { order: "asc" } })
 );
+
+// ---------------------------------------------------------------------------
+// IT Society — student leadership (executives grouped by academic year)
+// ---------------------------------------------------------------------------
+
+export type PublicExecutive = {
+  id: string;
+  name: string;
+  position: string;
+  photoUrl: string | null;
+  ordering: number;
+  academicYearId: string;
+  academicYear: { id: string; year: string };
+};
+
+export const getAcademicYears = cache(async () =>
+  prisma.academicYear.findMany({
+    orderBy: { year: "desc" },
+    select: { id: true, year: true, active: true },
+  })
+);
+
+export const getStudentExecutives = cache(async (): Promise<PublicExecutive[]> => {
+  const years = await prisma.academicYear.findMany({
+    orderBy: { year: "desc" },
+    include: {
+      executives: {
+        orderBy: [{ ordering: "asc" }, { name: "asc" }],
+      },
+    },
+  });
+  return years.flatMap((y) =>
+    y.executives.map((e) => ({
+      id: e.id,
+      name: e.name,
+      position: e.position,
+      photoUrl: e.photoUrl,
+      ordering: e.ordering,
+      academicYearId: e.academicYearId,
+      academicYear: { id: y.id, year: y.year },
+    }))
+  );
+});

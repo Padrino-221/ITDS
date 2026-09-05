@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 
 /**
  * Reveals its children with a fade-up transition when scrolled into view.
- * Respects prefers-reduced-motion (content is shown immediately).
  */
 export default function Reveal({
   children,
@@ -22,11 +21,6 @@ export default function Reveal({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      const id = requestAnimationFrame(() => setVisible(true));
-      return () => cancelAnimationFrame(id);
-    }
 
     const observer = new IntersectionObserver(
       (entries) => {

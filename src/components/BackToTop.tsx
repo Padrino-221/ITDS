@@ -24,7 +24,7 @@ export default function BackToTop() {
       aria-label="Back to top"
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       className={cn(
-        "fixed bottom-20 right-5 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-forest-950 text-white shadow-lg shadow-forest-950/25 transition-all hover:-translate-y-0.5 hover:bg-gold-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/60 lg:bottom-5",
+        "fixed bottom-20 right-5 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-forest-950 text-white transition-all hover:-translate-y-0.5 hover:bg-gold-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/60 lg:bottom-5",
         visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0"
       )}
       aria-hidden={!visible}

@@ -845,6 +845,60 @@ Thesis writing, Internal review, External examination, Thesis defense & viva voc
   }
 
   // ------------------------------------------------------------------
+  // IT Society — Student leadership (executives grouped by academic year)
+  // ------------------------------------------------------------------
+  const leadershipYears: Array<{
+    year: string;
+    active: boolean;
+    executives: Array<{ name: string; position: string; ordering: number }>;
+  }> = [
+    {
+      year: "2025/2026",
+      active: true,
+      executives: [
+        { name: "Nana Kwame Boakye", position: "President", ordering: 1 },
+        { name: "Akosua Adoma", position: "Vice President", ordering: 2 },
+        { name: "Kofi Owusu", position: "Secretary", ordering: 3 },
+        { name: "Efua Mensah", position: "Treasurer", ordering: 4 },
+        { name: "Yaw Boateng", position: "Welfare Coordinator", ordering: 5 },
+      ],
+    },
+    {
+      year: "2024/2025",
+      active: false,
+      executives: [
+        { name: "Abena Serwaa", position: "President", ordering: 1 },
+        { name: "Kwabena Osei", position: "Secretary", ordering: 2 },
+      ],
+    },
+  ];
+
+  for (const y of leadershipYears) {
+    let year = await prisma.academicYear.findUnique({ where: { year: y.year } });
+    const isNew = !year;
+
+    if (!year) {
+      year = await prisma.academicYear.create({ data: { year: y.year, active: y.active } });
+    } else if (!bootstrap) {
+      // Full (overwriting) seed is authoritative about the current tenure.
+      await prisma.academicYear.update({ where: { id: year.id }, data: { active: y.active } });
+    }
+
+    if (!year) continue;
+
+    // Bootstrap mode only seeds executives for a brand-new year; the full
+    // seed re-syncs the executives for every year.
+    if (isNew || !bootstrap) {
+      if (!bootstrap) {
+        await prisma.studentExecutive.deleteMany({ where: { academicYearId: year.id } });
+      }
+      for (const e of y.executives) {
+        await prisma.studentExecutive.create({ data: { ...e, academicYearId: year.id } });
+      }
+    }
+  }
+
+  // ------------------------------------------------------------------
   // E-Learning platform (/learn) — subjects, topics and lessons live in
   // prisma/seed-learn.ts
   await seedLearn(prisma, bootstrap);

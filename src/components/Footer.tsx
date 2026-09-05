@@ -2,8 +2,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { Mail, MapPin, Phone, ArrowUpRight } from "lucide-react";
 import { getContact, getSocials, getStringSetting } from "@/lib/settings";
-import { LEARN_URL } from "@/lib/utils";
-
 const brandPaths = {
   Facebook:
     "M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.9h2.54V9.85c0-2.52 1.49-3.91 3.78-3.91 1.09 0 2.24.2 2.24.2v2.46H15.2c-1.24 0-1.63.78-1.63 1.57v1.89h2.78l-.45 2.9h-2.33V22c4.78-.76 8.44-4.92 8.44-9.94Z",
@@ -44,7 +42,7 @@ const footerLinks = {
   resources: [
     { label: "Student Projects", href: "/projects" },
     { label: "IT Society", href: "/about/it-society" },
-    { label: "E-Learning Hub", href: LEARN_URL },
+    { label: "E-Learning Hub", href: "/learn" },
   ],
 };
 

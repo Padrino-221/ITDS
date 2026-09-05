@@ -26,7 +26,7 @@ export default async function TeamSection() {
             <Link
               key={lecturer.id}
               href={`/lecturers/${lecturer.slug}`}
-              className="group block overflow-hidden rounded-3xl border border-forest-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+              className="group block overflow-hidden rounded-3xl border border-forest-100 bg-white transition-transform duration-300 hover:-translate-y-1"
             >
               {/* Photo */}
               <div className="relative h-72 overflow-hidden bg-forest-100">
@@ -46,7 +46,7 @@ export default async function TeamSection() {
                   </div>
                 )}
                 {/* Bookmark icon */}
-                <div className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur-sm">
+                <div className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm">
                   <Bookmark className="h-4 w-4 text-forest-600" />
                 </div>
               </div>
@@ -86,7 +86,7 @@ export default async function TeamSection() {
         <div className="mt-10 text-center">
           <Link
             href="/lecturers"
-            className="inline-flex items-center gap-2 rounded-lg border border-forest-200 bg-white px-6 py-3 text-sm font-bold text-forest-800 transition-all hover:-translate-y-0.5 hover:border-forest-400 hover:shadow-lg"
+            className="inline-flex items-center gap-2 rounded-lg border border-forest-200 bg-white px-6 py-3 text-sm font-bold text-forest-800 transition-all hover:-translate-y-0.5 hover:border-forest-400"
           >
             View All Lecturers
             <ArrowRight className="h-4 w-4" />

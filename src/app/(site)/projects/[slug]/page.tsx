@@ -238,7 +238,7 @@ export default async function ProjectDetailPage({
                 href={project.documentUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-3 rounded-xl border border-forest-100 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-gold-300 hover:shadow-md"
+                className="flex items-center gap-3 rounded-xl border border-forest-100 bg-white p-5 transition-transform hover:-translate-y-0.5 hover:border-gold-300"
               >
                 <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gold-500 text-white">
                   <Download className="h-5 w-5" />
@@ -260,7 +260,7 @@ export default async function ProjectDetailPage({
                 href={project.githubLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-3 rounded-xl border border-forest-100 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-gold-300 hover:shadow-md"
+                className="flex items-center gap-3 rounded-xl border border-forest-100 bg-white p-5 transition-transform hover:-translate-y-0.5 hover:border-gold-300"
               >
                 <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-forest-800 text-white">
                   <GitBranch className="h-5 w-5" />

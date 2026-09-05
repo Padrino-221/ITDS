@@ -140,6 +140,39 @@ model Setting {
 }
 
 // ---------------------------------------------------------------------------
+// IT Society — Student leadership (executives grouped by academic year).
+// Mirrors the School of Sciences feature: a tenure (academic year) holds a
+// set of student executives, and one tenure can be flagged as current.
+// ---------------------------------------------------------------------------
+
+model AcademicYear {
+  id        String            @id @default(cuid())
+  year      String            @unique // e.g. "2025/2026"
+  active    Boolean           @default(false)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  executives StudentExecutive[]
+
+  @@map("academic_years")
+}
+
+model StudentExecutive {
+  id             String       @id @default(cuid())
+  name           String
+  position       String // e.g. President, Secretary
+  photoUrl       String?
+  ordering       Int          @default(0)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  academicYearId String
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+
+  @@index([academicYearId])
+  @@map("student_executives")
+}
+
+// ---------------------------------------------------------------------------
 // SPMS Password Resets
 // ---------------------------------------------------------------------------
 

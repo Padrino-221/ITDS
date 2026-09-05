@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { BadgeCheck, ChevronDown, Menu, X } from "lucide-react";
-import { cn, LEARN_URL } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 type NavChild = { label: string; href: string };
 type NavItem = { label: string; href?: string; children?: NavChild[] };
@@ -33,7 +33,7 @@ const NAV: NavItem[] = [
     ],
   },
   { label: "Lecturers", href: "/lecturers" },
-  { label: "E-Learning", href: LEARN_URL },
+  { label: "E-Learning", href: "/learn" },
 ];
 
 export default function SiteHeader({
@@ -70,7 +70,7 @@ export default function SiteHeader({
         className={cn(
           "sticky top-0 z-50 border-b transition-all duration-300",
           scrolled
-            ? "border-forest-100 bg-white/95 backdrop-blur-md shadow-lg shadow-forest-950/5"
+            ? "border-forest-100 bg-white/95 backdrop-blur-md"
             : "border-transparent bg-white"
         )}
       >
@@ -103,7 +103,7 @@ export default function SiteHeader({
                     {item.label}
                     <ChevronDown className="h-3.5 w-3.5 transition-transform group-hover:rotate-180" />
                   </button>
-                  <div className="invisible absolute left-0 top-full z-50 w-56 translate-y-1 rounded-xl border border-forest-100 bg-white p-1.5 opacity-0 shadow-xl shadow-forest-950/10 transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+                  <div className="invisible absolute left-0 top-full z-50 w-56 translate-y-1 rounded-xl border border-forest-100 bg-white p-1.5 opacity-0 transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
                     {item.children.map((child) => (
                       <Link
                         key={child.href}
@@ -135,7 +135,7 @@ export default function SiteHeader({
           <div className="hidden items-center gap-3 lg:flex">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 rounded-lg bg-gold-500 px-5 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-gold-600 hover:shadow-lg hover:shadow-gold-500/25"
+              className="inline-flex items-center gap-2 rounded-lg bg-gold-500 px-5 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-gold-600"
             >
               Contact Us
             </Link>

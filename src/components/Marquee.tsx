@@ -22,7 +22,7 @@ export default function Marquee({
         className
       )}
     >
-      <div className="flex w-max animate-marquee motion-reduce:animate-none">
+      <div className="flex w-max animate-marquee">
         {duplicated.map((item, i) => (
           <Link
             key={`${item.label}-${i}`}

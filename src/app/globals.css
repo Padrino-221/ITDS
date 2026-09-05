@@ -51,6 +51,7 @@
   --animate-slide-in-right: slide-in-right 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-float: float 6s ease-in-out infinite;
   --animate-pulse-soft: pulse-soft 2s ease-in-out infinite;
+  --animate-kenburns: kenburns 18s ease-in-out infinite;
 
   @keyframes marquee {
     0% { transform: translateX(0); }
@@ -96,14 +97,10 @@
     0%, 100% { opacity: 1; }
     50% { opacity: 0.7; }
   }
-}
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  @keyframes kenburns {
+    0% { transform: scale(1) translate(0, 0); }
+    100% { transform: scale(1.15) translate(1.5%, -1.5%); }
   }
 }
 
@@ -182,8 +179,7 @@
     letter-spacing: -0.01em;
     padding: 0.625rem 1.25rem;
     transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-      background-color 0.2s ease,
-      box-shadow 0.2s ease;
+      background-color 0.2s ease;
     white-space: nowrap;
   }
 
@@ -198,7 +194,6 @@
 
   .btn-pill-accent:hover {
     background-color: var(--color-gold-600);
-    box-shadow: 0 4px 14px -3px var(--color-gold-500);
   }
 
   .btn-pill-dark {
@@ -208,7 +203,6 @@
 
   .btn-pill-dark:hover {
     background-color: var(--color-forest-700);
-    box-shadow: 0 4px 14px -3px var(--color-forest-800);
   }
 
   .prose-content p {

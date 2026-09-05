@@ -202,7 +202,7 @@ export default async function HomePage() {
 
               <Link
                 href="/about"
-                className="mt-8 inline-flex items-center gap-2 rounded-lg bg-gold-500 px-6 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-gold-600 hover:shadow-lg hover:shadow-gold-500/25"
+                className="mt-8 inline-flex items-center gap-2 rounded-lg bg-gold-500 px-6 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-gold-600"
               >
                 More About Us
                 <ArrowRight className="h-4 w-4" />
@@ -345,7 +345,7 @@ export default async function HomePage() {
           <div className="mt-10 text-center">
             <Link
               href="/research"
-              className="inline-flex items-center gap-2 rounded-lg border border-forest-200 bg-white px-6 py-3 text-sm font-bold text-forest-800 transition-all hover:-translate-y-0.5 hover:border-forest-400 hover:shadow-lg"
+              className="inline-flex items-center gap-2 rounded-lg border border-forest-200 bg-white px-6 py-3 text-sm font-bold text-forest-800 transition-all hover:-translate-y-0.5 hover:border-forest-400"
             >
               All Research Areas
               <ArrowRight className="h-4 w-4" />
@@ -370,7 +370,7 @@ export default async function HomePage() {
             <Reveal delay={120}>
               <Link
                 href="/projects"
-                className="inline-flex items-center gap-2 rounded-lg bg-forest-950 px-6 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-forest-800 hover:shadow-lg"
+                className="inline-flex items-center gap-2 rounded-lg bg-forest-950 px-6 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-forest-800"
               >
                 Browse All Projects
                 <ArrowRight className="h-4 w-4" />
@@ -401,7 +401,7 @@ export default async function HomePage() {
               </h2>
             </div>
           </div>
-          <div className="mt-12 flex gap-4 w-max animate-[marquee_40s_linear_infinite] motion-reduce:animate-none">
+          <div className="mt-12 flex gap-4 w-max animate-[marquee_40s_linear_infinite]">
             {[...gallery, ...gallery, ...gallery].map((item, i) => (
               <figure
                 key={`${item.id}-${i}`}
@@ -421,7 +421,7 @@ export default async function HomePage() {
             ))}
           </div>
           {/* Reverse row */}
-          <div className="mt-4 flex gap-4 w-max animate-[marquee_40s_linear_infinite_reverse] motion-reduce:animate-none">
+          <div className="mt-4 flex gap-4 w-max animate-[marquee_40s_linear_infinite_reverse]">
             {[...gallery, ...gallery, ...gallery].map((item, i) => (
               <figure
                 key={`${item.id}-rev-${i}`}

@@ -1,6 +1,7 @@
-import Link from "next/link";
-import { CheckCircle, Sparkles, Users } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import { PageHeader, SectionHeading } from "@/components/ui";
+import { ExecutivesSection } from "@/components/ExecutivesSection";
+import { getAcademicYears, getStudentExecutives } from "@/lib/data";
 import { getJSONSetting, getStringSetting } from "@/lib/settings";
 
 export const metadata = {
@@ -20,9 +21,11 @@ export const metadata = {
 export const revalidate = 3600;
 
 export default async function ItSocietyPage() {
-  const [story, objectives] = await Promise.all([
+  const [story, objectives, executives, academicYears] = await Promise.all([
     getStringSetting("its_story", ""),
     getJSONSetting<string[]>("its_objectives", []),
+    getStudentExecutives(),
+    getAcademicYears(),
   ]);
 
   return (
@@ -38,47 +41,25 @@ export default async function ItSocietyPage() {
       />
 
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-        <div className="grid items-center gap-12 lg:grid-cols-2">
+        <div className="grid items-start gap-12 lg:grid-cols-2">
           <div>
             <SectionHeading
               eyebrow="The Student Association"
               title="ITS — Empowering Student Innovators"
             />
             <p className="mt-5 leading-relaxed text-ink-soft">{story}</p>
-            <div className="mt-8 rounded-xl border border-gold-200 bg-gold-50 p-6">
-              <div className="flex items-center gap-3">
-                <Sparkles className="h-5 w-5 text-gold-600" />
-                <h3 className="font-display text-lg font-bold text-forest-900">
-                  Annual Flagship Event
-                </h3>
-              </div>
-              <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-                The <strong>UENR Tech Fair</strong> brings together hundreds of student
-                innovators, industry partners and the wider community every year to
-                showcase technology made in the ITDS Department.
-              </p>
-              <Link
-                href="/news"
-                className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-gold-700 transition-colors hover:text-gold-800"
-              >
-                Catch up on Tech Fair news →
-              </Link>
-            </div>
           </div>
 
-          <div className="rounded-xl border border-forest-100 bg-white p-8">
-            <div className="flex items-center gap-3">
-              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-forest-800 text-gold-300">
-                <Users className="h-6 w-6" />
-              </span>
-              <h3 className="font-display text-xl font-bold text-forest-900">
-                Society Objectives
-              </h3>
-            </div>
-            <ul className="mt-6 space-y-4">
+          <div>
+            <h3 className="font-display text-xl font-bold text-forest-900">
+              Society Objectives
+            </h3>
+            <ul className="mt-6 space-y-5">
               {objectives.map((objective) => (
                 <li key={objective} className="flex gap-3">
-                  <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-gold-600" />
+                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gold-50">
+                    <CheckCircle className="h-4 w-4 text-gold-600" />
+                  </span>
                   <p className="text-sm leading-relaxed text-ink-soft">{objective}</p>
                 </li>
               ))}
@@ -86,6 +67,8 @@ export default async function ItSocietyPage() {
           </div>
         </div>
       </section>
+
+      <ExecutivesSection executives={executives} academicYears={academicYears} />
     </>
   );
 }

@@ -162,7 +162,7 @@ export function LecturerCard({
   return (
     <Link
       href={`/lecturers/${lecturer.slug}`}
-      className="group block overflow-hidden rounded-3xl border border-forest-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+      className="group block overflow-hidden rounded-3xl border border-forest-100 bg-white transition-transform duration-300 hover:-translate-y-1"
     >
       {/* Photo */}
       <div className="relative h-72 overflow-hidden bg-forest-100">
@@ -182,7 +182,7 @@ export function LecturerCard({
           </div>
         )}
         {/* Bookmark icon */}
-        <div className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur-sm">
+        <div className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm">
           <Bookmark className="h-4 w-4 text-forest-600" />
         </div>
       </div>

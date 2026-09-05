@@ -39,7 +39,7 @@ export default async function ProgrammesPage() {
             <Link
               key={program.slug}
               href={`/programs/${program.slug}`}
-              className="group relative overflow-hidden rounded-2xl border border-forest-100 bg-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+              className="group relative overflow-hidden rounded-2xl border border-forest-100 bg-white p-8 transition-transform hover:-translate-y-1"
             >
               <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-forest-50 text-forest-700 transition-colors group-hover:bg-forest-900 group-hover:text-white">
                 <BookOpen className="h-6 w-6" />

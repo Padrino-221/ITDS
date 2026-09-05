@@ -69,7 +69,7 @@ export default function FAQSection({
                 </p>
                 <a
                   href="/contact"
-                  className="mt-4 inline-flex items-center gap-2 rounded-lg bg-gold-500 px-5 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-gold-600 hover:shadow-lg hover:shadow-gold-500/25"
+                  className="mt-4 inline-flex items-center gap-2 rounded-lg bg-gold-500 px-5 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-gold-600"
                 >
                   Contact Us
                 </a>
@@ -86,7 +86,7 @@ export default function FAQSection({
                   className={cn(
                     "rounded-xl border transition-all duration-300",
                     openIndex === i
-                      ? "border-forest-200 bg-white shadow-lg shadow-forest-950/5"
+                      ? "border-forest-200 bg-white"
                       : "border-forest-100 bg-white hover:border-forest-200"
                   )}
                 >
