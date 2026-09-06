@@ -1,5 +1,5 @@
 import { upsertExecutive } from "@/app/staff-panel/student-leadership/actions";
-import { AdminCard, Field, SaveButton, SecondaryLink, TextInput } from "../ui";
+import { AdminCard, Field, SaveButton, TextInput } from "../ui";
 import { ImageUpload } from "../ImageUpload";
 
 type ExecutiveInput = {
@@ -13,9 +13,11 @@ type ExecutiveInput = {
 export function ExecutiveForm({
   academicYearId,
   executive,
+  onCancel,
 }: {
   academicYearId: string;
   executive?: ExecutiveInput;
+  onCancel?: () => void;
 }) {
   return (
     <form action={upsertExecutive}>
@@ -48,9 +50,22 @@ export function ExecutiveForm({
         </div>
         <div className="mt-6 flex items-center gap-3 border-t border-forest-100 pt-6">
           <SaveButton />
-          <SecondaryLink href={`/staff-panel/student-leadership/${academicYearId}`}>
-            Cancel
-          </SecondaryLink>
+          {onCancel ? (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-forest-200 bg-white px-5 py-2.5 text-sm font-semibold text-forest-800 hover:border-forest-400"
+            >
+              Cancel
+            </button>
+          ) : (
+            <a
+              href={`/staff-panel/student-leadership/${academicYearId}`}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-forest-200 bg-white px-5 py-2.5 text-sm font-semibold text-forest-800 hover:border-forest-400"
+            >
+              Cancel
+            </a>
+          )}
         </div>
       </AdminCard>
     </form>

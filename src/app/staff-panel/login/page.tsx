@@ -3,13 +3,11 @@ import Image from "next/image";
 import LoginForm from "@/components/admin/LoginForm";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { learnUrl } from "@/lib/utils";
-
 export const metadata = { title: "Staff Login" };
 
 export default async function LoginPage() {
   const session = await getSession();
-  if (session) redirect(session.role === "LECTURER" ? learnUrl("/author") : "/staff-panel");
+  if (session) redirect(session.role === "LECTURER" ? "/learn/author" : "/staff-panel");
 
   return (
     <div className="flex min-h-dvh items-center justify-center bg-forest-950 px-4">

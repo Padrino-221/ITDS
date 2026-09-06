@@ -7,7 +7,7 @@ export function TenureForm() {
       <Field label="Academic Year" htmlFor="tenure-year" hint="e.g. 2025/2026" className="w-full max-w-xs">
         <TextInput id="tenure-year" name="year" required placeholder="2025/2026" />
       </Field>
-      <PrimaryButton className="mb-0">Add Tenure</PrimaryButton>
+      <PrimaryButton className="mb-6">Add Tenure</PrimaryButton>
     </form>
   );
 }

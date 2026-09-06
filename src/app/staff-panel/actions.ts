@@ -13,7 +13,7 @@ import {
   requireAdmin,
   requireAuth,
 } from "@/lib/auth";
-import { slugify, learnUrl } from "@/lib/utils";
+import { slugify } from "@/lib/utils";
 import { removeUploadFile } from "@/lib/uploads";
 import { str, opt, bool } from "@/lib/form-utils";
 
@@ -72,7 +72,7 @@ export async function login(prev: { error?: string }, formData: FormData) {
   // Lecturers don't get content management — they author e-learning lessons
   // on /learn, so send them straight to the author dashboard.
   if (user.role === "LECTURER") {
-    redirect(learnUrl("/author"));
+    redirect("/learn/author");
   }
   redirect("/staff-panel");
 }

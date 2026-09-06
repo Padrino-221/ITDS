@@ -23,7 +23,7 @@ import {
   X,
 } from "@phosphor-icons/react";
 import { useState } from "react";
-import { cn, learnUrl } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { logout } from "@/app/staff-panel/actions";
 import type { SessionUser } from "@/lib/auth";
 
@@ -60,9 +60,9 @@ const sections: Array<{
   {
     label: "E-Learning",
     items: [
-      { href: learnUrl("/author"), label: "Lesson Authoring", icon: ChalkboardTeacher, adminOnly: true },
-      { href: learnUrl("/manage"), label: "Courses & Topics", icon: TreeStructure, adminOnly: true },
-      { href: learnUrl("/review"), label: "Lesson Reviews", icon: ClipboardText, adminOnly: true },
+      { href: "/learn/author", label: "Lesson Authoring", icon: ChalkboardTeacher, adminOnly: true },
+      { href: "/learn/manage", label: "Courses & Topics", icon: TreeStructure, adminOnly: true },
+      { href: "/learn/review", label: "Lesson Reviews", icon: ClipboardText, adminOnly: true },
     ],
   },
   {

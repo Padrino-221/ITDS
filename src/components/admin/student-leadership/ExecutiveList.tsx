@@ -58,8 +58,8 @@ export function ExecutiveList({
         </button>
       </div>
 
-      {createOpen && <ExecutiveForm academicYearId={yearId} />}
-      {editExec && <ExecutiveForm academicYearId={yearId} executive={editExec} />}
+      {createOpen && <ExecutiveForm academicYearId={yearId} onCancel={() => setCreateOpen(false)} />}
+      {editExec && <ExecutiveForm academicYearId={yearId} executive={editExec} onCancel={() => setEditId(null)} />}
 
       <DataTable
         rows={executives}
