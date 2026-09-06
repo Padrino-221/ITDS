@@ -22,7 +22,7 @@ const NAV: NavItem[] = [
   { label: "News & Events", href: "/news" },
   { label: "Research", href: "/research" },
   {
-    label: "Programmes",
+    label: "Academics",
     children: [
       { label: "All Programmes", href: "/programs" },
       { label: "Undergraduate", href: "/programs/undergraduate" },
@@ -30,6 +30,7 @@ const NAV: NavItem[] = [
       { label: "MSc", href: "/programs/msc" },
       { label: "MPhil", href: "/programs/mphil" },
       { label: "PhD", href: "/programs/phd" },
+      { label: "Resources", href: "/resources" },
     ],
   },
   { label: "Lecturers", href: "/lecturers" },

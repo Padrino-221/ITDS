@@ -2,7 +2,21 @@ import { prisma } from "./prisma";
 
 export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024; // 5MB — matches ImageUpload
 
-/** Extension for a browser-reported image MIME type. */
+export const MAX_RESOURCE_BYTES = 10 * 1024 * 1024; // 10MB for documents
+
+export const ALLOWED_DOCUMENT_TYPES = new Set([
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  "text/plain",
+  "application/zip",
+]);
+
+/** Extension for a browser-reported MIME type (images + documents). */
 export function extForMime(mime: string): string {
   switch (mime) {
     case "image/png":
@@ -17,8 +31,26 @@ export function extForMime(mime: string): string {
       return ".avif";
     case "image/svg+xml":
       return ".svg";
+    case "application/pdf":
+      return ".pdf";
+    case "application/msword":
+      return ".doc";
+    case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+      return ".docx";
+    case "application/vnd.ms-excel":
+      return ".xls";
+    case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+      return ".xlsx";
+    case "application/vnd.ms-powerpoint":
+      return ".ppt";
+    case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+      return ".pptx";
+    case "text/plain":
+      return ".txt";
+    case "application/zip":
+      return ".zip";
     default:
-      return ".img";
+      return ".bin";
   }
 }
 
@@ -38,6 +70,24 @@ export function contentTypeFor(fileName: string): string {
       return "image/avif";
     case "svg":
       return "image/svg+xml";
+    case "pdf":
+      return "application/pdf";
+    case "doc":
+      return "application/msword";
+    case "docx":
+      return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    case "xls":
+      return "application/vnd.ms-excel";
+    case "xlsx":
+      return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    case "ppt":
+      return "application/vnd.ms-powerpoint";
+    case "pptx":
+      return "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+    case "txt":
+      return "text/plain";
+    case "zip":
+      return "application/zip";
     default:
       return "application/octet-stream";
   }

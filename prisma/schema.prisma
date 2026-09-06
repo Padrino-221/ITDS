@@ -152,8 +152,31 @@ model AcademicYear {
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt
   executives StudentExecutive[]
+  resources Resource[]
 
   @@map("academic_years")
+}
+
+enum ResourceCategory {
+  HANDBOOK
+  STUDENT_LIST
+  OTHER
+}
+
+model Resource {
+  id        String           @id @default(cuid())
+  title     String
+  description String         @default("")
+  fileUrl   String
+  fileName  String?
+  category  ResourceCategory @default(HANDBOOK)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  academicYearId String?
+  academicYear   AcademicYear? @relation(fields: [academicYearId], references: [id], onDelete: SetNull)
+
+  @@map("resources")
 }
 
 model StudentExecutive {
