@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import { getSession } from "@/lib/auth";
 import type { SessionRole } from "@/lib/auth";
 import { getSpmsSession } from "@/lib/spms-auth";
-import { extForMime, MAX_UPLOAD_BYTES, saveUpload } from "@/lib/uploads";
+import { compressImage, extForMime, isCompressibleImage, MAX_UPLOAD_BYTES, saveUpload } from "@/lib/uploads";
 
 // Staff accounts and SPMS supervisors may upload files.
 const STAFF_ROLES: SessionRole[] = ["ADMIN", "EDITOR", "LECTURER"];
@@ -64,7 +64,10 @@ export async function POST(request: Request) {
     );
   }
 
-  const bytes = new Uint8Array(await file.arrayBuffer());
+  let bytes = new Uint8Array(await file.arrayBuffer()) as Uint8Array<ArrayBuffer>;
+  if (isCompressibleImage(file.type)) {
+    bytes = await compressImage(bytes, file.type);
+  }
   const name = `${Date.now()}-${randomUUID().slice(0, 8)}${extForMime(file.type)}`;
   await saveUpload(name, file.type, bytes);
 

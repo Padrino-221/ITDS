@@ -2,7 +2,14 @@ import { NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { getSession } from "@/lib/auth";
 import type { SessionRole } from "@/lib/auth";
-import { ALLOWED_DOCUMENT_TYPES, extForMime, MAX_RESOURCE_BYTES, saveUpload } from "@/lib/uploads";
+import {
+  ALLOWED_DOCUMENT_TYPES,
+  compressImage,
+  extForMime,
+  isCompressibleImage,
+  MAX_RESOURCE_BYTES,
+  saveUpload,
+} from "@/lib/uploads";
 
 const STAFF_ROLES: SessionRole[] = ["ADMIN", "EDITOR", "LECTURER"];
 
@@ -38,7 +45,10 @@ export async function POST(request: Request) {
     );
   }
 
-  const bytes = new Uint8Array(await file.arrayBuffer());
+  let bytes = new Uint8Array(await file.arrayBuffer()) as Uint8Array<ArrayBuffer>;
+  if (isCompressibleImage(file.type)) {
+    bytes = await compressImage(bytes, file.type);
+  }
   const name = `${Date.now()}-${randomUUID().slice(0, 8)}${extForMime(file.type)}`;
   await saveUpload(name, file.type, bytes);
 

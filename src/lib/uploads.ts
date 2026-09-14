@@ -1,8 +1,72 @@
+import sharp from "sharp";
 import { prisma } from "./prisma";
 
 export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024; // 5MB — matches ImageUpload
 
 export const MAX_RESOURCE_BYTES = 10 * 1024 * 1024; // 10MB for documents
+
+export const MAX_IMAGE_DIMENSION = 1920;
+export const IMAGE_JPEG_QUALITY = 80;
+export const IMAGE_WEBP_QUALITY = 80;
+export const IMAGE_AVIF_QUALITY = 50;
+export const IMAGE_PNG_COMPRESSION_LEVEL = 9;
+
+const COMPRESSIBLE_IMAGE_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+]);
+
+export function isCompressibleImage(mime: string): boolean {
+  return COMPRESSIBLE_IMAGE_TYPES.has(mime);
+}
+
+/**
+ * Compress and resize a raster image via sharp.
+ * - Auto-rotates based on EXIF.
+ * - Resizes to fit within MAX_IMAGE_DIMENSION (preserves aspect, no enlargement).
+ * - Re-encodes with quality settings appropriate for the format.
+ * Returns the original bytes on failure or for non-compressible types.
+ */
+export async function compressImage(
+  input: Uint8Array<ArrayBuffer>,
+  mime: string
+): Promise<Uint8Array<ArrayBuffer>> {
+  if (!isCompressibleImage(mime)) return input;
+  try {
+    const pipeline = sharp(Buffer.from(input)).rotate().resize({
+      width: MAX_IMAGE_DIMENSION,
+      height: MAX_IMAGE_DIMENSION,
+      fit: "inside",
+      withoutEnlargement: true,
+    });
+
+    let buffer: Buffer;
+    switch (mime) {
+      case "image/jpeg":
+        buffer = await pipeline.jpeg({ quality: IMAGE_JPEG_QUALITY, mozjpeg: true }).toBuffer();
+        break;
+      case "image/png":
+        buffer = await pipeline.png({ compressionLevel: IMAGE_PNG_COMPRESSION_LEVEL, palette: true }).toBuffer();
+        break;
+      case "image/webp":
+        buffer = await pipeline.webp({ quality: IMAGE_WEBP_QUALITY }).toBuffer();
+        break;
+      case "image/avif":
+        buffer = await pipeline.avif({ quality: IMAGE_AVIF_QUALITY }).toBuffer();
+        break;
+      default:
+        return input;
+    }
+
+    // Only use compressed version if it's actually smaller (e.g. tiny icons)
+    if (buffer.length >= input.length) return input;
+    return new Uint8Array(buffer) as Uint8Array<ArrayBuffer>;
+  } catch {
+    return input;
+  }
+}
 
 export const ALLOWED_DOCUMENT_TYPES = new Set([
   "application/pdf",
