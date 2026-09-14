@@ -8,6 +8,7 @@ const TOASTS = {
   "year-required": "A year is required.",
   "year-exists": "That academic year already exists.",
   "year-created": "Tenure created.",
+  "year-updated": "Tenure updated.",
   "year-current": "Current tenure updated.",
   "year-deleted": "Tenure deleted.",
   "year-not-found": "Tenure not found.",

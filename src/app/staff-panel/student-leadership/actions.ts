@@ -37,6 +37,28 @@ export async function createTenure(formData: FormData) {
   redirect("/staff-panel/student-leadership?toast=year-created");
 }
 
+export async function updateTenure(id: string, formData: FormData) {
+  await requireAuth();
+  const year = str(formData, "year");
+
+  if (!year) {
+    redirect("/staff-panel/student-leadership?toast=year-required");
+  }
+
+  const clash = await prisma.academicYear.findFirst({
+    where: { year, NOT: { id } },
+    select: { id: true },
+  });
+  if (clash) {
+    redirect("/staff-panel/student-leadership?toast=year-exists");
+  }
+
+  await prisma.academicYear.update({ where: { id }, data: { year } });
+
+  revalidateLeadership();
+  redirect("/staff-panel/student-leadership?toast=year-updated");
+}
+
 export async function setCurrentTenure(id: string) {
   await requireAuth();
   if (!id) return;

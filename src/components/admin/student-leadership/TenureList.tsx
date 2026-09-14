@@ -1,8 +1,12 @@
 import Link from "next/link";
-import { Users } from "lucide-react";
-import { DataTable, SecondaryLink } from "../ui";
+import { PenLine, Users } from "lucide-react";
+import { DataTable, Field, PrimaryButton, SecondaryLink, baseInput } from "../ui";
 import DeleteButton from "../DeleteButton";
-import { deleteTenure, setCurrentTenure } from "@/app/staff-panel/student-leadership/actions";
+import {
+  deleteTenure,
+  setCurrentTenure,
+  updateTenure,
+} from "@/app/staff-panel/student-leadership/actions";
 
 export type TenureRow = {
   id: string;
@@ -60,15 +64,41 @@ export function TenureList({ tenures }: { tenures: TenureRow[] }) {
           header: "Actions",
           align: "right",
           cell: (t) => (
-            <div className="flex justify-end gap-2">
-              <SecondaryLink href={`/staff-panel/student-leadership/${t.id}`} size="sm">
-                <Users className="h-3.5 w-3.5" />
-                Manage
-              </SecondaryLink>
-              <DeleteButton
-                action={deleteTenure.bind(null, t.id)}
-                confirmText="Deleting this tenure also removes all executives in it. Continue?"
-              />
+            <div className="flex flex-col items-end gap-2">
+              <div className="flex justify-end gap-2">
+                <details className="group">
+                  <summary className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-forest-200 bg-white px-3 py-1.5 text-xs font-semibold text-forest-800 transition-colors hover:border-forest-400 [&::-webkit-details-marker]:hidden list-none">
+                    <PenLine className="h-3.5 w-3.5" />
+                    Edit
+                  </summary>
+                  <form
+                    action={updateTenure.bind(null, t.id)}
+                    className="mt-2 w-56 space-y-3 rounded-xl border border-forest-100 bg-forest-50/40 p-4 text-left"
+                  >
+                    <Field label="Academic Year" htmlFor={`tenure-year-${t.id}`}>
+                      <input
+                        id={`tenure-year-${t.id}`}
+                        name="year"
+                        defaultValue={t.year}
+                        required
+                        placeholder="e.g. 2025/2026"
+                        className={baseInput}
+                      />
+                    </Field>
+                    <PrimaryButton type="submit" className="w-full">
+                      Save
+                    </PrimaryButton>
+                  </form>
+                </details>
+                <SecondaryLink href={`/staff-panel/student-leadership/${t.id}`} size="sm">
+                  <Users className="h-3.5 w-3.5" />
+                  Manage
+                </SecondaryLink>
+                <DeleteButton
+                  action={deleteTenure.bind(null, t.id)}
+                  confirmText="Deleting this tenure also removes all executives in it. Continue?"
+                />
+              </div>
             </div>
           ),
         },
