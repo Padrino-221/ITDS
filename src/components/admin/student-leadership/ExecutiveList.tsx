@@ -19,10 +19,14 @@ export function ExecutiveList({
   yearId,
   yearLabel,
   executives,
+  total,
+  pagination,
 }: {
   yearId: string;
   yearLabel: string;
   executives: ExecutiveRow[];
+  total: number;
+  pagination: { page: number; totalPages: number; basePath: string };
 }) {
   const [createOpen, setCreateOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
@@ -33,8 +37,8 @@ export function ExecutiveList({
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="font-display text-lg font-bold text-forest-900">
-          {yearLabel} — {executives.length} executive
-          {executives.length !== 1 ? "s" : ""}
+          {yearLabel} — {total} executive
+          {total !== 1 ? "s" : ""}
         </h2>
         <button
           type="button"
@@ -65,6 +69,7 @@ export function ExecutiveList({
         rows={executives}
         getKey={(e) => e.id}
         emptyMessage={`No executives yet for ${yearLabel} — add the council members for this tenure.`}
+        pagination={pagination}
         columns={[
           {
             key: "name",

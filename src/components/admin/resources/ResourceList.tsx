@@ -14,9 +14,13 @@ type ResourceRow = Resource & { academicYear: { year: string } | null };
 export function ResourceList({
   resources,
   academicYears,
+  total,
+  pagination,
 }: {
   resources: ResourceRow[];
   academicYears: AcademicYear[];
+  total: number;
+  pagination: { page: number; totalPages: number; basePath: string };
 }) {
   const [createOpen, setCreateOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
@@ -69,7 +73,7 @@ export function ResourceList({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-ink-soft">{resources.length} resource{resources.length !== 1 ? "s" : ""}</p>
+        <p className="text-sm text-ink-soft">{total} resource{total !== 1 ? "s" : ""}</p>
         <button
           type="button"
           onClick={() => {
@@ -85,7 +89,13 @@ export function ResourceList({
       {createOpen && <ResourceForm academicYears={academicYears} />}
       {editResource && <ResourceForm resource={editResource} academicYears={academicYears} />}
 
-      <DataTable columns={columns} rows={resources} getKey={(r) => r.id} emptyMessage="No resources yet. Upload your first document." />
+      <DataTable
+        columns={columns}
+        rows={resources}
+        getKey={(r) => r.id}
+        emptyMessage="No resources yet. Upload your first document."
+        pagination={pagination}
+      />
     </div>
   );
 }

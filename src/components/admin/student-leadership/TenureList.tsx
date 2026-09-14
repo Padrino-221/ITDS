@@ -15,12 +15,19 @@ export type TenureRow = {
   executiveCount: number;
 };
 
-export function TenureList({ tenures }: { tenures: TenureRow[] }) {
+export function TenureList({
+  tenures,
+  pagination,
+}: {
+  tenures: TenureRow[];
+  pagination: { page: number; totalPages: number; basePath: string };
+}) {
   return (
     <DataTable
       rows={tenures}
       getKey={(t) => t.id}
       emptyMessage="No tenures yet — create the current academic year to start adding executives."
+      pagination={pagination}
       columns={[
         {
           key: "year",

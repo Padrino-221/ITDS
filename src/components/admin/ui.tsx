@@ -258,7 +258,11 @@ export function Pagination({
   totalPages: number;
   basePath: string;
 }) {
-  const href = (p: number) => `${basePath}?page=${p}`;
+  // Pagination only appears once there is more than one page of results.
+  if (totalPages <= 1) return null;
+
+  const href = (p: number) =>
+    `${basePath}${basePath.includes("?") ? "&" : "?"}page=${p}`;
 
   return (
     <nav className="flex items-center justify-between rounded-xl border border-forest-100 bg-white px-5 py-3 text-sm" aria-label="Pagination">

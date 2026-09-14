@@ -4,6 +4,7 @@ import { requireSpmsAdmin } from "@/lib/spms-auth";
 import {
   AdminPageHeader,
   DataTable,
+  PAGE_SIZE,
   PrimaryLink,
   SecondaryLink,
 } from "@/components/admin/ui";
@@ -16,27 +17,35 @@ export const metadata = { title: "Users" };
 export default async function SpmsUsersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ created?: string; tempPassword?: string }>;
+  searchParams: Promise<{ created?: string; tempPassword?: string; page?: string }>;
 }) {
   await requireSpmsAdmin();
   const params = await searchParams;
+  const page = Math.max(1, parseInt(params.page ?? "1", 10) || 1);
 
-  const users = await prisma.supervisor.findMany({
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      createdAt: true,
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const [users, total] = await Promise.all([
+    prisma.supervisor.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.supervisor.count(),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
 
   return (
     <div className="space-y-6">
       <AdminPageHeader
         title="Users"
-        description={`${users.length} user${users.length !== 1 ? "s" : ""} total`}
+        description={`${total} user${total !== 1 ? "s" : ""} total`}
         action={
           <PrimaryLink href="/spms/users/new">
             + Add User
@@ -67,6 +76,7 @@ export default async function SpmsUsersPage({
         rows={users}
         getKey={(user) => user.id}
         emptyMessage="No users found."
+        pagination={{ page: safePage, totalPages, basePath: "/spms/users" }}
         columns={[
 
           {
