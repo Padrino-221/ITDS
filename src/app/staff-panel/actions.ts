@@ -392,6 +392,28 @@ export async function deleteMessage(id: string) {
 }
 
 // ------------------------------------------------------------------
+// Alumni survey responses
+// ------------------------------------------------------------------
+
+export async function toggleAlumniSurveyRead(id: string) {
+  await requireAuth();
+  const response = await prisma.alumniSurveyResponse.findUnique({ where: { id } });
+  if (response) {
+    await prisma.alumniSurveyResponse.update({
+      where: { id },
+      data: { read: !response.read },
+    });
+  }
+  revalidatePath("/staff-panel/alumni-survey");
+}
+
+export async function deleteAlumniSurveyResponse(id: string) {
+  await requireAuth();
+  await prisma.alumniSurveyResponse.delete({ where: { id } });
+  revalidatePath("/staff-panel/alumni-survey");
+}
+
+// ------------------------------------------------------------------
 // Newsletter subscribers
 // ------------------------------------------------------------------
 

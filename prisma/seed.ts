@@ -187,7 +187,7 @@ image: img("hero/slide3.jpg"),
       JSON.stringify([
         { title: "Project Works", description: "Browse all student project works uploaded on the platform.", href: "/projects", icon: "folder" },
         { title: "News & Events", description: "Get the latest updates on News & Events in the ITDS Department.", href: "/news", icon: "newspaper" },
-        { title: "ITDS Alumni Survey", description: "Alumni survey for academic quality enhancement.", href: "/contact", icon: "clipboard" },
+        { title: "ITDS Alumni Survey", description: "Alumni survey for academic quality enhancement.", href: "/alumni-survey", icon: "clipboard" },
         { title: "UENR Tech Fair Gallery", description: "Click to view UENR TECH FAIR 2026 images.", href: "/news", icon: "image" },
       ]),
     ],

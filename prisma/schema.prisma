@@ -97,7 +97,11 @@ model Project {
   objective    String? // Project main objective
   groupMembers String? // Group member names
   githubLink   String? // GitHub repository URL
+  researchAreaId String?
+  researchArea   ResearchArea? @relation(fields: [researchAreaId], references: [id], onDelete: SetNull)
   createdAt    DateTime    @default(now())
+
+  @@index([researchAreaId])
 }
 
 model ResearchArea {
@@ -108,6 +112,7 @@ model ResearchArea {
   image       String?
   icon        String?
   order       Int      @default(0)
+  projects    Project[]
   createdAt   DateTime @default(now())
 }
 
@@ -119,6 +124,27 @@ model ContactMessage {
   message   String
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
+}
+
+model AlumniSurveyResponse {
+  id               String   @id @default(cuid())
+  fullName         String
+  email            String
+  phone            String?
+  graduationYear   String
+  programme        String
+  employmentStatus String
+  employer         String?
+  jobTitle         String?
+  industry         String?
+  preparationRating Int
+  curriculumRating Int
+  recommendRating  Int
+  skillsFeedback   String?
+  feedback         String?
+  willingToMentor  Boolean  @default(false)
+  read             Boolean  @default(false)
+  createdAt        DateTime @default(now())
 }
 
 model NewsletterSubscriber {
@@ -281,7 +307,7 @@ model Subject {
   name             String
   slug             String   @unique
   description      String?
-  certificatePrice Int?     // Price in GHS cents (e.g. 5000 = GHS 50.00), null = no certificate available
+  certificatePrice Int?     // Deprecated: certificates are now free. Retained for historical data.
   topics           Topic[]
   certificates     Certificate[]
   createdAt        DateTime @default(now())
@@ -414,8 +440,8 @@ model Certificate {
   learner      Learner  @relation(fields: [learnerId], references: [id], onDelete: Cascade)
   subjectId    String
   subject      Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
-  paystackRef  String?  @unique // Paystack transaction reference
-  amountPaid   Int      // Amount paid in GHS cents
+  paystackRef  String?  @unique // Historical: Paystack reference for paid certificates (null for free ones)
+  amountPaid   Int      // Historical: amount paid in GHS cents (0 for free certificates)
   issuedAt     DateTime @default(now())
   certificateNo String  @unique // e.g. ITDS-2026-WEB-001
 

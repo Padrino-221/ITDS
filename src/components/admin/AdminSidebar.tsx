@@ -54,6 +54,7 @@ const sections: Array<{
     editorOnly: true,
     items: [
       { href: "/staff-panel/messages", label: "Messages", icon: Tray },
+      { href: "/staff-panel/alumni-survey", label: "Alumni Survey", icon: ClipboardText },
       { href: "/staff-panel/subscribers", label: "Subscribers", icon: EnvelopeSimple },
     ],
   },
