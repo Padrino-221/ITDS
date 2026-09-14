@@ -1,5 +1,5 @@
-import Image from "next/image";
-import { PageHeader, SectionHeading } from "@/components/ui";
+import { PageHeader } from "@/components/ui";
+import { ResearchAreaCard } from "@/components/cards";
 import { getResearchAreas } from "@/lib/data";
 
 export const metadata = {
@@ -27,32 +27,9 @@ export default async function ResearchPage() {
       />
 
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="space-y-20">
-          {areas.map((area, i) => (
-            <div
-              key={area.id}
-              id={area.slug}
-              className="grid scroll-mt-28 items-center gap-10 lg:grid-cols-2"
-            >
-              <div className={i % 2 === 1 ? "lg:order-2" : ""}>
-                <div className="relative overflow-hidden rounded-xl">
-                  <Image
-                    src={area.image ?? "/images/research/ai.jpg"}
-                    alt={area.title}
-                    width={720}
-                    height={460}
-                    className="h-[340px] w-full object-cover"
-                  />
-                </div>
-              </div>
-              <div className={i % 2 === 1 ? "lg:order-1" : ""}>
-                <SectionHeading
-                  eyebrow={`Research Area ${String(i + 1).padStart(2, "0")}`}
-                  title={area.title}
-                />
-                <p className="mt-4 leading-relaxed text-ink-soft">{area.description}</p>
-              </div>
-            </div>
+        <div className="grid gap-6 sm:grid-cols-2">
+          {areas.map((area) => (
+            <ResearchAreaCard key={area.id} area={area} />
           ))}
         </div>
       </section>

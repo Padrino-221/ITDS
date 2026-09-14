@@ -190,6 +190,18 @@ export const getResearchAreas = cache(async () =>
   prisma.researchArea.findMany({ orderBy: { order: "asc" } })
 );
 
+export const getResearchAreaBySlug = cache(async (slug: string) =>
+  prisma.researchArea.findUnique({ where: { slug } })
+);
+
+export const getProjectsByResearchArea = cache(async (researchAreaId: string) =>
+  prisma.project.findMany({
+    where: { published: true, researchAreaId },
+    include: { supervisor: true },
+    orderBy: { createdAt: "desc" },
+  })
+);
+
 export const getGallery = cache(async () =>
   prisma.galleryImage.findMany({ orderBy: { order: "asc" } })
 );

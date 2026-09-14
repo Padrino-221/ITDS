@@ -146,6 +146,7 @@ export async function createSpmsProject(formData: FormData) {
   const githubLink = opt(formData, "githubLink");
   const documentUrl = opt(formData, "documentUrl");
   const documentName = opt(formData, "documentName");
+  const researchAreaId = opt(formData, "researchAreaId");
 
   const slug = await uniqueProjectSlug(title);
 
@@ -164,6 +165,7 @@ export async function createSpmsProject(formData: FormData) {
       githubLink,
       documentUrl,
       documentName,
+      researchAreaId,
       published: true,
     },
   });
@@ -194,6 +196,7 @@ export async function updateSpmsProject(id: string, formData: FormData) {
   const githubLink = opt(formData, "githubLink");
   const documentUrl = opt(formData, "documentUrl");
   const documentName = opt(formData, "documentName");
+  const researchAreaId = opt(formData, "researchAreaId");
 
   // Clean up old document file when replaced
   const current = await prisma.project.findUnique({ where: { id }, select: { documentUrl: true } });
@@ -213,6 +216,7 @@ export async function updateSpmsProject(id: string, formData: FormData) {
       objective,
       groupMembers,
       githubLink,
+      researchAreaId,
       ...(documentUrl && { documentUrl }),
       ...(documentName && { documentName }),
     },

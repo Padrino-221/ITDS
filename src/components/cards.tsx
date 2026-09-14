@@ -232,7 +232,7 @@ export function ResearchAreaCard({ area }: { area: ResearchArea }) {
   const Icon = researchIcons[area.icon ?? ""] ?? Globe;
   return (
     <Link
-      href={`/research#${area.slug}`}
+      href={`/research/${area.slug}`}
       className="group flex flex-col rounded-2xl border border-forest-100 bg-white p-6 transition-all duration-300 hover:-translate-y-2 hover:border-gold-300"
     >
       <span className="flex h-14 w-14 items-center justify-center rounded-xl bg-forest-50 text-forest-700 transition-colors group-hover:bg-gold-500 group-hover:text-white">
