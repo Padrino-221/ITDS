@@ -51,7 +51,6 @@ export async function seedLearn(
     name: string;
     slug: string;
     description: string;
-    certificatePrice?: number; // GHS pesewas (3000 = GHS 30.00); omit = certificates disabled
     topics: SeedTopic[];
   };
 
@@ -1721,7 +1720,6 @@ export async function seedLearn(
       slug: "artificial-intelligence-basics",
       description:
         "Discover how machines learn — from the core ideas of AI to training and evaluating simple models responsibly.",
-      certificatePrice: 3000, // GHS 30.00
       topics: [
         {
           title: "Foundations of AI",
@@ -2147,17 +2145,10 @@ export async function seedLearn(
     }
   }
 
-  // Certificate pricing + topic exams. Exams replace their questions on every
-  // non-bootstrap run so seed edits propagate (same contract as lessons).
+  // Topic exams. Exams replace their questions on every non-bootstrap run so
+  // seed edits propagate (same contract as lessons).
   for (const s of learnSubjects) {
     const subject = await prisma.subject.findUniqueOrThrow({ where: { slug: s.slug } });
-
-    if (typeof s.certificatePrice === "number") {
-      await prisma.subject.update({
-        where: { id: subject.id },
-        data: { certificatePrice: s.certificatePrice },
-      });
-    }
 
     for (const t of s.topics) {
       if (!t.exam) continue;

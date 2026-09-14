@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Award,
   CircleUserRound,
   ListTree,
   LogOut,
@@ -120,6 +121,14 @@ export default function AccountMenu() {
         >
           <CircleUserRound className="h-4 w-4" />
           My Progress
+        </Link>
+        <Link
+          href={learnUrl("/certificate")}
+          className={linkClass}
+          onClick={() => setOpen(false)}
+        >
+          <Award className="h-4 w-4" />
+          My Certificates
         </Link>
       </AccountArea>
     );

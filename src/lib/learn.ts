@@ -584,6 +584,18 @@ export async function checkCertificateEligibilityFor(
   return { eligible: true, hasCertificate: false };
 }
 
+/**
+ * Generate a certificate number.
+ * Format: ITDS-YYYY-SUBJECT-NNN
+ */
+export function generateCertificateNo(subjectSlug: string): string {
+  const year = new Date().getFullYear();
+  const rand = Math.floor(Math.random() * 999)
+    .toString()
+    .padStart(3, "0");
+  return `ITDS-${year}-${subjectSlug.slice(0, 3).toUpperCase()}-${rand}`;
+}
+
 export type CertificateVerification = {
   certificateNo: string;
   learnerName: string;

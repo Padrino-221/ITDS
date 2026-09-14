@@ -124,23 +124,6 @@ export default async function ManageCurriculumPage() {
                         placeholder="Short description (optional)"
                         className={cn(inputClass, "resize-y")}
                       />
-                      <div>
-                        <label className="mb-1 block text-xs font-bold uppercase tracking-wider text-ink-soft">
-                          Certificate Price (GHS)
-                        </label>
-                        <input
-                          name="certificatePrice"
-                          type="number"
-                          min={0}
-                          step={0.01}
-                          defaultValue={subject.certificatePrice ? (subject.certificatePrice / 100).toFixed(2) : ""}
-                          placeholder="Leave empty if no certificate"
-                          className={cn(inputClass, "max-w-[200px]")}
-                        />
-                        <p className="mt-1 text-xs text-ink-soft">
-                          Price in GHS. Leave empty to disable certificates.
-                        </p>
-                      </div>
                       <button type="submit" className={saveButtonClass}>
                         Save course
                       </button>
@@ -284,22 +267,6 @@ export default async function ManageCurriculumPage() {
               placeholder="Short description (optional)"
               className={cn(inputClass, "resize-y")}
             />
-            <div>
-              <label className="mb-1 block text-xs font-bold uppercase tracking-wider text-ink-soft">
-                Certificate Price (GHS)
-              </label>
-              <input
-                name="certificatePrice"
-                type="number"
-                min={0}
-                step={0.01}
-                placeholder="Leave empty if no certificate"
-                className={cn(inputClass, "max-w-[200px]")}
-              />
-              <p className="mt-1 text-xs text-ink-soft">
-                Price in GHS. Leave empty to disable certificates.
-              </p>
-            </div>
             <button type="submit" className={saveButtonClass}>
               Create course
             </button>

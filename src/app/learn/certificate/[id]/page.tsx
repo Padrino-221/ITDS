@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { requireLearner } from "@/lib/learn-auth";
 import { prisma } from "@/lib/prisma";
+import { getContact } from "@/lib/settings";
 import CertificateView from "@/components/learn/CertificateView";
 
 export const metadata = { title: "Certificate" };
@@ -22,6 +23,8 @@ export default async function CertificateDetailPage({
     notFound();
   }
 
+  const contact = await getContact();
+
   return (
     <div className="min-h-screen bg-paper py-8 print:bg-white print:p-0">
       <CertificateView
@@ -31,6 +34,7 @@ export default async function CertificateDetailPage({
           learnerName: learner.name,
           subjectName: certificate.subject.name,
         }}
+        contact={{ phone: contact.phone, email: contact.email, hours: contact.hours }}
       />
     </div>
   );

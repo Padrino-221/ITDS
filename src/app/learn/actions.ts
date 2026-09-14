@@ -18,7 +18,7 @@ import {
 import { absoluteUrl, slugify, learnUrl } from "@/lib/utils";
 import { str, opt, bool } from "@/lib/form-utils";
 import type { ContentBlock, QuizQuestion, ExamQuestionInput } from "@/lib/learn";
-import { checkCertificateEligibilityFor } from "@/lib/learn";
+import { checkCertificateEligibilityFor, generateCertificateNo } from "@/lib/learn";
 
 // ---------------------------------------------------------------------------
 // Auth rate limiting (in-memory sliding window — fine for a single instance)
@@ -442,20 +442,13 @@ export async function createSubject(formData: FormData) {
   await requireRole(["ADMIN"], absoluteUrl("/staff-panel/login"));
   const name = str(formData, "name");
   const description = str(formData, "description");
-  const certificatePriceRaw = formData.get("certificatePrice");
-  const certificatePrice = certificatePriceRaw && certificatePriceRaw !== ""
-    ? Math.round(Number(certificatePriceRaw) * 100) // Convert GHS to pesewas
-    : null;
-  if (certificatePrice !== null && certificatePrice < 100) {
-    throw new Error("Certificate price must be at least GHS 1.00.");
-  }
   if (name.length < 2) throw new Error("Course name is required.");
 
   const slug = slugify(name) || "subject";
   const existing = await prisma.subject.findUnique({ where: { slug } });
   if (existing) throw new Error("A course with this name already exists.");
 
-  await prisma.subject.create({ data: { name, slug, description: description || null, certificatePrice } });
+  await prisma.subject.create({ data: { name, slug, description: description || null } });
   revalidateLearn();
   redirect(learnUrl("/manage?created=subject"));
 }
@@ -483,13 +476,6 @@ export async function updateSubject(formData: FormData) {
   const id = str(formData, "subjectId");
   const name = str(formData, "name");
   const description = opt(formData, "description");
-  const certificatePriceRaw = formData.get("certificatePrice");
-  const certificatePrice = certificatePriceRaw && certificatePriceRaw !== ""
-    ? Math.round(Number(certificatePriceRaw) * 100) // Convert GHS to pesewas
-    : null;
-  if (certificatePrice !== null && certificatePrice < 100) {
-    throw new Error("Certificate price must be at least GHS 1.00.");
-  }
   if (name.length < 2) throw new Error("Course name is required.");
 
   const existing = await prisma.subject.findUnique({ where: { id } });
@@ -499,7 +485,7 @@ export async function updateSubject(formData: FormData) {
   const duplicate = await prisma.subject.findFirst({ where: { slug, NOT: { id } } });
   if (duplicate) throw new Error("A course with this name already exists.");
 
-  await prisma.subject.update({ where: { id }, data: { name, slug, description, certificatePrice } });
+  await prisma.subject.update({ where: { id }, data: { name, slug, description } });
   revalidateLearn();
   redirect(learnUrl("/manage?updated=subject"));
 }
@@ -825,124 +811,76 @@ export async function submitExamAttempt(attemptId: string, formData: FormData) {
 // Certificates
 // ---------------------------------------------------------------------------
 
-import {
-  initializeTransaction,
-  verifyTransaction,
-  generateCertificateNo,
-} from "@/lib/paystack";
-
-/** Check if a learner is eligible for a certificate (all lessons completed). */
-export async function checkCertificateEligibility(subjectId: string) {
-  const learner = await requireLearner();
-  return checkCertificateEligibilityFor(learner.id, subjectId);
-}
-
-/** Initialize a certificate payment via Paystack. */
-export async function initiateCertificatePayment(subjectId: string) {
+/**
+ * Issue a free certificate for a course the learner has fully completed.
+ *
+ * Soft copies are free. Printed copies are requested from the department and
+ * paid for offline — no payment is handled in the app. Returns the existing
+ * certificate if one was already issued, otherwise creates one.
+ */
+export async function claimCertificate(
+  subjectId: string
+): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
   const learner = await requireLearner();
 
-  // Check eligibility
-  const eligibility = await checkCertificateEligibility(subjectId);
-  if (eligibility.hasCertificate) {
-    throw new Error("You already have a certificate for this course.");
+  const eligibility = await checkCertificateEligibilityFor(learner.id, subjectId);
+  if (eligibility.hasCertificate && eligibility.certificate) {
+    return { ok: true, id: eligibility.certificate.id };
   }
   if (!eligibility.eligible) {
-    throw new Error(eligibility.reason ?? "Not eligible for certificate.");
+    return {
+      ok: false,
+      error: eligibility.reason ?? "You are not eligible for a certificate yet.",
+    };
   }
 
-  // Get subject price
   const subject = await prisma.subject.findUnique({ where: { id: subjectId } });
-  if (!subject) throw new Error("Course not found.");
-  if (!subject.certificatePrice) throw new Error("Certificates are not available for this course.");
+  if (!subject) return { ok: false, error: "Course not found." };
 
-  // Initialize Paystack transaction
-  const reference = `CERT-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-  const transaction = await initializeTransaction({
-    email: learner.email,
-    amount: subject.certificatePrice, // Already in GHS pesewas
-    reference,
-    metadata: {
-      learnerId: learner.id,
-      subjectId,
-      learnerName: learner.name,
-      subjectName: subject.name,
-      type: "certificate",
-    },
-  });
-
-  return { authorizationUrl: transaction.authorization_url, reference };
-}
-
-/** Verify payment and issue certificate. */
-export async function verifyCertificatePayment(reference: string) {
-  const learner = await requireLearner();
-
-  // Verify with Paystack
-  const verification = await verifyTransaction(reference);
-  if (verification.status !== "success") {
-    throw new Error("Payment was not successful.");
-  }
-
-  const metadata = verification.metadata as {
-    learnerId?: string;
-    subjectId?: string;
-  };
-
-  if (metadata.learnerId !== learner.id) {
-    throw new Error("Payment does not belong to this user.");
-  }
-
-  if (!metadata.subjectId) throw new Error("Invalid payment metadata.");
-
-  // Check if certificate already exists
-  const existing = await prisma.certificate.findUnique({
-    where: { learnerId_subjectId: { learnerId: learner.id, subjectId: metadata.subjectId } },
-  });
-  if (existing) return existing;
-
-  // Get subject for certificate number
-  const subject = await prisma.subject.findUnique({ where: { id: metadata.subjectId } });
-  if (!subject) throw new Error("Course not found.");
-
-  // Issue certificate — handle race condition with webhook
-  const certificateNo = generateCertificateNo(subject.slug);
-  try {
-    const certificate = await prisma.certificate.create({
-      data: {
-        learnerId: learner.id,
-        subjectId: metadata.subjectId,
-        paystackRef: reference,
-        amountPaid: verification.amount,
-        certificateNo,
-      },
-    });
-
-    // Send certificate email notification
-    sendCertificateEmail(learner.email, learner.name, subject.name, certificateNo, certificate.id).catch(
-      (err) => console.error("Failed to send certificate email:", err)
-    );
-
-    return certificate;
-  } catch (err: unknown) {
-    // Unique constraint violation means the webhook already created it — return the existing one.
-    if (err && typeof err === "object" && "code" in err && (err as { code: string }).code === "P2002") {
-      const existing = await prisma.certificate.findUnique({
-        where: { learnerId_subjectId: { learnerId: learner.id, subjectId: metadata.subjectId } },
+  // Retry in the rare event of a certificate-number collision.
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      const certificate = await prisma.certificate.create({
+        data: {
+          learnerId: learner.id,
+          subjectId,
+          certificateNo: generateCertificateNo(subject.slug),
+          amountPaid: 0,
+        },
       });
-      if (existing) return existing;
+
+      sendCertificateEmail(
+        learner.email,
+        learner.name,
+        subject.name,
+        certificate.certificateNo,
+        certificate.id
+      ).catch((err) => console.error("Failed to send certificate email:", err));
+
+      return { ok: true, id: certificate.id };
+    } catch (err: unknown) {
+      if (isUniqueConstraintError(err)) {
+        // A concurrent request already issued it, or the number collided.
+        const existing = await prisma.certificate.findUnique({
+          where: { learnerId_subjectId: { learnerId: learner.id, subjectId } },
+        });
+        if (existing) return { ok: true, id: existing.id };
+        continue; // certificate-number collision — try another number
+      }
+      throw err;
     }
-    throw err;
   }
+
+  return { ok: false, error: "Could not generate a certificate. Please try again." };
 }
 
-/** Get a learner's certificates. */
-export async function getMyCertificates() {
-  const learner = await requireLearner();
-  return prisma.certificate.findMany({
-    where: { learnerId: learner.id },
-    include: { subject: { select: { name: true, slug: true } } },
-    orderBy: { issuedAt: "desc" },
-  });
+function isUniqueConstraintError(err: unknown): boolean {
+  return (
+    !!err &&
+    typeof err === "object" &&
+    "code" in err &&
+    (err as { code: string }).code === "P2002"
+  );
 }
 
 /** Send a certificate-issued email via Resend (fire-and-forget). */

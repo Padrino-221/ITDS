@@ -124,8 +124,9 @@ export default async function VerifyCertificatePage({
       )}
 
       <p className="mt-8 text-center text-xs leading-relaxed text-ink-soft/80">
-        Certificates are issued only after a learner completes every lesson,
-        passes every course exam, and settles the certification fee.
+        Certificates are issued only after a learner completes every lesson and
+        passes every course exam. The digital certificate is free; printed
+        copies can be requested from the department.
       </p>
     </div>
   );

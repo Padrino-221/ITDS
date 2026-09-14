@@ -2,7 +2,17 @@
 
 import { useRef, useState } from "react";
 import Image from "next/image";
-import { Award, Check, Download, Link2, Loader2 } from "lucide-react";
+import {
+  Award,
+  Check,
+  Clock,
+  Download,
+  Link2,
+  Loader2,
+  Mail,
+  Phone,
+  Printer,
+} from "lucide-react";
 
 type CertificateData = {
   certificateNo: string;
@@ -11,10 +21,18 @@ type CertificateData = {
   subjectName: string;
 };
 
+type CertificateContact = {
+  phone: string;
+  email: string;
+  hours?: string;
+};
+
 export default function CertificateView({
   certificate,
+  contact,
 }: {
   certificate: CertificateData;
+  contact: CertificateContact;
 }) {
   const certRef = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
@@ -405,6 +423,41 @@ export default function CertificateView({
             </>
           )}
         </button>
+      </div>
+
+      {/* Hard-copy request note — soft copy is free, printing is arranged offline */}
+      <div className="no-print mx-auto mt-6 max-w-2xl rounded-2xl border border-gold-200 bg-gold-50 p-5 text-center">
+        <p className="flex items-center justify-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gold-700">
+          <Printer className="h-4 w-4" />
+          Need a printed copy?
+        </p>
+        <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-ink-soft">
+          This digital certificate is free to download. To request a hard copy,
+          call the department — payment for printed copies is arranged directly
+          with the department.
+        </p>
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-ink-soft">
+          <a
+            href={`tel:${contact.phone.replace(/\s/g, "")}`}
+            className="inline-flex items-center gap-2 font-semibold text-forest-900 transition-colors hover:text-gold-700"
+          >
+            <Phone className="h-4 w-4" />
+            {contact.phone}
+          </a>
+          <a
+            href={`mailto:${contact.email}`}
+            className="inline-flex items-center gap-2 font-semibold text-forest-900 transition-colors hover:text-gold-700"
+          >
+            <Mail className="h-4 w-4" />
+            {contact.email}
+          </a>
+          {contact.hours && (
+            <span className="inline-flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              {contact.hours}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Print styles */}

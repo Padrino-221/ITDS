@@ -6,6 +6,7 @@ import { PageHeader, EmptyState } from "@/components/ui";
 import SubjectLessonList from "@/components/learn/SubjectLessonList";
 import CertificateButton from "@/components/learn/CertificateButton";
 import { getSubjectWithTopics, getSubjects } from "@/lib/learn";
+import { getContact } from "@/lib/settings";
 import { learnUrl } from "@/lib/utils";
 
 export const revalidate = 3600;
@@ -37,6 +38,8 @@ export default async function SubjectPage({
   const { subject: slug } = await params;
   const subject = await getSubjectWithTopics(slug);
   if (!subject) notFound();
+
+  const contact = await getContact();
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -99,7 +102,7 @@ export default async function SubjectPage({
           <CertificateButton
             subjectId={subject.id}
             subjectName={subject.name}
-            certificatePrice={subject.certificatePrice}
+            contact={{ phone: contact.phone, email: contact.email, hours: contact.hours }}
           />
         </div>
 
